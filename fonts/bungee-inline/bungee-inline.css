@@ -1,0 +1,8 @@
+/* bungee-inline */
+@font-face {
+	font-family: Bungee Inline;
+	font-style: normal;
+	font-weight: 400;
+	src: local("Bungee Inline"), local("BungeeInline-Regular"), url(bungee-inline.woff2) format("woff2"), url(bungee-inline.woff) format("woff");
+}
+

@@ -1,0 +1,15 @@
+/* poppins-black */
+@font-face {
+	font-family: Poppins Black;
+	font-style: normal;
+	font-weight: 900;
+	src: local("Poppins Black"), local("Poppins-Black"), url(poppins-black.woff2) format("woff2"), url(poppins-black.woff) format("woff");
+}
+/* poppins-regular */
+@font-face {
+	font-family: Poppins;
+	font-style: normal;
+	font-weight: 400;
+	src: local("Poppins Regular"), local("Poppins-Regular"), url(poppins-regular.woff2) format("woff2"), url(poppins-regular.woff) format("woff");
+}
+
