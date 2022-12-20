@@ -299,7 +299,9 @@ p {
 .escudo {
   display: block;
   max-width: 100%;
+  min-width: 150px;
   margin: auto;
+  width: 18.125vw;
 }
 
 .repo-link {
