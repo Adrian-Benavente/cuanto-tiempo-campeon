@@ -274,6 +274,7 @@ textarea {
   flex-direction: column;
   height: 100vh;
   justify-content: center;
+  position: relative;
   text-align: center;
 }
 
@@ -299,4 +300,14 @@ p {
   display: block;
   max-width: 100%;
   margin: auto;
+}
+
+.repo-link {
+  background: url(../img/github-icon.svg) no-repeat center / cover;
+  bottom: 50px;
+  display: block;
+  height: 51px;
+  position: absolute;
+  right: 50px;
+  width: 51px;
 }
