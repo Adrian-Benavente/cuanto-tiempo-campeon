@@ -19,6 +19,6 @@ const fillSlots = () => {
   minutesSlot.innerHTML = `${minutes} minutos`;
 };
 
-window.addEventListener('load', fillSlots);
+document.addEventListener('DOMContentLoaded', fillSlots);
 
 setInterval(fillSlots, 1000);
