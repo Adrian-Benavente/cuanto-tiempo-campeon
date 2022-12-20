@@ -16,7 +16,7 @@ const fillSlots = () => {
   monthsSlot.innerHTML = months > 0 ? (months > 1 ? `${months} meses, ` : `${months} mes, `) : '';
   daysSlot.innerHTML = days > 0 ? (days > 1 ? `${days} días, ` : `${days} día, `) : '';
   hoursSlot.innerHTML = hours > 0 ? (hours > 1 ? `${hours} horas y ` : `${hours} hora y `) : '';
-  minutesSlot.innerHTML = `${minutes} minutos`;
+  minutesSlot.innerHTML = minutes === 1 ? `${minutes} minuto` : `${minutes} minutos`;
 };
 
 document.addEventListener('DOMContentLoaded', fillSlots);

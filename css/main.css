@@ -288,16 +288,12 @@ h1 {
   font-size: 3em;
 }
 
-p {
+.paragraph {
   font-family: Poppins, arial, sans-serif;
-  font-size: 1.25em;
-}
-
-.time {
   font-size: 2em;
 }
 
-.time > span {
+.paragraph > span {
   font-family: Poppins Black, arial, sans-serif;
 }
 
