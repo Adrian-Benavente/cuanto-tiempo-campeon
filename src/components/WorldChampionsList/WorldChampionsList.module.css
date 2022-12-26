@@ -1,0 +1,47 @@
+.countriesList {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  list-style: none;
+  margin: auto;
+  padding: 0;
+  width: max-content;
+}
+
+.countryListItem {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 2em;
+}
+
+.countryFlag {
+  display: inline-block;
+  height: 1.5em;
+  margin-bottom: 0.5em;
+  object-fit: cover;
+  width: 2.5em;
+}
+
+.lastChampionCountry {
+  font-weight: 900;
+}
+
+@media (min-width: 768px) {
+  .countryListItem {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .countryFlag {
+    margin-bottom: 0;
+    margin-right: 1em;
+  }
+
+  .lastChampionCountry {
+  font-size: 1.5em;
+
+  }
+}

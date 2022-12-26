@@ -1,0 +1,28 @@
+@import "./assets/fonts/bungee-inline/bungee-inline.css";
+@import "./assets/fonts/poppins/poppins.css";
+
+body {
+  align-items: center;
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+          45deg,
+          rgba(0,212,255,1) 0%,
+          rgba(255,255,255,1) 35%,
+          rgba(255,255,255,1) 63%,
+          rgba(0,212,255,1) 100%);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  justify-content: center;
+  padding: 1em;
+  position: relative;
+  text-align: center;
+}
+
+.repo-link {
+  background: url(./assets/img/github-icon.svg) no-repeat center / cover;
+  display: block;
+  height: 45px;
+  margin: auto;
+  width: 45px;
+}
