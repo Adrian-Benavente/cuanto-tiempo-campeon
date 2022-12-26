@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { intervalToDuration } from "date-fns";
 import worldChampionDates from "../../api/world-champion-dates";
 import styles from "./WorldChampionsList.module.css";
@@ -6,22 +6,36 @@ import countryFlags from "../../api/flags";
 import upperFirst from "../../utils/upperFirst";
 
 export default function WorldChampionsList() {
-  const timeWorldChampions = Object.entries(worldChampionDates)
-    .sort(([, a], [, b]) => b - a)
-    .map(([country, championDate]) => {
-      const { years, months, days, hours, minutes } = intervalToDuration({
-        start: championDate,
-        end: new Date(),
-      });
+  const [allTimeWorldChampions, setAllTimeWorldChampions] = useState([]);
 
-      return {
-        [country]: { years, months, days, hours, minutes },
-      };
-    });
+  const getWorldChampionDates = useCallback(
+    () =>
+      Object.entries(worldChampionDates)
+        .sort(([, a], [, b]) => b - a)
+        .map(([country, championDate]) => {
+          const { years, months, days, hours, minutes } = intervalToDuration({
+            start: championDate,
+            end: new Date(),
+          });
+
+          return {
+            [country]: { years, months, days, hours, minutes },
+          };
+        }),
+    []
+  );
+
+  useEffect(() => {
+    setAllTimeWorldChampions(getWorldChampionDates());
+    const refresh = setInterval(() =>
+      setAllTimeWorldChampions(getWorldChampionDates())
+    );
+    return () => clearInterval(refresh);
+  }, []);
 
   return (
     <ul className={styles.countriesList}>
-      {timeWorldChampions.map((country, index) =>
+      {allTimeWorldChampions.map((country, index) =>
         Object.entries(country).map(
           ([name, { years, months, days, hours, minutes }]) => (
             <li key={name} className={styles.countryListItem}>
