@@ -74,15 +74,19 @@ export default function WorldChampionsList() {
                   {upperFirst(name)}:{" "}
                   {years > 0
                     ? years > 1
-                      ? `${years} años, `
-                      : `${years} año, `
+                      ? `${years} años`
+                      : `${years} año`
                     : ""}
                   {months > 0
                     ? months > 1
-                      ? `${months} meses y `
-                      : `${months} mes y `
+                      ? `, ${months} meses`
+                      : `, ${months} mes`
                     : ""}
-                  {days > 0 ? (days > 1 ? `${days} días` : `${days} día`) : ""}
+                  {days > 0
+                    ? days > 1
+                      ? ` y ${days} días`
+                      : ` y ${days} día`
+                    : ""}
                 </span>
               )}
             </li>

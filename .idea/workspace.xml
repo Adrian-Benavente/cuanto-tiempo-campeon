@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78faa9cc-ba69-4e94-92a5-04bd8aaf6296" name="Changes" comment="Configure html head">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="78faa9cc-ba69-4e94-92a5-04bd8aaf6296" name="Changes" comment="Restore real time refresh">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/WorldChampionsList/WorldChampionsList.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/WorldChampionsList/WorldChampionsList.jsx" afterDir="false" />
     </list>
@@ -51,23 +50,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/fena/WebstormProjects/cuanto-tiempo-campeon&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/home/fena/WebstormProjects/cuanto-tiempo-campeon/node_modules/prettier&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/home/fena/.local/share/JetBrains/Toolbox/apps/WebStorm/ch-0/223.8214.51/plugins/javascript-impl/jsLanguageServicesImpl/external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/fena/WebstormProjects/cuanto-tiempo-campeon",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "prettierjs.PrettierConfiguration.Package": "/home/fena/WebstormProjects/cuanto-tiempo-campeon/node_modules/prettier",
+    "settings.editor.selected.configurable": "settings.javascript.prettier",
+    "ts.external.directory.path": "/home/fena/.local/share/JetBrains/Toolbox/apps/WebStorm/ch-0/223.8214.51/plugins/javascript-impl/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunAnythingCache">
     <option name="myCommands">
       <command value="yarn add -D prettier" />
@@ -86,7 +85,11 @@
       <workItem from="1672022399899" duration="13444000" />
       <workItem from="1672066860275" duration="406000" />
       <workItem from="1672067892190" duration="266000" />
-      <workItem from="1672068174513" duration="190000" />
+      <workItem from="1672068174513" duration="472000" />
+      <workItem from="1672087371370" duration="144000" />
+      <workItem from="1672105607084" duration="912000" />
+      <workItem from="1672152048988" duration="9000" />
+      <workItem from="1672408699685" duration="106000" />
     </task>
     <task id="LOCAL-00001" summary="Version 2 of the site">
       <created>1672035703229</created>
@@ -109,7 +112,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672036197919</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Restore real time refresh">
+      <created>1672068447430</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1672068447430</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -130,6 +140,7 @@
     <MESSAGE value="Version 2 of the site" />
     <MESSAGE value="Add favico" />
     <MESSAGE value="Configure html head" />
-    <option name="LAST_COMMIT_MESSAGE" value="Configure html head" />
+    <MESSAGE value="Restore real time refresh" />
+    <option name="LAST_COMMIT_MESSAGE" value="Restore real time refresh" />
   </component>
 </project>
