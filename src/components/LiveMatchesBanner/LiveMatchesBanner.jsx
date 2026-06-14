@@ -1,33 +1,10 @@
 import React from "react";
 import { useLocale } from "../../context/LocaleContext";
 import useLiveScoreHighlights from "../../hooks/useLiveScoreHighlights";
-import {
-  getMatchKey,
-  getMatchScores,
-  getTeamName,
-} from "../../utils/liveMatchData";
+import { getMatchKey } from "../../utils/liveMatchData";
 import LiveMatchCard from "./LiveMatchCard";
+import RecentMatchCard from "./RecentMatchCard";
 import styles from "./LiveMatchesBanner.module.css";
-
-function RecentMatchRow({ match, index, t }) {
-  const homeTeam = getTeamName(match.homeTeam ?? match.home);
-  const awayTeam = getTeamName(match.awayTeam ?? match.away);
-  const { homeScore, awayScore } = getMatchScores(match);
-  const hasScore = homeScore != null && awayScore != null;
-  const stage = match.stage ?? match.round;
-  const key = getMatchKey(match, index);
-
-  return (
-    <li key={key}>
-      {stage ? <span className={styles.stage}>{stage}</span> : null}
-      <span className={styles.matchup}>
-        {homeTeam}{" "}
-        {hasScore ? `${homeScore} - ${awayScore}` : t("vs")}{" "}
-        {awayTeam}
-      </span>
-    </li>
-  );
-}
 
 function LiveMatchesBanner({ mode = "recent", year = 2022, matches = [] }) {
   const { t } = useLocale();
@@ -80,14 +57,11 @@ function LiveMatchesBanner({ mode = "recent", year = 2022, matches = [] }) {
     <section className={styles.banner} aria-label={title}>
       <h2 className={styles.title}>{title}</h2>
       {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
-      <ul className={styles.list}>
+      <ul className={styles.recentList}>
         {matches.map((match, index) => (
-          <RecentMatchRow
-            key={getMatchKey(match, index)}
-            match={match}
-            index={index}
-            t={t}
-          />
+          <li key={getMatchKey(match, index)}>
+            <RecentMatchCard match={match} />
+          </li>
         ))}
       </ul>
     </section>

@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocale } from "../../context/LocaleContext";
+import { formatMatchStageFromMatch } from "../../utils/formatMatchStage";
 import {
   formatLastGoalLabel,
   formatLiveMinute,
@@ -16,7 +17,7 @@ export default function LiveMatchCard({ match, highlights = {} }) {
   const homeTeam = getTeamName(match.homeTeam ?? match.home);
   const awayTeam = getTeamName(match.awayTeam ?? match.away);
   const { homeScore, awayScore } = getMatchScores(match);
-  const stage = match.stage ?? match.round;
+  const stage = formatMatchStageFromMatch(match, locale);
   const status = getMatchStatus(match);
   const statusLabel = getMatchStatusLabel(match, locale);
   const liveMinute = formatLiveMinute(match);
