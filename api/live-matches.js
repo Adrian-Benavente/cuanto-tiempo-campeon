@@ -3,6 +3,19 @@ const { getLiveOrRecentMatches } = require("./_lib/fetch-live-matches");
 const LIVE_CACHE_CONTROL = "public, s-maxage=60, stale-while-revalidate=300";
 const RECENT_CACHE_CONTROL =
   "public, s-maxage=86400, stale-while-revalidate=604800";
+const IDLE_CACHE_CONTROL = "public, s-maxage=60, stale-while-revalidate=300";
+
+function getCacheControl(mode) {
+  if (mode === "live") {
+    return LIVE_CACHE_CONTROL;
+  }
+
+  if (mode === "recent") {
+    return RECENT_CACHE_CONTROL;
+  }
+
+  return IDLE_CACHE_CONTROL;
+}
 
 module.exports = async function handler(req, res) {
   if (req.method !== "GET") {
@@ -12,10 +25,8 @@ module.exports = async function handler(req, res) {
 
   try {
     const payload = await getLiveOrRecentMatches(process.env.ZAFRONIX_API_KEY);
-    const cacheControl =
-      payload.mode === "live" ? LIVE_CACHE_CONTROL : RECENT_CACHE_CONTROL;
 
-    res.setHeader("Cache-Control", cacheControl);
+    res.setHeader("Cache-Control", getCacheControl(payload.mode));
     res.setHeader("Content-Type", "application/json");
     return res.status(200).json(payload);
   } catch (error) {

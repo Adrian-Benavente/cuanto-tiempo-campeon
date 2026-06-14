@@ -1,6 +1,7 @@
 const { zafronixFetch } = require("./zafronix-client");
 const {
-  getFallbackRecentMatches,
+  getCurrentWorldCupYear,
+  getEmptyLivePayload,
   getRecentTournamentYears,
   selectRecentMatches,
 } = require("./recent-matches");
@@ -17,36 +18,37 @@ async function fetchRecentMatchesForYear(year, apiKey) {
 }
 
 async function getRecentMatches(apiKey) {
-  if (!apiKey) {
-    return getFallbackRecentMatches(2022);
+  const currentWorldCupYear = getCurrentWorldCupYear();
+
+  if (!apiKey || !currentWorldCupYear) {
+    return getEmptyLivePayload(new Date(), apiKey ? "zafronix" : "fallback");
   }
 
   try {
-    const candidateYears = getRecentTournamentYears();
+    const { year, matches } = await fetchRecentMatchesForYear(
+      currentWorldCupYear,
+      apiKey
+    );
 
-    for (const year of candidateYears) {
-      const { matches } = await fetchRecentMatchesForYear(year, apiKey);
-
-      if (matches.length > 0) {
-        return {
-          mode: "recent",
-          year,
-          matches,
-          source: "zafronix",
-        };
-      }
+    if (matches.length > 0) {
+      return {
+        mode: "recent",
+        year,
+        matches,
+        source: "zafronix",
+      };
     }
 
-    return getFallbackRecentMatches(2022);
+    return getEmptyLivePayload();
   } catch (error) {
     console.error("Failed to fetch recent matches:", error);
-    return getFallbackRecentMatches(2022);
+    return getEmptyLivePayload();
   }
 }
 
 async function getLiveOrRecentMatches(apiKey) {
   if (!apiKey) {
-    return getRecentMatches(apiKey);
+    return getEmptyLivePayload(new Date(), "fallback");
   }
 
   try {

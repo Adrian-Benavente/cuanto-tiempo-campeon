@@ -89,18 +89,9 @@ beforeEach(() => {
       return Promise.resolve({
         ok: true,
         json: async () => ({
-          mode: "recent",
-          year: 2022,
-          matches: [
-            {
-              id: "wc2022-final",
-              stage: "Final",
-              homeTeam: "Argentina",
-              awayTeam: "Francia",
-              homeScore: 3,
-              awayScore: 3,
-            },
-          ],
+          mode: "idle",
+          year: 2026,
+          matches: [],
           source: "fallback",
         }),
       });

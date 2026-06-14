@@ -75,20 +75,29 @@ function getFallbackRecentMatches(year = 2022) {
   };
 }
 
-function getRecentTournamentYears() {
-  const currentYear = new Date().getUTCFullYear();
-  const years = [];
+function getCurrentWorldCupYear(now = new Date()) {
+  const currentYear = now.getUTCFullYear();
+  return currentYear >= 2026 ? 2026 : null;
+}
 
-  if (currentYear >= 2026) {
-    years.push(2026);
-  }
+function getEmptyLivePayload(now = new Date(), source = "zafronix") {
+  return {
+    mode: "idle",
+    year: getCurrentWorldCupYear(now) ?? now.getUTCFullYear(),
+    matches: [],
+    source,
+  };
+}
 
-  years.push(2022);
-  return [...new Set(years)];
+function getRecentTournamentYears(now = new Date()) {
+  const currentWorldCupYear = getCurrentWorldCupYear(now);
+  return currentWorldCupYear ? [currentWorldCupYear] : [];
 }
 
 module.exports = {
   FALLBACK_RECENT_2022,
+  getCurrentWorldCupYear,
+  getEmptyLivePayload,
   getFallbackRecentMatches,
   getMatchDate,
   getRecentTournamentYears,

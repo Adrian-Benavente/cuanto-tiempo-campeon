@@ -1,6 +1,9 @@
 const {
   FALLBACK_RECENT_2022,
+  getCurrentWorldCupYear,
+  getEmptyLivePayload,
   getFallbackRecentMatches,
+  getRecentTournamentYears,
   selectRecentMatches,
 } = require("../../api/_lib/recent-matches");
 
@@ -67,5 +70,28 @@ describe("getFallbackRecentMatches", () => {
     });
     expect(payload.matches).toHaveLength(5);
     expect(payload.matches[0].stage).toBe("Final");
+  });
+});
+
+describe("current tournament helpers", () => {
+  it("returns 2026 as current world cup year from 2026 onward", () => {
+    expect(getCurrentWorldCupYear(new Date("2026-06-14T12:00:00.000Z"))).toBe(2026);
+    expect(getCurrentWorldCupYear(new Date("2025-12-01T12:00:00.000Z"))).toBeNull();
+  });
+
+  it("only considers the current tournament year for recent fallback", () => {
+    expect(getRecentTournamentYears(new Date("2026-06-14T12:00:00.000Z"))).toEqual([
+      2026,
+    ]);
+    expect(getRecentTournamentYears(new Date("2024-06-14T12:00:00.000Z"))).toEqual([]);
+  });
+
+  it("returns an idle payload when there is nothing to show", () => {
+    expect(getEmptyLivePayload(new Date("2024-06-14T12:00:00.000Z"), "fallback")).toEqual({
+      mode: "idle",
+      year: 2024,
+      matches: [],
+      source: "fallback",
+    });
   });
 });

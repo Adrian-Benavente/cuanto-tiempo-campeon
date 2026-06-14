@@ -25,7 +25,7 @@ export default function useSiteExtras(lastChampionDate) {
   const [tournaments, setTournaments] = useState([]);
   const [worldCup2026, setWorldCup2026] = useState(null);
   const [liveMatches, setLiveMatches] = useState({
-    mode: "recent",
+    mode: "idle",
     year: 2022,
     matches: [],
     source: "fallback",
@@ -71,7 +71,7 @@ export default function useSiteExtras(lastChampionDate) {
         const payload = await fetchJson("/api/live-matches");
         if (!cancelled) {
           setLiveMatches({
-            mode: payload?.mode ?? "recent",
+            mode: payload?.mode ?? "idle",
             year: payload?.year ?? 2022,
             matches: payload?.matches ?? [],
             source: payload?.source ?? "fallback",
