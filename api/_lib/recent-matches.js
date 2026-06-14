@@ -87,6 +87,8 @@ function hasScore(match) {
   return false;
 }
 
+const MATCH_MAX_DURATION_MS = 165 * 60 * 1000;
+
 function isInProgressMatch(match, now = new Date()) {
   const status = (match?.status ?? "").toLowerCase();
 
@@ -111,6 +113,10 @@ function isInProgressMatch(match, now = new Date()) {
   const kickoffTime = new Date(kickoffRaw).getTime();
 
   if (Number.isNaN(kickoffTime) || kickoffTime > now.getTime()) {
+    return false;
+  }
+
+  if (now.getTime() - kickoffTime > MATCH_MAX_DURATION_MS) {
     return false;
   }
 

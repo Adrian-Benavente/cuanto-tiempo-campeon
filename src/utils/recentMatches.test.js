@@ -187,6 +187,22 @@ describe("isInProgressMatch", () => {
       )
     ).toBe(false);
   });
+
+  it("stops treating scheduled matches as in progress after the max duration", () => {
+    const lateNow = new Date("2026-06-14T20:00:00.000Z");
+
+    expect(
+      isInProgressMatch(
+        {
+          id: "2026-010",
+          status: "scheduled",
+          result: null,
+          kickoffUtc: "2026-06-14T17:00:00.000Z",
+        },
+        lateNow
+      )
+    ).toBe(false);
+  });
 });
 
 describe("getFallbackRecentMatches", () => {

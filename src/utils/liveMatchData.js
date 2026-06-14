@@ -23,6 +23,8 @@ function getKickoffTime(match) {
   return Number.isNaN(kickoffTime) ? null : kickoffTime;
 }
 
+const MATCH_MAX_DURATION_MS = 165 * 60 * 1000;
+
 export function isMatchInProgress(match, now = new Date()) {
   const status = (match?.status ?? "").toLowerCase();
 
@@ -41,6 +43,10 @@ export function isMatchInProgress(match, now = new Date()) {
   const kickoffTime = getKickoffTime(match);
 
   if (kickoffTime == null || kickoffTime > now.getTime()) {
+    return false;
+  }
+
+  if (now.getTime() - kickoffTime > MATCH_MAX_DURATION_MS) {
     return false;
   }
 

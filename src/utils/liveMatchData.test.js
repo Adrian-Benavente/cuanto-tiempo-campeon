@@ -40,4 +40,19 @@ describe("liveMatchData", () => {
       })
     ).toEqual({ homeScore: 2, awayScore: 1 });
   });
+
+  test("stops treating scheduled matches as in progress after the max duration", () => {
+    const lateNow = new Date("2026-06-14T20:00:00.000Z");
+
+    expect(
+      isMatchInProgress(
+        {
+          status: "scheduled",
+          result: null,
+          kickoffUtc: "2026-06-14T17:00:00.000Z",
+        },
+        lateNow
+      )
+    ).toBe(false);
+  });
 });
