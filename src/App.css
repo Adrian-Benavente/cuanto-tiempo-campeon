@@ -39,10 +39,10 @@ body::before {
 .glassCard {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  background: var(--color-surface-strong);
-  border: 1px solid var(--color-border);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-glass);
+  box-shadow: var(--shadow-elevated);
 }
 
 .fallbackNotice {

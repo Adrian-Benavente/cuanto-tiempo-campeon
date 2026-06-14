@@ -2,10 +2,12 @@
   --color-text: #0f172a;
   --color-text-muted: #475569;
   --color-text-subtle: #64748b;
-  --color-surface: rgba(255, 255, 255, 0.45);
-  --color-surface-strong: rgba(255, 255, 255, 0.65);
-  --color-surface-hover: rgba(255, 255, 255, 0.75);
-  --color-border: rgba(255, 255, 255, 0.55);
+  --color-surface: rgba(255, 255, 255, 0.78);
+  --color-surface-strong: rgba(255, 255, 255, 0.9);
+  --color-surface-card: #ffffff;
+  --color-surface-hover: #ffffff;
+  --color-border: rgba(15, 23, 42, 0.1);
+  --color-border-strong: rgba(15, 23, 42, 0.18);
   --color-accent: #1e40af;
   --color-live: #dc2626;
   --color-live-bg: rgba(220, 38, 38, 0.1);
@@ -22,8 +24,9 @@
   --radius-lg: 1.25rem;
   --radius-xl: 1.5rem;
 
-  --shadow-glass: 0 8px 32px rgba(15, 23, 42, 0.08);
-  --shadow-glass-hover: 0 12px 40px rgba(15, 23, 42, 0.12);
+  --shadow-glass: 0 4px 20px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-glass-hover: 0 8px 32px rgba(15, 23, 42, 0.12);
+  --shadow-elevated: 0 6px 28px rgba(15, 23, 42, 0.12);
 
   --space-xs: 0.5rem;
   --space-sm: 0.75rem;
