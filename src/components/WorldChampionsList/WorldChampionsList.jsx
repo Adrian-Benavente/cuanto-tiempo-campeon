@@ -5,14 +5,10 @@ import { useSelectedCountry } from "../../context/SelectedCountryContext";
 import { useWorldChampionsContext } from "../../context/WorldChampionsContext";
 import useLiveNow from "../../hooks/useLiveNow";
 import { getDroughtRatio, getMaxDroughtMs } from "../../utils/droughtRatio";
+import { getTitlesForSlug } from "../../utils/championTitles";
 import { formatDuration } from "../../utils/formatDuration";
 import CountryFlag from "../CountryFlag/CountryFlag";
 import styles from "./WorldChampionsList.module.css";
-
-function getTitlesForSlug(slug, aggregates) {
-  const entry = aggregates.find((item) => item.slug === slug);
-  return entry?.titles ?? 1;
-}
 
 export default function WorldChampionsList({ aggregates = [] }) {
   const { locale, t } = useLocale();

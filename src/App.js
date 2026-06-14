@@ -3,7 +3,7 @@ import ChampionBackground from "./components/ChampionBackground/ChampionBackgrou
 import ChampionFacts from "./components/ChampionFacts/ChampionFacts";
 import CountryPicker from "./components/CountryPicker/CountryPicker";
 import DroughtMilestones from "./components/DroughtMilestones/DroughtMilestones";
-import DroughtRace from "./components/DroughtRace/DroughtRace";
+import WorldCup2026Spotlight from "./components/WorldCup2026Spotlight/WorldCup2026Spotlight";
 import EmbedView from "./components/EmbedView/EmbedView";
 import Footer from "./components/Footer/Footer";
 import HeroChampion from "./components/HeroChampion/HeroChampion";
@@ -75,7 +75,10 @@ function MainExperience() {
       <main className="mainPanel">
         <WorldChampionsList aggregates={aggregates} />
         <WorldCupTimeline tournaments={tournaments} />
-        <DroughtRace />
+        <WorldCup2026Spotlight
+          aggregates={aggregates}
+          tournaments={tournaments}
+        />
       </main>
     </>
   );

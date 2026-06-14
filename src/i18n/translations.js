@@ -28,8 +28,20 @@ export const translations = {
     worldCupLive: "Partidos en vivo",
     recentResults: "Últimos resultados",
     recentResultsSubtitle: "Mundial {year}",
-    droughtRace: "Campeones en sequía",
-    droughtRaceSubtitle: "Estos campeones buscan sumar una estrella en 2026",
+    spotlightTitle: "Mundial 2026 en números",
+    spotlightSubtitle: "Datos curados sobre quién busca la próxima estrella",
+    spotlightLabelLongest: "Sequía más larga",
+    spotlightLabelStars: "Más estrellas en juego",
+    spotlightLabelClosest: "Más cerca de repetir",
+    spotlightLabelHistoric: "Récord histórico",
+    spotlightLongestActive:
+      "{country} lleva {duration} sin ganar — la sequía activa más larga entre campeones.",
+    spotlightMostTitles:
+      "{country} suma {titles} estrellas y aún busca sumar otra en 2026.",
+    spotlightClosestChallenger:
+      "{country} fue el último campeón antes del actual — el ex-campeón más reciente.",
+    spotlightLongestEnded:
+      "{country} esperó {years} años entre {fromYear} y {toYear}, la sequía más larga que terminó en la historia.",
     milestoneApproaching: "Faltan {days} días para que {country} cumpla {milestone} días sin título",
     milestoneReached: "{country} cumplió {milestone} días sin ganar el Mundial",
     addToHome: "Agregar a inicio",
@@ -71,8 +83,20 @@ export const translations = {
     worldCupLive: "Live matches",
     recentResults: "Recent results",
     recentResultsSubtitle: "World Cup {year}",
-    droughtRace: "Champions in drought",
-    droughtRaceSubtitle: "These winners are chasing another star in 2026",
+    spotlightTitle: "World Cup 2026 by the numbers",
+    spotlightSubtitle: "Curated insights on who is chasing the next star",
+    spotlightLabelLongest: "Longest drought",
+    spotlightLabelStars: "Most stars at stake",
+    spotlightLabelClosest: "Closest to repeat",
+    spotlightLabelHistoric: "Historic record",
+    spotlightLongestActive:
+      "{country} has gone {duration} without winning — the longest active drought among champions.",
+    spotlightMostTitles:
+      "{country} has {titles} titles and is still chasing another in 2026.",
+    spotlightClosestChallenger:
+      "{country} was the last champion before the current one — the most recent former winner.",
+    spotlightLongestEnded:
+      "{country} waited {years} years between {fromYear} and {toYear}, the longest drought that ended in history.",
     milestoneApproaching: "{days} days until {country} reaches {milestone} days without a title",
     milestoneReached: "{country} reached {milestone} days without winning the World Cup",
     addToHome: "Add to home screen",

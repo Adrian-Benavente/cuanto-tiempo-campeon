@@ -47,7 +47,13 @@ beforeEach(() => {
         json: async () => ({
           aggregates: [
             { slug: "argentina", displayName: "Argentina", countryCode: "AR", titles: 3 },
+            { slug: "brasil", displayName: "Brasil", countryCode: "BR", titles: 5 },
+            { slug: "alemania", displayName: "Alemania", countryCode: "DE", titles: 4 },
+            { slug: "italia", displayName: "Italia", countryCode: "IT", titles: 4 },
             { slug: "francia", displayName: "Francia", countryCode: "FR", titles: 2 },
+            { slug: "uruguay", displayName: "Uruguay", countryCode: "UY", titles: 2 },
+            { slug: "inglaterra", displayName: "Inglaterra", countryCode: "GB", titles: 1 },
+            { slug: "españa", displayName: "España", countryCode: "ES", titles: 1 },
           ],
           source: "fallback",
         }),
