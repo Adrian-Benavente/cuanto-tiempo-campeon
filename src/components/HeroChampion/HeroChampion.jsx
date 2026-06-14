@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { intervalToDuration } from "date-fns";
+import { useLocale } from "../../context/LocaleContext";
 import { useWorldChampionsContext } from "../../context/WorldChampionsContext";
 import useLiveNow from "../../hooks/useLiveNow";
 import {
@@ -9,16 +10,20 @@ import {
 import CountryFlag from "../CountryFlag/CountryFlag";
 import styles from "./HeroChampion.module.css";
 
-const COUNTDOWN_UNITS = [
-  { key: "days", label: "Días" },
-  { key: "hours", label: "Horas" },
-  { key: "minutes", label: "Minutos" },
-  { key: "seconds", label: "Segundos" },
-];
-
 export default function HeroChampion() {
+  const { t } = useLocale();
   const { lastChampion } = useWorldChampionsContext();
   const now = useLiveNow();
+
+  const countdownUnits = useMemo(
+    () => [
+      { key: "days", label: t("days") },
+      { key: "hours", label: t("hours") },
+      { key: "minutes", label: t("minutes") },
+      { key: "seconds", label: t("seconds") },
+    ],
+    [t]
+  );
 
   const countdown = useMemo(() => {
     if (!lastChampion) {
@@ -43,7 +48,7 @@ export default function HeroChampion() {
   return (
     <section className={styles.hero} aria-labelledby="hero-title">
       <div className={styles.flagWrapper}>
-        <span className={styles.badge}>Campeón actual</span>
+        <span className={styles.badge}>{t("currentChampionBadge")}</span>
         <CountryFlag
           champion={lastChampion}
           imageClassName={styles.championFlag}
@@ -53,19 +58,17 @@ export default function HeroChampion() {
 
       <div className={styles.content}>
         <h1 className={styles.title} id="hero-title">
-          {lastChampion.displayName} es el último campeón mundial
+          {t("currentChampionTitle", { country: lastChampion.displayName })}
         </h1>
-        <p className={styles.subtitle}>
-          ¿Cuándo fue la última vez que saliste campeón del mundo?
-        </p>
+        <p className={styles.subtitle}>{t("subtitle")}</p>
 
         <div
           className={styles.countdown}
           role="timer"
           aria-live="polite"
-          aria-label={`Tiempo desde el título: ${sinceText.years ?? 0} años, ${sinceText.months ?? 0} meses, ${sinceText.days ?? 0} días`}
+          aria-label={`${sinceText.years ?? 0} ${sinceText.months ?? 0} ${sinceText.days ?? 0}`}
         >
-          {COUNTDOWN_UNITS.map(({ key, label }) => (
+          {countdownUnits.map(({ key, label }) => (
             <div className={styles.countdownUnit} key={key}>
               <span className={styles.countdownValue}>
                 {padCountdownValue(countdown[key])}

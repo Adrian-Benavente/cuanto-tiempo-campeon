@@ -1,0 +1,58 @@
+.panel {
+  margin-top: var(--space-lg);
+}
+
+.title {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin: 0 0 var(--space-md);
+  text-transform: uppercase;
+}
+
+.scroller {
+  margin: 0 calc(var(--space-md) * -1);
+  overflow-x: auto;
+  padding: 0 var(--space-md) var(--space-sm);
+}
+
+.timeline {
+  display: flex;
+  gap: var(--space-sm);
+  list-style: none;
+  margin: 0;
+  min-width: max-content;
+  padding: 0;
+}
+
+.item {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 5.5rem;
+  padding: var(--space-sm);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.item:hover {
+  transform: translateY(-2px);
+}
+
+.year {
+  color: var(--color-accent);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.champion {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+}

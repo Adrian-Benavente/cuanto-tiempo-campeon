@@ -1,10 +1,42 @@
+.header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
 .sectionTitle {
   color: var(--color-text-muted);
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.08em;
-  margin: 0 0 var(--space-lg);
+  margin: 0;
   text-transform: uppercase;
+}
+
+.sortToggle {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.sortButton,
+.sortActive {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+}
+
+.sortActive {
+  background: var(--color-badge);
+  color: var(--color-accent);
 }
 
 .rankingList {
@@ -28,9 +60,13 @@
   display: grid;
   gap: var(--space-sm);
   grid-template-columns: auto auto 1fr;
-  grid-template-rows: auto auto;
   padding: var(--space-md);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.highlighted {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent), var(--shadow-glass);
 }
 
 .rankingItem:hover {
@@ -44,14 +80,12 @@
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
-  grid-row: span 2;
 }
 
 .countryFlag {
   border-radius: var(--radius-sm);
   display: block;
   font-size: 1.5rem;
-  grid-row: span 2;
   height: 1.5rem;
   line-height: 1.5rem;
   overflow: hidden;
@@ -61,8 +95,14 @@
 .countryFlagFallback {
   display: block;
   font-size: 1.5rem;
-  grid-row: span 2;
   line-height: 1;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
 }
 
 .countryName {
@@ -71,15 +111,43 @@
   text-align: left;
 }
 
+.droughtBar {
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  height: 0.35rem;
+  overflow: hidden;
+  width: 100%;
+}
+
+.droughtFill {
+  background: var(--color-accent);
+  border-radius: 999px;
+  display: block;
+  height: 100%;
+  min-width: 0.25rem;
+  transition: width 0.4s ease;
+}
+
+.badges {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  grid-column: 1 / -1;
+}
+
+.starsBadge {
+  color: #ca8a04;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
 .durationBadge {
   background: var(--color-badge);
   border-radius: 999px;
   color: var(--color-accent);
   font-size: 0.8125rem;
   font-weight: 600;
-  justify-self: start;
   padding: 0.25rem 0.75rem;
-  text-align: left;
   width: fit-content;
 }
 
@@ -99,22 +167,16 @@
   .rankingItem {
     gap: var(--space-md);
     grid-template-columns: 3rem 2.5rem 1fr auto;
-    grid-template-rows: auto;
     padding: var(--space-md) var(--space-lg);
   }
 
-  .rank,
-  .countryFlag,
-  .countryFlagFallback {
-    grid-row: auto;
+  .badges {
+    align-items: flex-end;
+    grid-column: auto;
   }
 
   .countryName {
     font-size: 1.0625rem;
-  }
-
-  .durationBadge {
-    justify-self: end;
   }
 }
 
@@ -125,5 +187,9 @@
 
   .rankingItem:hover {
     transform: none;
+  }
+
+  .droughtFill {
+    transition: none;
   }
 }

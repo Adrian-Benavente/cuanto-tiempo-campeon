@@ -24,6 +24,22 @@ No commitees la API key al repositorio.
 - `yarn start`: levanta solo el frontend. Si `/api/world-champions` no está disponible, verás el fallback local.
 - `npx vercel dev`: levanta frontend + API Route serverless para probar el flujo completo.
 
+### Embeber en otro sitio
+
+Vista compacta:
+
+```html
+<iframe
+  src="https://tu-dominio.vercel.app/?embed=1&pais=argentina"
+  width="420"
+  height="280"
+  title="¿Cuánto tiempo campeón?"
+  loading="lazy"
+></iframe>
+```
+
+oEmbed disponible en `/api/oembed`.
+
 ### Deploy en Vercel
 
 1. Conectá el repositorio a Vercel.

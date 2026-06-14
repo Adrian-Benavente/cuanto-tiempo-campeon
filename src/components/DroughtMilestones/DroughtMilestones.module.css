@@ -1,0 +1,14 @@
+.banner {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 999px;
+  color: #047857;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin: 0 auto;
+  padding: var(--space-xs) var(--space-md);
+  text-align: center;
+  width: fit-content;
+}

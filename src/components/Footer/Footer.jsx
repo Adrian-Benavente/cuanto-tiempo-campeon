@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocale } from "../../context/LocaleContext";
 import styles from "./Footer.module.css";
 
 const GITHUB_URL =
@@ -18,10 +19,29 @@ function GithubIcon() {
 }
 
 export default function Footer() {
+  const { locale, setLocale, t } = useLocale();
+
   return (
     <footer className={styles.footer}>
+      <div className={styles.localeToggle}>
+        <span className={styles.localeLabel}>{t("language")}</span>
+        <button
+          className={locale === "es" ? styles.localeActive : styles.localeButton}
+          onClick={() => setLocale("es")}
+          type="button"
+        >
+          ES
+        </button>
+        <button
+          className={locale === "en" ? styles.localeActive : styles.localeButton}
+          onClick={() => setLocale("en")}
+          type="button"
+        >
+          EN
+        </button>
+      </div>
       <p className={styles.credit}>
-        Datos de{" "}
+        {t("footerData")}{" "}
         <a
           href="https://api.zafronix.com/docs"
           rel="noreferrer"
@@ -30,7 +50,7 @@ export default function Footer() {
           Zafronix World Cup API
         </a>
       </p>
-      <p className={styles.credit}>Hecho por Adrián Benavente</p>
+      <p className={styles.credit}>{t("footerAuthor")}</p>
       <a
         className={styles.githubLink}
         href={GITHUB_URL}
@@ -38,7 +58,7 @@ export default function Footer() {
         target="_blank"
       >
         <GithubIcon />
-        Ver repositorio en GitHub
+        {t("footerGithub")}
       </a>
     </footer>
   );

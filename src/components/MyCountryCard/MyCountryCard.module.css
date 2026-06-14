@@ -1,0 +1,45 @@
+.card {
+  align-items: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  text-align: center;
+}
+
+.flag {
+  border-radius: var(--radius-sm);
+  display: block;
+  font-size: 2rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  overflow: hidden;
+  width: 2.25rem;
+}
+
+.flagFallback {
+  display: block;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.message {
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .card {
+    flex-direction: row;
+    text-align: left;
+  }
+}

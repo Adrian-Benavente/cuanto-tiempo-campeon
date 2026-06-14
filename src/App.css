@@ -60,6 +60,27 @@ body::before {
   width: fit-content;
 }
 
+.toolbar {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: 1fr;
+}
+
+.toolbar button {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .toolbar {
+    align-items: stretch;
+    grid-template-columns: 1fr auto;
+  }
+
+  .toolbar button {
+    width: auto;
+  }
+}
+
 .sr-only {
   border: 0;
   clip: rect(0, 0, 0, 0);
