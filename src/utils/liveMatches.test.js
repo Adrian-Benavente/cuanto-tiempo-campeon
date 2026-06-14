@@ -102,7 +102,9 @@ describe("getLiveOrRecentMatches", () => {
       source: "zafronix",
     });
     expect(fetchMatchesForYear).not.toHaveBeenCalled();
-    expect(fetchMatchesByIds).toHaveBeenCalledWith(["live-1"], "test-key");
+    expect(fetchMatchesByIds).toHaveBeenCalledWith(["live-1"], "test-key", {
+      cacheTtlMs: LIVE_MATCHES_CACHE_TTL_MS,
+    });
   });
 
   it("falls back to year fixture when the live endpoint returns 402", async () => {
@@ -118,7 +120,9 @@ describe("getLiveOrRecentMatches", () => {
     expect(fetchMatchesForYear).toHaveBeenCalledWith(2026, "test-key", {
       cacheTtlMs: LIVE_MATCHES_CACHE_TTL_MS,
     });
-    expect(fetchMatchesByIds).toHaveBeenCalledWith(["2026-010"], "test-key");
+    expect(fetchMatchesByIds).toHaveBeenCalledWith(["2026-010"], "test-key", {
+      cacheTtlMs: LIVE_MATCHES_CACHE_TTL_MS,
+    });
     expect(payload).toEqual({
       mode: "live",
       year: 2026,
@@ -151,5 +155,9 @@ describe("getLiveOrRecentMatches", () => {
       source: "zafronix",
     });
     expect(fetchMatchesByIds).not.toHaveBeenCalled();
+  });
+
+  it("uses a 15 second cache ttl for live detection", () => {
+    expect(LIVE_MATCHES_CACHE_TTL_MS).toBe(15000);
   });
 });

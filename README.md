@@ -37,7 +37,7 @@ La app no llama a Zafronix desde el navegador. Usa **API Routes** en Vercel como
 | `/api/og` | Imagen Open Graph |
 | `/api/oembed` | oEmbed para embeber |
 
-En planes **Hobby**, el endpoint dedicado `/matches/live` de Zafronix requiere **Pro+**; la app detecta partidos en curso desde el fixture anual (`/matches?year=2026`) cuando el kickoff ya pasó y el partido no está finalizado. Los marcadores se aproximan refrescando cada partido vía `GET /matches/{id}` (cache ~60s) y derivando el resultado desde `goals[]` cuando los scores numéricos vienen en `null`. Minuto a minuto y eventos en tiempo real solo están disponibles con Pro+.
+En planes **Hobby**, el endpoint dedicado `/matches/live` de Zafronix requiere **Pro+**; la app detecta partidos en curso desde el fixture anual (`/matches?year=2026`) cuando el kickoff ya pasó y el partido no está finalizado. Los marcadores se aproximan refrescando cada partido vía `GET /matches/{id}` (cache ~15s, alineada con el poll del cliente) y derivando el resultado desde `goals[]` cuando los scores numéricos vienen en `null`. Minuto a minuto y eventos en tiempo real solo están disponibles con Pro+.
 
 ### Variables de entorno
 

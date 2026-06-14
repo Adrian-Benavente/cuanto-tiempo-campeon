@@ -1,6 +1,6 @@
 const { getLiveOrRecentMatches } = require("./_lib/fetch-live-matches");
 
-const LIVE_CACHE_CONTROL = "public, s-maxage=60, stale-while-revalidate=300";
+const LIVE_CACHE_CONTROL = "public, s-maxage=15, stale-while-revalidate=60";
 const RECENT_CACHE_CONTROL =
   "public, s-maxage=86400, stale-while-revalidate=604800";
 const IDLE_CACHE_CONTROL =
@@ -18,7 +18,7 @@ function getCacheControl(mode) {
   return IDLE_CACHE_CONTROL;
 }
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
     return res.status(405).json({ error: "Method not allowed" });
@@ -34,4 +34,9 @@ module.exports = async function handler(req, res) {
     console.error("Unhandled error in /api/live-matches:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
-};
+}
+
+handler.getCacheControl = getCacheControl;
+handler.LIVE_CACHE_CONTROL = LIVE_CACHE_CONTROL;
+
+module.exports = handler;

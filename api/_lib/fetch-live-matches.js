@@ -13,7 +13,7 @@ const {
 const { extractMatches } = require("./zafronix-normalize");
 const { zafronixFetch } = require("./zafronix-client");
 
-const LIVE_MATCHES_CACHE_TTL_MS = 60 * 1000;
+const LIVE_MATCHES_CACHE_TTL_MS = 15 * 1000;
 
 function isZafronixProOnlyError(error) {
   const message = String(error?.message ?? "");
@@ -62,7 +62,9 @@ async function getRecentMatches(apiKey, now = new Date()) {
 async function enrichLiveMatches(matches, apiKey, now = new Date()) {
   const matchIds = matches.map((match) => match.id).filter(Boolean);
   const refreshedMatches = matchIds.length
-    ? await fetchMatchesByIds(matchIds, apiKey)
+    ? await fetchMatchesByIds(matchIds, apiKey, {
+        cacheTtlMs: LIVE_MATCHES_CACHE_TTL_MS,
+      })
     : [];
 
   const refreshedById = new Map(

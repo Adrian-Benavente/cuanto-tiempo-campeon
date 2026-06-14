@@ -1,6 +1,6 @@
 const { zafronixFetch } = require("./zafronix-client");
 
-const MATCH_BY_ID_CACHE_TTL_MS = 60 * 1000;
+const DEFAULT_MATCH_BY_ID_CACHE_TTL_MS = 60 * 1000;
 const matchByIdCache = new Map();
 
 function extractMatch(payload) {
@@ -15,16 +15,20 @@ function extractMatch(payload) {
   return payload?.data ?? payload?.match ?? null;
 }
 
-async function fetchMatchById(matchId, apiKey) {
+async function fetchMatchById(
+  matchId,
+  apiKey,
+  { cacheTtlMs = DEFAULT_MATCH_BY_ID_CACHE_TTL_MS } = {}
+) {
   if (!matchId || !apiKey) {
     return null;
   }
 
-  const cacheKey = String(matchId);
+  const cacheKey = `${matchId}:${cacheTtlMs}`;
   const cached = matchByIdCache.get(cacheKey);
   const now = Date.now();
 
-  if (cached && now - cached.fetchedAt < MATCH_BY_ID_CACHE_TTL_MS) {
+  if (cached && now - cached.fetchedAt < cacheTtlMs) {
     return cached.match;
   }
 
@@ -41,7 +45,11 @@ async function fetchMatchById(matchId, apiKey) {
   return match;
 }
 
-async function fetchMatchesByIds(matchIds, apiKey) {
+async function fetchMatchesByIds(
+  matchIds,
+  apiKey,
+  { cacheTtlMs = DEFAULT_MATCH_BY_ID_CACHE_TTL_MS } = {}
+) {
   const ids = Array.isArray(matchIds) ? matchIds.filter(Boolean) : [];
 
   if (ids.length === 0) {
@@ -51,7 +59,7 @@ async function fetchMatchesByIds(matchIds, apiKey) {
   const matches = await Promise.all(
     ids.map(async (matchId) => {
       try {
-        return await fetchMatchById(matchId, apiKey);
+        return await fetchMatchById(matchId, apiKey, { cacheTtlMs });
       } catch (error) {
         console.error(`Failed to fetch match ${matchId}:`, error);
         return null;
@@ -68,8 +76,8 @@ function clearMatchByIdCache() {
 
 module.exports = {
   clearMatchByIdCache,
+  DEFAULT_MATCH_BY_ID_CACHE_TTL_MS,
   extractMatch,
   fetchMatchById,
   fetchMatchesByIds,
-  MATCH_BY_ID_CACHE_TTL_MS,
 };

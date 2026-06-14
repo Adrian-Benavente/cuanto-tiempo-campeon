@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 
-const LIVE_POLL_MS = 15000;
-const IDLE_POLL_MS = 300000;
+export const LIVE_POLL_MS = 15000;
+export const IDLE_POLL_MS = 300000;
+
+export function getLivePollInterval(mode, liveModeKnown) {
+  if (!liveModeKnown || mode === "live") {
+    return LIVE_POLL_MS;
+  }
+
+  return IDLE_POLL_MS;
+}
 
 async function fetchJson(url) {
   const response = await fetch(url);
@@ -30,6 +38,7 @@ export default function useSiteExtras(lastChampionDate) {
     matches: [],
     source: "fallback",
   });
+  const [liveModeKnown, setLiveModeKnown] = useState(false);
   const [fixture, setFixture] = useState({
     year: null,
     matches: [],
@@ -92,6 +101,7 @@ export default function useSiteExtras(lastChampionDate) {
             matches: payload?.matches ?? [],
             source: payload?.source ?? "fallback",
           });
+          setLiveModeKnown(true);
         }
       } catch (error) {
         console.warn("Failed to load live matches:", error);
@@ -99,15 +109,14 @@ export default function useSiteExtras(lastChampionDate) {
     }
 
     loadLive();
-    const pollMs =
-      liveMatches.mode === "live" ? LIVE_POLL_MS : IDLE_POLL_MS;
+    const pollMs = getLivePollInterval(liveMatches.mode, liveModeKnown);
     const interval = setInterval(loadLive, pollMs);
 
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [liveMatches.mode]);
+  }, [liveMatches.mode, liveModeKnown]);
 
   return { facts, aggregates, tournaments, worldCup2026, liveMatches, fixture };
 }
