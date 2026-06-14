@@ -1,4 +1,9 @@
-const { fetchMatchesForYear } = require("./fetch-matches");
+const { fetchMatchesByIds } = require("./fetch-match-by-id");
+const {
+  DEFAULT_MATCHES_CACHE_TTL_MS,
+  fetchMatchesForYear,
+} = require("./fetch-matches");
+const { enrichMatchScores } = require("./match-scores");
 const {
   getCurrentWorldCupYear,
   getEmptyLivePayload,
@@ -7,6 +12,8 @@ const {
 } = require("./recent-matches");
 const { extractMatches } = require("./zafronix-normalize");
 const { zafronixFetch } = require("./zafronix-client");
+
+const LIVE_MATCHES_CACHE_TTL_MS = 60 * 1000;
 
 function isZafronixProOnlyError(error) {
   const message = String(error?.message ?? "");
@@ -52,6 +59,24 @@ async function getRecentMatches(apiKey, now = new Date()) {
   }
 }
 
+async function enrichLiveMatches(matches, apiKey, now = new Date()) {
+  const matchIds = matches.map((match) => match.id).filter(Boolean);
+  const refreshedMatches = matchIds.length
+    ? await fetchMatchesByIds(matchIds, apiKey)
+    : [];
+
+  const refreshedById = new Map(
+    refreshedMatches
+      .filter(Boolean)
+      .map((match) => [match.id, match])
+  );
+
+  return matches.map((match) => {
+    const refreshed = refreshedById.get(match.id) ?? match;
+    return enrichMatchScores(refreshed, now);
+  });
+}
+
 async function getLiveMatchesFromYear(apiKey, now = new Date()) {
   const year = getCurrentWorldCupYear(now);
 
@@ -60,17 +85,21 @@ async function getLiveMatchesFromYear(apiKey, now = new Date()) {
   }
 
   try {
-    const matches = await fetchMatchesForYear(year, apiKey);
+    const matches = await fetchMatchesForYear(year, apiKey, {
+      cacheTtlMs: LIVE_MATCHES_CACHE_TTL_MS,
+    });
     const liveMatches = selectLiveMatches(matches, 5, now);
 
     if (liveMatches.length === 0) {
       return null;
     }
 
+    const enrichedMatches = await enrichLiveMatches(liveMatches, apiKey, now);
+
     return {
       mode: "live",
       year,
-      matches: liveMatches,
+      matches: enrichedMatches,
       source: "zafronix",
       liveSource: "year",
     };
@@ -91,10 +120,12 @@ async function getLiveOrRecentMatches(apiKey, now = new Date()) {
     const liveMatches = matches.slice(0, 5);
 
     if (liveMatches.length > 0) {
+      const enrichedMatches = await enrichLiveMatches(liveMatches, apiKey, now);
+
       return {
         mode: "live",
         year: now.getUTCFullYear(),
-        matches: liveMatches,
+        matches: enrichedMatches,
         source: "zafronix",
       };
     }
@@ -118,8 +149,10 @@ async function getLiveOrRecentMatches(apiKey, now = new Date()) {
 }
 
 module.exports = {
+  enrichLiveMatches,
   getLiveMatchesFromYear,
   getLiveOrRecentMatches,
   getLiveMatches: getLiveOrRecentMatches,
   isZafronixProOnlyError,
+  LIVE_MATCHES_CACHE_TTL_MS,
 };

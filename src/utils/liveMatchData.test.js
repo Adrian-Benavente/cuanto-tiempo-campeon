@@ -2,6 +2,7 @@ import {
   detectScoreChange,
   formatLastGoalLabel,
   getLastGoalEvent,
+  getMatchScores,
   getMatchStatus,
   getMatchStatusLabel,
 } from "./liveMatchData";
@@ -78,5 +79,36 @@ describe("liveMatchData", () => {
     expect(
       formatLastGoalLabel({ minute: 23, scorer: "Messi", team: "Argentina" }, "es")
     ).toBe("23' Messi");
+  });
+
+  test("derives scores from goals when numeric scores are missing", () => {
+    const now = new Date("2026-06-14T18:30:00.000Z");
+
+    expect(
+      getMatchScores(
+        {
+          status: "scheduled",
+          result: null,
+          kickoffUtc: "2026-06-14T17:00:00.000Z",
+          goals: [{ minute: 23, team: "home", scorer: "Havertz" }],
+        },
+        now
+      )
+    ).toEqual({ homeScore: 1, awayScore: 0 });
+  });
+
+  test("defaults to 0-0 for in-progress matches without score data", () => {
+    const now = new Date("2026-06-14T18:30:00.000Z");
+
+    expect(
+      getMatchScores(
+        {
+          status: "scheduled",
+          result: null,
+          kickoffUtc: "2026-06-14T17:00:00.000Z",
+        },
+        now
+      )
+    ).toEqual({ homeScore: 0, awayScore: 0 });
   });
 });

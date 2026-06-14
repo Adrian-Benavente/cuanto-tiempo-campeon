@@ -12,13 +12,89 @@ export function getTeamName(team) {
   return team.name ?? team.displayName ?? team.shortName ?? "";
 }
 
-export function getMatchScores(match) {
+function parseNumericScore(value) {
+  if (value == null || value === "") {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function parseResultScores(match) {
+  const result = match?.result;
+
+  if (typeof result !== "string" || !result.includes("-")) {
+    return null;
+  }
+
+  const [home, away] = result.split("-").map((value) => value.trim());
+  const homeScore = parseNumericScore(home);
+  const awayScore = parseNumericScore(away);
+
+  if (homeScore == null || awayScore == null) {
+    return null;
+  }
+
+  return { homeScore, awayScore };
+}
+
+function deriveScoresFromGoals(match) {
+  const goals = Array.isArray(match?.goals) ? match.goals : [];
+
+  if (goals.length === 0) {
+    return null;
+  }
+
+  let homeScore = 0;
+  let awayScore = 0;
+
+  for (const goal of goals) {
+    const team = (goal?.team ?? "").toLowerCase();
+
+    if (team === "home") {
+      homeScore += 1;
+      continue;
+    }
+
+    if (team === "away") {
+      awayScore += 1;
+    }
+  }
+
+  return { homeScore, awayScore };
+}
+
+export function getMatchScores(match, now = new Date()) {
   const homeScore = match?.homeScore ?? match?.score?.home;
   const awayScore = match?.awayScore ?? match?.score?.away;
 
+  if (homeScore != null && awayScore != null) {
+    return {
+      homeScore: parseNumericScore(homeScore),
+      awayScore: parseNumericScore(awayScore),
+    };
+  }
+
+  const fromResult = parseResultScores(match);
+
+  if (fromResult) {
+    return fromResult;
+  }
+
+  const fromGoals = deriveScoresFromGoals(match);
+
+  if (fromGoals) {
+    return fromGoals;
+  }
+
+  if (getMatchStatus(match, now)) {
+    return { homeScore: 0, awayScore: 0 };
+  }
+
   return {
-    homeScore: homeScore ?? null,
-    awayScore: awayScore ?? null,
+    homeScore: null,
+    awayScore: null,
   };
 }
 
