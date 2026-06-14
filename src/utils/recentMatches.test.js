@@ -46,6 +46,28 @@ describe("selectRecentMatches", () => {
     expect(result.map((match) => match.id)).toEqual(["new", "nested-score", "old"]);
   });
 
+  it("accepts scores provided only in result text", () => {
+    const matches = [
+      {
+        id: "result-only",
+        homeTeam: "Argentina",
+        awayTeam: "Francia",
+        result: "2-1",
+        date: "2026-06-14T18:00:00.000Z",
+      },
+      {
+        id: "unplayed",
+        homeTeam: "Brasil",
+        awayTeam: "Alemania",
+        date: "2026-06-15T18:00:00.000Z",
+      },
+    ];
+
+    expect(selectRecentMatches(matches, 5).map((match) => match.id)).toEqual([
+      "result-only",
+    ]);
+  });
+
   it("limits the number of returned matches", () => {
     const matches = Array.from({ length: 8 }, (_, index) => ({
       id: `match-${index}`,

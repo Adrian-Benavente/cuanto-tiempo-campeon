@@ -56,7 +56,18 @@ function hasScore(match) {
   const homeScore = match?.homeScore ?? match?.score?.home;
   const awayScore = match?.awayScore ?? match?.score?.away;
 
-  return homeScore !== undefined && awayScore !== undefined;
+  if (homeScore != null && awayScore != null) {
+    return true;
+  }
+
+  const result = match?.result;
+
+  if (typeof result === "string" && result.includes("-")) {
+    const [home, away] = result.split("-").map((value) => value.trim());
+    return Boolean(home && away);
+  }
+
+  return false;
 }
 
 function selectRecentMatches(matches, limit = 5) {

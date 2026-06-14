@@ -24,7 +24,7 @@ describe("sortMatchesChronologically", () => {
 describe("getFixtureCacheControl", () => {
   it("uses shorter cache during the tournament", () => {
     expect(getFixtureCacheControl(new Date("2026-06-20T12:00:00.000Z"))).toContain(
-      "s-maxage=3600"
+      "s-maxage=21600"
     );
   });
 

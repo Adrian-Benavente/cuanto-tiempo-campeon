@@ -1,41 +1,7 @@
 const { resolveCountryMeta } = require("./country-meta");
 const { fallbackChampions } = require("./fallback-champions");
-
-const ZAFRONIX_BASE_URL = "https://api.zafronix.com/fifa/worldcup/v1";
-const FINAL_WHISTLE_UTC = "T18:00:00.000Z";
-
-async function zafronixFetch(path, apiKey) {
-  const response = await fetch(`${ZAFRONIX_BASE_URL}${path}`, {
-    headers: {
-      "X-API-Key": apiKey,
-      Accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(
-      `Zafronix request failed (${response.status}) for ${path}: ${body}`
-    );
-  }
-
-  return response.json();
-}
-
-function toChampionDate(isoDate) {
-  return `${isoDate}${FINAL_WHISTLE_UTC}`;
-}
-
-async function fetchTournamentEndDate(year, apiKey) {
-  const payload = await zafronixFetch(`/tournaments/${year}`, apiKey);
-  const endDate = payload?.tournament?.datesIso?.end;
-
-  if (!endDate) {
-    throw new Error(`Missing end date for tournament ${year}`);
-  }
-
-  return toChampionDate(endDate);
-}
+const { resolveTournamentEndDate } = require("./tournament-end-dates");
+const { zafronixFetch } = require("./zafronix-client");
 
 async function fetchWorldChampionsFromZafronix(apiKey) {
   const tournaments = await zafronixFetch("/tournaments", apiKey);
@@ -66,7 +32,11 @@ async function fetchWorldChampionsFromZafronix(apiKey) {
 
   const champions = await Promise.all(
     Array.from(latestWinBySlug.values()).map(async ({ meta, year }) => {
-      const lastChampionDate = await fetchTournamentEndDate(year, apiKey);
+      const lastChampionDate = await resolveTournamentEndDate(
+        year,
+        apiKey,
+        zafronixFetch
+      );
 
       return {
         ...meta,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const LIVE_POLL_MS = 15000;
-const RECENT_POLL_MS = 60000;
+const IDLE_POLL_MS = 300000;
 
 async function fetchJson(url) {
   const response = await fetch(url);
@@ -100,7 +100,7 @@ export default function useSiteExtras(lastChampionDate) {
 
     loadLive();
     const pollMs =
-      liveMatches.mode === "live" ? LIVE_POLL_MS : RECENT_POLL_MS;
+      liveMatches.mode === "live" ? LIVE_POLL_MS : IDLE_POLL_MS;
     const interval = setInterval(loadLive, pollMs);
 
     return () => {

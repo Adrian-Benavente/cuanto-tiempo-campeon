@@ -3,7 +3,8 @@ const { getLiveOrRecentMatches } = require("./_lib/fetch-live-matches");
 const LIVE_CACHE_CONTROL = "public, s-maxage=60, stale-while-revalidate=300";
 const RECENT_CACHE_CONTROL =
   "public, s-maxage=86400, stale-while-revalidate=604800";
-const IDLE_CACHE_CONTROL = "public, s-maxage=60, stale-while-revalidate=300";
+const IDLE_CACHE_CONTROL =
+  "public, s-maxage=300, stale-while-revalidate=1800";
 
 function getCacheControl(mode) {
   if (mode === "live") {
