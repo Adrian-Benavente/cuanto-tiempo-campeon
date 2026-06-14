@@ -117,18 +117,15 @@ function isInProgressMatch(match, now = new Date()) {
   return match?.result == null;
 }
 
-function selectLiveMatches(matches, limit = 5, now = new Date()) {
-  return (Array.isArray(matches) ? matches : [])
-    .filter((match) => isInProgressMatch(match, now))
-    .slice(0, limit);
-}
-
 function selectRecentMatches(matches, limit = 5, now = new Date()) {
-  return (Array.isArray(matches) ? matches : [])
+  const list = Array.isArray(matches) ? matches : [];
+  const inProgress = list.filter((match) => isInProgressMatch(match, now));
+  const finished = list
     .filter(hasScore)
     .filter((match) => !isInProgressMatch(match, now))
-    .sort((left, right) => getMatchDate(right) - getMatchDate(left))
-    .slice(0, limit);
+    .sort((left, right) => getMatchDate(right) - getMatchDate(left));
+
+  return [...inProgress, ...finished].slice(0, limit);
 }
 
 function getFallbackRecentMatches(year = 2022) {
@@ -169,6 +166,5 @@ module.exports = {
   getRecentTournamentYears,
   hasScore,
   isInProgressMatch,
-  selectLiveMatches,
   selectRecentMatches,
 };

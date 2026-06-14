@@ -48,7 +48,7 @@ function MyTeamSection() {
 function MainExperience() {
   const { t } = useLocale();
   const { isLoading, source, lastChampion } = useWorldChampionsContext();
-  const { facts, aggregates, tournaments, worldCup2026, liveMatches, fixture } =
+  const { facts, aggregates, tournaments, worldCup2026, recentMatches, fixture } =
     useSiteExtras(lastChampion?.lastChampionDate);
 
   if (isLoading) {
@@ -59,9 +59,8 @@ function MainExperience() {
     <>
       <WorldCupCountdown worldCup2026={worldCup2026} />
       <LiveMatchesBanner
-        mode={liveMatches.mode}
-        year={liveMatches.year}
-        matches={liveMatches.matches}
+        year={recentMatches.year}
+        matches={recentMatches.matches}
       />
       <PersonalizationToolbar />
       <HeroChampion />

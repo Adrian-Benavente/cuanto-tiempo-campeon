@@ -1,15 +1,6 @@
 import { useEffect, useState } from "react";
 
-export const LIVE_POLL_MS = 15000;
-export const IDLE_POLL_MS = 300000;
-
-export function getLivePollInterval(mode, liveModeKnown) {
-  if (!liveModeKnown || mode === "live") {
-    return LIVE_POLL_MS;
-  }
-
-  return IDLE_POLL_MS;
-}
+const RECENT_POLL_MS = 300000;
 
 async function fetchJson(url) {
   const response = await fetch(url);
@@ -32,13 +23,12 @@ export default function useSiteExtras(lastChampionDate) {
   const [aggregates, setAggregates] = useState([]);
   const [tournaments, setTournaments] = useState([]);
   const [worldCup2026, setWorldCup2026] = useState(null);
-  const [liveMatches, setLiveMatches] = useState({
+  const [recentMatches, setRecentMatches] = useState({
     mode: "idle",
     year: 2022,
     matches: [],
     source: "fallback",
   });
-  const [liveModeKnown, setLiveModeKnown] = useState(false);
   const [fixture, setFixture] = useState({
     year: null,
     matches: [],
@@ -91,32 +81,38 @@ export default function useSiteExtras(lastChampionDate) {
   useEffect(() => {
     let cancelled = false;
 
-    async function loadLive() {
+    async function loadRecent() {
       try {
         const payload = await fetchJson("/api/live-matches");
         if (!cancelled) {
-          setLiveMatches({
+          setRecentMatches({
             mode: payload?.mode ?? "idle",
             year: payload?.year ?? 2022,
             matches: payload?.matches ?? [],
             source: payload?.source ?? "fallback",
           });
-          setLiveModeKnown(true);
         }
       } catch (error) {
-        console.warn("Failed to load live matches:", error);
+        console.warn("Failed to load recent matches:", error);
       }
     }
 
-    loadLive();
-    const pollMs = getLivePollInterval(liveMatches.mode, liveModeKnown);
-    const interval = setInterval(loadLive, pollMs);
+    loadRecent();
+    const interval = setInterval(loadRecent, RECENT_POLL_MS);
 
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [liveMatches.mode, liveModeKnown]);
+  }, []);
 
-  return { facts, aggregates, tournaments, worldCup2026, liveMatches, fixture };
+  return {
+    facts,
+    aggregates,
+    tournaments,
+    worldCup2026,
+    recentMatches,
+    liveMatches: recentMatches,
+    fixture,
+  };
 }

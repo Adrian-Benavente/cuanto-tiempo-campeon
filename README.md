@@ -7,7 +7,7 @@ El último campeón aparece destacado con su bandera y un fondo inspirado en los
 ## Qué incluye el sitio
 
 - **Contador en vivo** del campeón actual (días, horas, minutos y segundos).
-- **Partidos en vivo** con scoreboard, minuto y último gol; si no hay live, **últimos resultados** del torneo actual (2026+).
+- **Últimos resultados** del torneo actual (2026+); los partidos en curso aparecen como "En desarrollo" sin marcador hasta que finalizan.
 - **Cuenta regresiva** al Mundial 2026.
 - **Datos del último título** del campeón (resumen de la final y trivia).
 - **Mi selección**: elegí tu país y mirá cuánto hace que no gana (o si es el campeón actual).
@@ -32,12 +32,12 @@ La app no llama a Zafronix desde el navegador. Usa **API Routes** en Vercel como
 | `/api/champion-aggregates` | Títulos por selección |
 | `/api/tournaments-history` | Historia de torneos |
 | `/api/world-cup-2026` | Metadatos del Mundial 2026 |
-| `/api/live-matches` | Partidos en vivo o últimos resultados del torneo actual |
+| `/api/live-matches` | Últimos resultados del torneo actual (incluye partidos en curso sin marcador) |
 | `/api/world-cup-fixture` | Fixture completo del torneo actual |
 | `/api/og` | Imagen Open Graph |
 | `/api/oembed` | oEmbed para embeber |
 
-En planes **Hobby**, el endpoint dedicado `/matches/live` de Zafronix requiere **Pro+**; la app detecta partidos en curso desde el fixture anual (`/matches?year=2026`) cuando el kickoff ya pasó y el partido no está finalizado. Los marcadores se aproximan refrescando cada partido vía `GET /matches/{id}` (cache ~15s, alineada con el poll del cliente) y derivando el resultado desde `goals[]` cuando los scores numéricos vienen en `null`. Minuto a minuto y eventos en tiempo real solo están disponibles con Pro+.
+Los partidos en curso se listan arriba con el texto **"En desarrollo"** (sin marcador), porque el plan Hobby de Zafronix no publica scores en tiempo real. Al finalizar, el resultado aparece en el próximo refresh (~5 min).
 
 ### Variables de entorno
 
@@ -84,7 +84,7 @@ oEmbed: `GET /api/oembed?url=…`
 3. Usá Node.js **24.x** (declarado en `package.json` y `.nvmrc`).
 4. Deployá con `yarn build`.
 
-Cuando haya un nuevo campeón mundial, el sitio se actualiza al vencer el cache de los endpoints (sin redeploy). Durante el Mundial en curso, live y resultados recientes se refrescan con mayor frecuencia; el fixture y los datos históricos usan ventanas de cache más largas.
+Cuando haya un nuevo campeón mundial, el sitio se actualiza al vencer el cache de los endpoints (sin redeploy). Durante el Mundial en curso, los últimos resultados se refrescan cada ~5 minutos; el fixture y los datos históricos usan ventanas de cache más largas.
 
 ## Stack
 

@@ -5,7 +5,6 @@ const {
   getFallbackRecentMatches,
   getRecentTournamentYears,
   isInProgressMatch,
-  selectLiveMatches,
   selectRecentMatches,
 } = require("../../api/_lib/recent-matches");
 
@@ -81,7 +80,7 @@ describe("selectRecentMatches", () => {
     expect(selectRecentMatches(matches, 5)).toHaveLength(5);
   });
 
-  it("excludes in-progress matches from recent results", () => {
+  it("lists in-progress matches first, then finished results", () => {
     const now = new Date("2026-06-14T18:30:00.000Z");
     const matches = [
       {
@@ -109,6 +108,7 @@ describe("selectRecentMatches", () => {
     ];
 
     expect(selectRecentMatches(matches, 5, now).map((match) => match.id)).toEqual([
+      "2026-010",
       "2026-005",
     ]);
   });
@@ -186,30 +186,6 @@ describe("isInProgressMatch", () => {
         now
       )
     ).toBe(false);
-  });
-});
-
-describe("selectLiveMatches", () => {
-  it("returns only in-progress matches", () => {
-    const now = new Date("2026-06-14T18:30:00.000Z");
-    const matches = [
-      {
-        id: "2026-010",
-        status: "scheduled",
-        result: null,
-        kickoffUtc: "2026-06-14T17:00:00.000Z",
-      },
-      {
-        id: "2026-005",
-        status: "finished",
-        result: "0-1",
-        kickoffUtc: "2026-06-14T01:00:00.000Z",
-      },
-    ];
-
-    expect(selectLiveMatches(matches, 5, now).map((match) => match.id)).toEqual([
-      "2026-010",
-    ]);
   });
 });
 

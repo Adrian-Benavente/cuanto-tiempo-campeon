@@ -4,6 +4,7 @@ import { formatMatchStageFromMatch } from "../../utils/formatMatchStage";
 import {
   getMatchScores,
   getTeamName,
+  isMatchInProgress,
 } from "../../utils/liveMatchData";
 import styles from "./LiveMatchesBanner.module.css";
 
@@ -28,13 +29,18 @@ export default function RecentMatchCard({ match }) {
   const { locale, t } = useLocale();
   const homeTeam = getTeamName(match.homeTeam ?? match.home);
   const awayTeam = getTeamName(match.awayTeam ?? match.away);
+  const inProgress = isMatchInProgress(match);
   const { homeScore, awayScore } = getMatchScores(match);
-  const hasScore = homeScore != null && awayScore != null;
+  const hasScore = !inProgress && homeScore != null && awayScore != null;
   const stage = formatMatchStageFromMatch(match, locale);
   const matchDate = formatMatchDate(match.date, locale);
 
   return (
-    <article className={styles.recentCard}>
+    <article
+      className={`${styles.recentCard} ${
+        inProgress ? styles.recentCardInProgress : ""
+      }`}
+    >
       <div className={styles.recentCardHeader}>
         {stage ? <span className={styles.stage}>{stage}</span> : <span />}
         {matchDate ? (
@@ -47,7 +53,11 @@ export default function RecentMatchCard({ match }) {
       <div className={styles.scoreboard}>
         <span className={styles.teamName}>{homeTeam}</span>
         <div className={styles.scoreCenter}>
-          {hasScore ? (
+          {inProgress ? (
+            <span className={styles.matchInProgressLabel}>
+              {t("matchInProgress")}
+            </span>
+          ) : hasScore ? (
             <span className={styles.scoreLine}>
               <span className={styles.scoreValue}>{homeScore}</span>
               <span className={styles.scoreSeparator}>-</span>
