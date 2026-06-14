@@ -47,6 +47,33 @@ describe("liveMatchData", () => {
     expect(getMatchStatusLabel({ status: "live" }, "en")).toBe("Live");
   });
 
+  test("treats scheduled matches with past kickoff as live", () => {
+    const now = new Date("2026-06-14T18:30:00.000Z");
+
+    expect(
+      getMatchStatus(
+        {
+          status: "scheduled",
+          result: null,
+          kickoffUtc: "2026-06-14T17:00:00.000Z",
+        },
+        now
+      )
+    ).toBe("live");
+
+    expect(
+      getMatchStatusLabel(
+        {
+          status: "scheduled",
+          result: null,
+          kickoffUtc: "2026-06-14T17:00:00.000Z",
+        },
+        "es",
+        now
+      )
+    ).toBe("En vivo");
+  });
+
   test("formats last goal label with scorer when available", () => {
     expect(
       formatLastGoalLabel({ minute: 23, scorer: "Messi", team: "Argentina" }, "es")

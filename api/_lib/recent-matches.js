@@ -46,8 +46,25 @@ const FALLBACK_RECENT_2022 = [
   },
 ];
 
+function getKickoffRaw(match) {
+  if (match?.kickoffUtc) {
+    return match.kickoffUtc;
+  }
+
+  if (match?.date && match?.kickoff) {
+    return `${match.date}T${match.kickoff}:00Z`;
+  }
+
+  return null;
+}
+
 function getMatchDate(match) {
-  const raw = match?.date ?? match?.dateIso ?? match?.kickoff ?? match?.kickoffIso;
+  const raw =
+    getKickoffRaw(match) ??
+    match?.date ??
+    match?.dateIso ??
+    match?.kickoff ??
+    match?.kickoffIso;
   const parsed = raw ? new Date(raw).getTime() : 0;
   return Number.isNaN(parsed) ? 0 : parsed;
 }
@@ -70,9 +87,46 @@ function hasScore(match) {
   return false;
 }
 
-function selectRecentMatches(matches, limit = 5) {
+function isInProgressMatch(match, now = new Date()) {
+  const status = (match?.status ?? "").toLowerCase();
+
+  if (status === "finished") {
+    return false;
+  }
+
+  if (["live", "halftime", "half_time", "in_progress"].includes(status)) {
+    return true;
+  }
+
+  if (status !== "scheduled") {
+    return false;
+  }
+
+  const kickoffRaw = getKickoffRaw(match);
+
+  if (!kickoffRaw) {
+    return false;
+  }
+
+  const kickoffTime = new Date(kickoffRaw).getTime();
+
+  if (Number.isNaN(kickoffTime) || kickoffTime > now.getTime()) {
+    return false;
+  }
+
+  return match?.result == null;
+}
+
+function selectLiveMatches(matches, limit = 5, now = new Date()) {
+  return (Array.isArray(matches) ? matches : [])
+    .filter((match) => isInProgressMatch(match, now))
+    .slice(0, limit);
+}
+
+function selectRecentMatches(matches, limit = 5, now = new Date()) {
   return (Array.isArray(matches) ? matches : [])
     .filter(hasScore)
+    .filter((match) => !isInProgressMatch(match, now))
     .sort((left, right) => getMatchDate(right) - getMatchDate(left))
     .slice(0, limit);
 }
@@ -110,8 +164,11 @@ module.exports = {
   getCurrentWorldCupYear,
   getEmptyLivePayload,
   getFallbackRecentMatches,
+  getKickoffRaw,
   getMatchDate,
   getRecentTournamentYears,
   hasScore,
+  isInProgressMatch,
+  selectLiveMatches,
   selectRecentMatches,
 };

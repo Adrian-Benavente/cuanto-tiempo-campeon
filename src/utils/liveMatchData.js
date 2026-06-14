@@ -66,22 +66,47 @@ export function getLastGoalEvent(match) {
   return null;
 }
 
-export function getMatchStatus(match) {
+function getKickoffTime(match) {
+  const kickoffRaw =
+    match?.kickoffUtc ??
+    (match?.date && match?.kickoff ? `${match.date}T${match.kickoff}:00Z` : null);
+
+  if (!kickoffRaw) {
+    return null;
+  }
+
+  const kickoffTime = new Date(kickoffRaw).getTime();
+  return Number.isNaN(kickoffTime) ? null : kickoffTime;
+}
+
+export function getMatchStatus(match, now = new Date()) {
   const status = match?.status?.toLowerCase?.() ?? match?.status;
 
   if (status === "halftime" || status === "half_time") {
     return "halftime";
   }
 
-  if (status === "live") {
+  if (status === "live" || status === "in_progress") {
     return "live";
+  }
+
+  if (status === "scheduled") {
+    const kickoffTime = getKickoffTime(match);
+
+    if (
+      kickoffTime != null &&
+      kickoffTime <= now.getTime() &&
+      match?.result == null
+    ) {
+      return "live";
+    }
   }
 
   return null;
 }
 
-export function getMatchStatusLabel(match, locale = "es") {
-  const status = getMatchStatus(match);
+export function getMatchStatusLabel(match, locale = "es", now = new Date()) {
+  const status = getMatchStatus(match, now);
 
   if (status === "halftime") {
     return t(locale, "halftime");

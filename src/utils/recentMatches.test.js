@@ -4,6 +4,8 @@ const {
   getEmptyLivePayload,
   getFallbackRecentMatches,
   getRecentTournamentYears,
+  isInProgressMatch,
+  selectLiveMatches,
   selectRecentMatches,
 } = require("../../api/_lib/recent-matches");
 
@@ -77,6 +79,137 @@ describe("selectRecentMatches", () => {
     }));
 
     expect(selectRecentMatches(matches, 5)).toHaveLength(5);
+  });
+
+  it("excludes in-progress matches from recent results", () => {
+    const now = new Date("2026-06-14T18:30:00.000Z");
+    const matches = [
+      {
+        id: "2026-010",
+        homeTeam: "Germany",
+        awayTeam: "Curaçao",
+        homeScore: 0,
+        awayScore: 0,
+        result: null,
+        status: "scheduled",
+        date: "2026-06-14",
+        kickoffUtc: "2026-06-14T17:00:00.000Z",
+      },
+      {
+        id: "2026-005",
+        homeTeam: "Haiti",
+        awayTeam: "Scotland",
+        homeScore: 0,
+        awayScore: 1,
+        result: "0-1",
+        status: "finished",
+        date: "2026-06-14",
+        kickoffUtc: "2026-06-14T01:00:00.000Z",
+      },
+    ];
+
+    expect(selectRecentMatches(matches, 5, now).map((match) => match.id)).toEqual([
+      "2026-005",
+    ]);
+  });
+
+  it("sorts same-day matches by kickoff time", () => {
+    const matches = [
+      {
+        id: "early",
+        homeScore: 1,
+        awayScore: 0,
+        date: "2026-06-14",
+        kickoffUtc: "2026-06-14T01:00:00.000Z",
+      },
+      {
+        id: "late",
+        homeScore: 2,
+        awayScore: 1,
+        date: "2026-06-14",
+        kickoffUtc: "2026-06-14T17:00:00.000Z",
+      },
+    ];
+
+    expect(selectRecentMatches(matches, 5).map((match) => match.id)).toEqual([
+      "late",
+      "early",
+    ]);
+  });
+});
+
+describe("isInProgressMatch", () => {
+  const now = new Date("2026-06-14T18:30:00.000Z");
+
+  it("detects scheduled matches with a past kickoff as in progress", () => {
+    expect(
+      isInProgressMatch(
+        {
+          id: "2026-010",
+          status: "scheduled",
+          homeScore: 0,
+          awayScore: 0,
+          result: null,
+          date: "2026-06-14",
+          kickoffUtc: "2026-06-14T17:00:00.000Z",
+        },
+        now
+      )
+    ).toBe(true);
+  });
+
+  it("does not treat finished matches as in progress", () => {
+    expect(
+      isInProgressMatch(
+        {
+          id: "2026-005",
+          status: "finished",
+          homeScore: 0,
+          awayScore: 1,
+          result: "0-1",
+          kickoffUtc: "2026-06-14T01:00:00.000Z",
+        },
+        now
+      )
+    ).toBe(false);
+  });
+
+  it("does not treat future kickoffs as in progress", () => {
+    expect(
+      isInProgressMatch(
+        {
+          id: "2026-099",
+          status: "scheduled",
+          result: null,
+          kickoffUtc: "2026-06-15T17:00:00.000Z",
+        },
+        now
+      )
+    ).toBe(false);
+  });
+});
+
+describe("selectLiveMatches", () => {
+  it("returns only in-progress matches", () => {
+    const now = new Date("2026-06-14T18:30:00.000Z");
+    const matches = [
+      {
+        id: "2026-010",
+        status: "scheduled",
+        result: null,
+        kickoffUtc: "2026-06-14T17:00:00.000Z",
+      },
+      {
+        id: "2026-005",
+        status: "finished",
+        result: "0-1",
+        kickoffUtc: "2026-06-14T01:00:00.000Z",
+      },
+    ];
+
+    expect(selectLiveMatches(matches, 5, now).map((match) => match.id)).toEqual([
+      "2026-010",
+    ]);
   });
 });
 
