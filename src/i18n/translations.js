@@ -52,6 +52,10 @@ export const translations = {
     footerGithub: "Ver repositorio en GitHub",
     stars: "{count} títulos",
     noLiveMatches: "No hay partidos en vivo ahora",
+    liveNow: "En vivo",
+    halftime: "Entretiempo",
+    liveGoalBy: "{minute}' {scorer}",
+    liveGoal: "{minute}' {team}",
     vs: "vs",
   },
   en: {
@@ -107,6 +111,10 @@ export const translations = {
     footerGithub: "View GitHub repository",
     stars: "{count} titles",
     noLiveMatches: "No live matches right now",
+    liveNow: "Live",
+    halftime: "Halftime",
+    liveGoalBy: "{minute}' {scorer}",
+    liveGoal: "{minute}' {team}",
     vs: "vs",
   },
 };

@@ -7,6 +7,8 @@
   --color-surface-hover: rgba(255, 255, 255, 0.75);
   --color-border: rgba(255, 255, 255, 0.55);
   --color-accent: #1e40af;
+  --color-live: #dc2626;
+  --color-live-bg: rgba(220, 38, 38, 0.1);
   --color-badge: rgba(30, 64, 175, 0.12);
   --color-warning: #b45309;
   --color-warning-bg: rgba(251, 191, 36, 0.2);
