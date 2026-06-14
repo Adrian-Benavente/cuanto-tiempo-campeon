@@ -1,23 +1,24 @@
 import React from "react";
-import worldChampionDates from "../../api/world-champion-dates";
-import upperFirst from "../../utils/upperFirst";
-import teamBadges from "../../api/badges";
+import { useWorldChampionsContext } from "../../context/WorldChampionsContext";
+import CountryFlag from "../CountryFlag/CountryFlag";
 import styles from "./Header.module.css";
 
 export default function Header() {
-  const lastChampion = Object.entries(worldChampionDates)
-    .sort(([, a], [, b]) => b - a)
-    .map(([name]) => name)[0];
+  const { lastChampion } = useWorldChampionsContext();
+
+  if (!lastChampion) {
+    return null;
+  }
 
   return (
     <header>
-      <img
-        alt="Escudo de la Asociación del Fútbol Argentino (AFA), con tres estrellas en la parte superior"
-        className={styles.badge}
-        src={teamBadges[lastChampion]}
+      <CountryFlag
+        champion={lastChampion}
+        imageClassName={styles.championFlag}
+        fallbackClassName={styles.championFlagFallback}
       />
       <h1 className={styles.mainTitle}>
-        {upperFirst(lastChampion)} es el último campeón mundial
+        {lastChampion.displayName} es el último campeón mundial
       </h1>
       <p className={styles.paragraph}>
         ¿Cuándo fue la última vez que saliste campeón del mundo?

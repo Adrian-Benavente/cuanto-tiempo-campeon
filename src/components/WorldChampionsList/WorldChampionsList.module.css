@@ -18,11 +18,19 @@
 }
 
 .countryFlag {
+  background-size: cover;
   display: inline-block;
+  flex-shrink: 0;
   height: 1.5em;
   margin-bottom: 0.5em;
-  object-fit: cover;
   width: 2.5em;
+}
+
+.countryFlagFallback {
+  display: inline-block;
+  font-size: 1.5em;
+  line-height: 1;
+  margin-bottom: 0.5em;
 }
 
 .lastChampionCountry {
@@ -35,13 +43,13 @@
     justify-content: flex-start;
   }
 
-  .countryFlag {
+  .countryFlag,
+  .countryFlagFallback {
     margin-bottom: 0;
     margin-right: 1em;
   }
 
   .lastChampionCountry {
-  font-size: 1.5em;
-
+    font-size: 1.5em;
   }
 }
