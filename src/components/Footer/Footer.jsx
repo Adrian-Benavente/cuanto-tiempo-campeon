@@ -4,6 +4,8 @@ import styles from "./Footer.module.css";
 
 const GITHUB_URL =
   "https://github.com/Adrian-Benavente/cuanto-tiempo-campeon";
+const BUY_ME_A_COFFEE_URL = "https://www.buymeacoffee.com/fena";
+const CAFECITO_URL = "https://cafecito.app/fena";
 
 function GithubIcon() {
   return (
@@ -51,6 +53,18 @@ export default function Footer() {
         </a>
       </p>
       <p className={styles.credit}>{t("footerAuthor")}</p>
+      <p className={styles.credit}>
+        {t("footerSupport")}{" "}
+        <a href={BUY_ME_A_COFFEE_URL} rel="noreferrer" target="_blank">
+          Buy Me a Coffee
+        </a>
+        <span className={styles.donationSeparator} aria-hidden="true">
+          ·
+        </span>
+        <a href={CAFECITO_URL} rel="noreferrer" target="_blank">
+          Cafecito
+        </a>
+      </p>
       <a
         className={styles.githubLink}
         href={GITHUB_URL}

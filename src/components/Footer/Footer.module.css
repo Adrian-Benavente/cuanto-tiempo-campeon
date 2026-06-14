@@ -30,6 +30,11 @@
   text-decoration: underline;
 }
 
+.donationSeparator {
+  color: var(--color-text-subtle);
+  margin: 0 0.35rem;
+}
+
 .githubLink {
   align-items: center;
   color: var(--color-text);
