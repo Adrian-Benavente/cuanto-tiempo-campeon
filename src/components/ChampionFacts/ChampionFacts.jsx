@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocale } from "../../context/LocaleContext";
+import formatHost from "../../utils/formatHost";
 import styles from "./ChampionFacts.module.css";
 
 export default function ChampionFacts({ facts }) {
@@ -15,7 +16,7 @@ export default function ChampionFacts({ facts }) {
         {t("championFactsTitle")}
       </h2>
       <p className={styles.summary}>
-        {facts.host} {facts.year}: {facts.summary}
+        {formatHost(facts.host)} {facts.year}: {facts.summary}
       </p>
       {facts.trivia?.length > 0 && (
         <ul className={styles.triviaList}>

@@ -1,5 +1,11 @@
 const { resolveCountryMeta } = require("./country-meta");
 const { zafronixFetch } = require("./zafronix-client");
+const {
+  extractMatches,
+  findFinalMatch,
+  formatFinalSummary,
+  formatHost,
+} = require("./zafronix-normalize");
 
 const FINAL_FALLBACK = {
   year: 2022,
@@ -11,25 +17,8 @@ const FINAL_FALLBACK = {
   ],
 };
 
-function findFinalMatch(matches = []) {
-  return (
-    matches.find((match) => match.stage === "final") ??
-    matches.find((match) => /final/i.test(match.stage ?? "")) ??
-    null
-  );
-}
-
-function formatFinalSummary(finalMatch, championName) {
-  if (!finalMatch) {
-    return null;
-  }
-
-  const home = finalMatch.homeTeam ?? finalMatch.home ?? "?";
-  const away = finalMatch.awayTeam ?? finalMatch.away ?? "?";
-  const homeScore = finalMatch.homeScore ?? finalMatch.score?.home ?? "?";
-  const awayScore = finalMatch.awayScore ?? finalMatch.score?.away ?? "?";
-
-  return `${championName} ganó la final ${homeScore}-${awayScore} ante ${home === championName ? away : home}.`;
+function resolveDisplayName(name) {
+  return resolveCountryMeta(name)?.displayName ?? name;
 }
 
 async function getChampionFacts(apiKey, year = 2022) {
@@ -48,23 +37,25 @@ async function getChampionFacts(apiKey, year = 2022) {
     const tournament = tournamentPayload?.tournament ?? tournamentPayload;
     const championName = tournament?.champion ?? "Argentina";
     const meta = resolveCountryMeta(championName);
-    const matches = matchesPayload?.matches ?? matchesPayload ?? [];
-    const finalMatch = Array.isArray(matches)
-      ? findFinalMatch(matches)
-      : matches;
+    const displayChampion = meta?.displayName ?? championName;
+    const matches = extractMatches(matchesPayload);
+    const finalMatch = findFinalMatch(matches);
     const summary =
-      formatFinalSummary(finalMatch, meta?.displayName ?? championName) ??
+      formatFinalSummary(finalMatch, displayChampion, resolveDisplayName) ??
       FINAL_FALLBACK.summary;
 
     const triviaItems = triviaPayload?.trivia ?? triviaPayload?.items ?? [];
     const trivia = Array.isArray(triviaItems)
       ? triviaItems.slice(0, 3).map((item) => item.fact ?? item.text ?? String(item))
       : FINAL_FALLBACK.trivia;
+    const host = formatHost(
+      tournament?.host ?? tournament?.hostCountry ?? FINAL_FALLBACK.host
+    );
 
     return {
       year,
-      host: tournament?.host ?? tournament?.hostCountry ?? FINAL_FALLBACK.host,
-      champion: meta?.displayName ?? championName,
+      host: host || FINAL_FALLBACK.host,
+      champion: displayChampion,
       summary,
       trivia: trivia.length ? trivia : FINAL_FALLBACK.trivia,
       source: "zafronix",

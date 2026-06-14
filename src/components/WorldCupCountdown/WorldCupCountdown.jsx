@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { useLocale } from "../../context/LocaleContext";
 import useLiveNow from "../../hooks/useLiveNow";
+import formatHost from "../../utils/formatHost";
 import styles from "./WorldCupCountdown.module.css";
 
 export default function WorldCupCountdown({ worldCup2026 }) {
@@ -16,6 +17,11 @@ export default function WorldCupCountdown({ worldCup2026 }) {
     return Math.max(0, Math.ceil(diffMs / 86400000));
   }, [worldCup2026, now]);
 
+  const hostLabel = useMemo(
+    () => formatHost(worldCup2026?.host),
+    [worldCup2026?.host]
+  );
+
   if (daysRemaining === null) {
     return null;
   }
@@ -25,9 +31,7 @@ export default function WorldCupCountdown({ worldCup2026 }) {
       <p className={styles.text}>
         {t("worldCupCountdown", { days: daysRemaining })}
       </p>
-      {worldCup2026?.host && (
-        <p className={styles.host}>{worldCup2026.host}</p>
-      )}
+      {hostLabel && <p className={styles.host}>{hostLabel}</p>}
     </section>
   );
 }

@@ -1,5 +1,6 @@
 const { resolveCountryMeta } = require("./country-meta");
 const { zafronixFetch } = require("./zafronix-client");
+const { formatHost } = require("./zafronix-normalize");
 
 const FALLBACK_TOURNAMENTS = [
   { year: 2022, champion: "Argentina", host: "Qatar" },
@@ -33,7 +34,7 @@ function normalizeTournament(entry) {
     year: entry.year,
     champion: meta?.displayName ?? entry.champion,
     slug: meta?.slug ?? null,
-    host: entry.host ?? entry.hostCountry ?? entry.location ?? "",
+    host: formatHost(entry.host ?? entry.hostCountry ?? entry.location ?? ""),
   };
 }
 

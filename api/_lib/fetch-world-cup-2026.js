@@ -1,4 +1,5 @@
 const { zafronixFetch } = require("./zafronix-client");
+const { formatHost } = require("./zafronix-normalize");
 
 const FALLBACK_2026 = {
   year: 2026,
@@ -21,13 +22,13 @@ async function getWorldCup2026(apiKey) {
     const endDate = tournament?.datesIso?.end
       ? `${tournament.datesIso.end}T18:00:00.000Z`
       : FALLBACK_2026.endDate;
+    const host = formatHost(
+      tournament?.host ?? tournament?.hostCountry ?? FALLBACK_2026.host
+    );
 
     return {
       year: 2026,
-      host:
-        tournament?.host ??
-        tournament?.hostCountry ??
-        FALLBACK_2026.host,
+      host: host || FALLBACK_2026.host,
       startDate,
       endDate,
       source: "zafronix",

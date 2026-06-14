@@ -4,10 +4,11 @@ const {
   getRecentTournamentYears,
   selectRecentMatches,
 } = require("./recent-matches");
+const { extractMatches } = require("./zafronix-normalize");
 
 async function fetchRecentMatchesForYear(year, apiKey) {
   const payload = await zafronixFetch(`/matches?year=${year}`, apiKey);
-  const matches = payload?.matches ?? payload ?? [];
+  const matches = extractMatches(payload);
 
   return {
     year,
@@ -50,8 +51,8 @@ async function getLiveOrRecentMatches(apiKey) {
 
   try {
     const payload = await zafronixFetch("/matches/live", apiKey);
-    const matches = payload?.matches ?? payload ?? [];
-    const liveMatches = Array.isArray(matches) ? matches.slice(0, 5) : [];
+    const matches = extractMatches(payload);
+    const liveMatches = matches.slice(0, 5);
 
     if (liveMatches.length > 0) {
       return {
