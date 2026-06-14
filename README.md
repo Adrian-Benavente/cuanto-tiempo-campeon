@@ -14,7 +14,7 @@ El último campeón aparece destacado con su bandera y un fondo inspirado en los
 - **Hitos de sequía** cuando un campeón se acerca a marcas redondas.
 - **Ranking** de campeones con barra de sequía relativa; orden por antigüedad del título o por estrellas.
 - **Línea de tiempo** de todos los Mundiales.
-- **Mundial 2026 en números**: tarjetas editoriales (sequía más larga, más estrellas en juego, etc.).
+- **Campeones en números**: tarjetas editoriales sobre sequías y récords entre campeones mundiales.
 - **Fixture completo** del torneo actual, agrupado por fase en grilla responsiva.
 - **Compartir** enlace personalizado, vista **embebida** (`?embed=1&pais=…`) y **Open Graph** dinámico.
 - **Español / inglés** (selector en el footer).
