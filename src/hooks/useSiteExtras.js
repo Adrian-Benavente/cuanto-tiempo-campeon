@@ -30,6 +30,11 @@ export default function useSiteExtras(lastChampionDate) {
     matches: [],
     source: "fallback",
   });
+  const [fixture, setFixture] = useState({
+    year: null,
+    matches: [],
+    source: "fallback",
+  });
 
   const championYear = getYearFromDate(lastChampionDate);
 
@@ -38,19 +43,30 @@ export default function useSiteExtras(lastChampionDate) {
 
     async function load() {
       try {
-        const [factsPayload, aggregatesPayload, tournamentsPayload, wc2026Payload] =
-          await Promise.all([
-            fetchJson(`/api/champion-facts?year=${championYear}`),
-            fetchJson("/api/champion-aggregates"),
-            fetchJson("/api/tournaments-history"),
-            fetchJson("/api/world-cup-2026"),
-          ]);
+        const [
+          factsPayload,
+          aggregatesPayload,
+          tournamentsPayload,
+          wc2026Payload,
+          fixturePayload,
+        ] = await Promise.all([
+          fetchJson(`/api/champion-facts?year=${championYear}`),
+          fetchJson("/api/champion-aggregates"),
+          fetchJson("/api/tournaments-history"),
+          fetchJson("/api/world-cup-2026"),
+          fetchJson("/api/world-cup-fixture"),
+        ]);
 
         if (!cancelled) {
           setFacts(factsPayload);
           setAggregates(aggregatesPayload?.aggregates ?? []);
           setTournaments(tournamentsPayload?.tournaments ?? []);
           setWorldCup2026(wc2026Payload);
+          setFixture({
+            year: fixturePayload?.year ?? null,
+            matches: fixturePayload?.matches ?? [],
+            source: fixturePayload?.source ?? "fallback",
+          });
         }
       } catch (error) {
         console.warn("Failed to load site extras:", error);
@@ -93,5 +109,5 @@ export default function useSiteExtras(lastChampionDate) {
     };
   }, [liveMatches.mode]);
 
-  return { facts, aggregates, tournaments, worldCup2026, liveMatches };
+  return { facts, aggregates, tournaments, worldCup2026, liveMatches, fixture };
 }

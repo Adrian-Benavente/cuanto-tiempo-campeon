@@ -14,6 +14,7 @@ import MyCountryCard from "./components/MyCountryCard/MyCountryCard";
 import ShareButton from "./components/ShareButton/ShareButton";
 import WorldChampionsList from "./components/WorldChampionsList/WorldChampionsList";
 import WorldCupCountdown from "./components/WorldCupCountdown/WorldCupCountdown";
+import WorldCupFixture from "./components/WorldCupFixture/WorldCupFixture";
 import WorldCupTimeline from "./components/WorldCupTimeline/WorldCupTimeline";
 import { LocaleProvider, useLocale } from "./context/LocaleContext";
 import {
@@ -47,7 +48,7 @@ function MyTeamSection() {
 function MainExperience() {
   const { t } = useLocale();
   const { isLoading, source, lastChampion } = useWorldChampionsContext();
-  const { facts, aggregates, tournaments, worldCup2026, liveMatches } =
+  const { facts, aggregates, tournaments, worldCup2026, liveMatches, fixture } =
     useSiteExtras(lastChampion?.lastChampionDate);
 
   if (isLoading) {
@@ -80,6 +81,7 @@ function MainExperience() {
           tournaments={tournaments}
         />
       </main>
+      <WorldCupFixture fixture={fixture} />
     </>
   );
 }

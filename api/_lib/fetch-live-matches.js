@@ -1,15 +1,14 @@
-const { zafronixFetch } = require("./zafronix-client");
+const { fetchMatchesForYear } = require("./fetch-matches");
 const {
   getCurrentWorldCupYear,
   getEmptyLivePayload,
-  getRecentTournamentYears,
   selectRecentMatches,
 } = require("./recent-matches");
 const { extractMatches } = require("./zafronix-normalize");
+const { zafronixFetch } = require("./zafronix-client");
 
 async function fetchRecentMatchesForYear(year, apiKey) {
-  const payload = await zafronixFetch(`/matches?year=${year}`, apiKey);
-  const matches = extractMatches(payload);
+  const matches = await fetchMatchesForYear(year, apiKey);
 
   return {
     year,

@@ -63,6 +63,9 @@ export const translations = {
     stageThirdPlace: "Tercer puesto",
     stageRoundOf16: "Octavos de final",
     stageRoundOf32: "Dieciseisavos de final",
+    fixtureTitle: "Fixture Mundial {year}",
+    fixtureSubtitle: "Todos los partidos del torneo actual",
+    fixtureTbd: "Por definir",
     vs: "vs",
   },
   en: {
@@ -129,6 +132,9 @@ export const translations = {
     stageThirdPlace: "Third place",
     stageRoundOf16: "Round of 16",
     stageRoundOf32: "Round of 32",
+    fixtureTitle: "World Cup {year} fixture",
+    fixtureSubtitle: "Every match in the current tournament",
+    fixtureTbd: "TBD",
     vs: "vs",
   },
 };

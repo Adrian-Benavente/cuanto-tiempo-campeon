@@ -97,6 +97,17 @@ beforeEach(() => {
       });
     }
 
+    if (String(url).includes("/api/world-cup-fixture")) {
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          year: 2026,
+          matches: [],
+          source: "fallback",
+        }),
+      });
+    }
+
     return Promise.reject(new Error(`Unhandled fetch: ${url}`));
   });
 });
