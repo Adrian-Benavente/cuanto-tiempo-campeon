@@ -61,9 +61,14 @@ body::before {
 }
 
 .toolbar {
-  display: grid;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.myTeamSection {
+  display: flex;
+  flex-direction: column;
   gap: var(--space-sm);
-  grid-template-columns: 1fr;
 }
 
 .toolbar button {
@@ -71,11 +76,6 @@ body::before {
 }
 
 @media (min-width: 768px) {
-  .toolbar {
-    align-items: stretch;
-    grid-template-columns: 1fr auto;
-  }
-
   .toolbar button {
     width: auto;
   }

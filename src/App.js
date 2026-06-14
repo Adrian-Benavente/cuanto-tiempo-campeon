@@ -30,9 +30,17 @@ import "./App.css";
 function PersonalizationToolbar() {
   return (
     <div className="toolbar">
-      <CountryPicker />
       <ShareButton />
     </div>
+  );
+}
+
+function MyTeamSection() {
+  return (
+    <section className="myTeamSection" aria-label="Mi selección">
+      <CountryPicker />
+      <MyCountryCard />
+    </section>
   );
 }
 
@@ -57,7 +65,7 @@ function MainExperience() {
       <PersonalizationToolbar />
       <HeroChampion />
       <ChampionFacts facts={facts} />
-      <MyCountryCard />
+      <MyTeamSection />
       <DroughtMilestones />
       {source === "fallback" && (
         <p className="fallbackNotice" role="status">
