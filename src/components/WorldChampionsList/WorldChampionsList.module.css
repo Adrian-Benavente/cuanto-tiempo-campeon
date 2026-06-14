@@ -1,55 +1,129 @@
-.countriesList {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  list-style: none;
-  margin: auto;
-  padding: 0;
-  width: max-content;
+.sectionTitle {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin: 0 0 var(--space-lg);
+  text-transform: uppercase;
 }
 
-.countryListItem {
-  align-items: center;
+.rankingList {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  margin-bottom: 2em;
+  gap: var(--space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rankingItem {
+  align-items: center;
+  animation: slideUp 0.5s ease-out both;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass);
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: auto auto 1fr;
+  grid-template-rows: auto auto;
+  padding: var(--space-md);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.rankingItem:hover {
+  background: var(--color-surface-hover);
+  box-shadow: var(--shadow-glass-hover);
+  transform: translateY(-2px);
+}
+
+.rank {
+  color: var(--color-text-subtle);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  grid-row: span 2;
 }
 
 .countryFlag {
-  background-size: cover;
-  display: inline-block;
-  flex-shrink: 0;
-  height: 1.5em;
-  margin-bottom: 0.5em;
-  width: 2.5em;
+  border-radius: var(--radius-sm);
+  display: block;
+  font-size: 1.5rem;
+  grid-row: span 2;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  overflow: hidden;
+  width: 2.25rem;
 }
 
 .countryFlagFallback {
-  display: inline-block;
-  font-size: 1.5em;
+  display: block;
+  font-size: 1.5rem;
+  grid-row: span 2;
   line-height: 1;
-  margin-bottom: 0.5em;
 }
 
-.lastChampionCountry {
-  font-weight: 900;
+.countryName {
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.durationBadge {
+  background: var(--color-badge);
+  border-radius: 999px;
+  color: var(--color-accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  justify-self: start;
+  padding: 0.25rem 0.75rem;
+  text-align: left;
+  width: fit-content;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (min-width: 768px) {
-  .countryListItem {
-    flex-direction: row;
-    justify-content: flex-start;
+  .rankingItem {
+    gap: var(--space-md);
+    grid-template-columns: 3rem 2.5rem 1fr auto;
+    grid-template-rows: auto;
+    padding: var(--space-md) var(--space-lg);
   }
 
+  .rank,
   .countryFlag,
   .countryFlagFallback {
-    margin-bottom: 0;
-    margin-right: 1em;
+    grid-row: auto;
   }
 
-  .lastChampionCountry {
-    font-size: 1.5em;
+  .countryName {
+    font-size: 1.0625rem;
+  }
+
+  .durationBadge {
+    justify-self: end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rankingItem {
+    animation: none;
+  }
+
+  .rankingItem:hover {
+    transform: none;
   }
 }

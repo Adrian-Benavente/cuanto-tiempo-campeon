@@ -1,30 +1,47 @@
 import React from "react";
-import WorldChampionsList from "./components/WorldChampionsList/WorldChampionsList";
-import "./App.css";
 import ChampionBackground from "./components/ChampionBackground/ChampionBackground";
-import Header from "./components/Header/Header";
-import { WorldChampionsProvider } from "./context/WorldChampionsContext";
+import Footer from "./components/Footer/Footer";
+import HeroChampion from "./components/HeroChampion/HeroChampion";
+import LoadingSkeleton from "./components/LoadingSkeleton/LoadingSkeleton";
+import WorldChampionsList from "./components/WorldChampionsList/WorldChampionsList";
+import {
+  useWorldChampionsContext,
+  WorldChampionsProvider,
+} from "./context/WorldChampionsContext";
+import "./App.css";
+
+function AppContent() {
+  const { isLoading, source } = useWorldChampionsContext();
+
+  return (
+    <>
+      <ChampionBackground />
+      <div className="appShell">
+        {isLoading ? (
+          <LoadingSkeleton />
+        ) : (
+          <>
+            <HeroChampion />
+            {source === "fallback" && (
+              <p className="fallbackNotice" role="status">
+                Datos locales — API no disponible
+              </p>
+            )}
+            <main className="mainPanel">
+              <WorldChampionsList />
+            </main>
+          </>
+        )}
+        <Footer />
+      </div>
+    </>
+  );
+}
 
 const App = () => {
   return (
     <WorldChampionsProvider>
-      <ChampionBackground />
-      <Header />
-      <main className="main-container">
-        <div className="inner">
-          <WorldChampionsList />
-        </div>
-      </main>
-      <footer>
-        <a
-          className="repo-link"
-          href="https://github.com/Adrian-Benavente/cuanto-tiempo-campeon"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <span className="sr-only">Repositorio en Github</span>
-        </a>
-      </footer>
+      <AppContent />
     </WorldChampionsProvider>
   );
 };

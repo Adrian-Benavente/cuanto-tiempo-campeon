@@ -1,47 +1,20 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { intervalToDuration } from "date-fns";
 import { useWorldChampionsContext } from "../../context/WorldChampionsContext";
+import useLiveNow from "../../hooks/useLiveNow";
+import { formatDuration } from "../../utils/formatDuration";
 import CountryFlag from "../CountryFlag/CountryFlag";
 import styles from "./WorldChampionsList.module.css";
 
-function formatDuration({ years, months, days, hours, minutes }, detailed) {
-  if (detailed) {
-    return (
-      <>
-        {years > 0 ? (years > 1 ? `${years} años, ` : `${years} año, `) : ""}
-        {months > 0
-          ? months > 1
-            ? `${months} meses, `
-            : `${months} mes, `
-          : ""}
-        {days > 0 ? (days > 1 ? `${days} días, ` : `${days} día, `) : ""}
-        {hours > 0
-          ? hours > 1
-            ? `${hours} horas y `
-            : `${hours} hora y `
-          : ""}
-        {minutes === 1 ? `${minutes} minuto` : `${minutes} minutos`}
-      </>
-    );
-  }
-
-  return (
-    <>
-      {years > 0 ? (years > 1 ? `${years} años` : `${years} año`) : ""}
-      {months > 0 ? (months > 1 ? `, ${months} meses` : `, ${months} mes`) : ""}
-      {days > 0 ? (days > 1 ? ` y ${days} días` : ` y ${days} día`) : ""}
-    </>
-  );
-}
-
 export default function WorldChampionsList() {
   const { champions } = useWorldChampionsContext();
-  const [now, setNow] = useState(() => new Date());
+  const now = useLiveNow();
 
-  const championsWithDuration = useMemo(
+  const rankedChampions = useMemo(
     () =>
-      champions.map((champion) => ({
+      champions.slice(1).map((champion, index) => ({
         ...champion,
+        rank: index + 2,
         duration: intervalToDuration({
           start: new Date(champion.lastChampionDate),
           end: now,
@@ -50,31 +23,35 @@ export default function WorldChampionsList() {
     [champions, now]
   );
 
-  useEffect(() => {
-    const refresh = setInterval(() => setNow(new Date()));
-    return () => clearInterval(refresh);
-  }, []);
+  if (rankedChampions.length === 0) {
+    return null;
+  }
 
   return (
-    <ul className={styles.countriesList}>
-      {championsWithDuration.map((champion, index) => (
-        <li key={champion.slug} className={styles.countryListItem}>
-          <CountryFlag
-            champion={champion}
-            imageClassName={styles.countryFlag}
-            fallbackClassName={styles.countryFlagFallback}
-          />
-          {index === 0 ? (
-            <span className={styles.lastChampionCountry}>
-              {champion.displayName}: {formatDuration(champion.duration, true)}
+    <section aria-labelledby="ranking-title">
+      <h2 className={styles.sectionTitle} id="ranking-title">
+        Resto de campeones mundiales
+      </h2>
+      <ul className={styles.rankingList}>
+        {rankedChampions.map((champion, index) => (
+          <li
+            key={champion.slug}
+            className={styles.rankingItem}
+            style={{ animationDelay: `${index * 60}ms` }}
+          >
+            <span className={styles.rank}>#{champion.rank}</span>
+            <CountryFlag
+              champion={champion}
+              imageClassName={styles.countryFlag}
+              fallbackClassName={styles.countryFlagFallback}
+            />
+            <span className={styles.countryName}>{champion.displayName}</span>
+            <span className={styles.durationBadge}>
+              {formatDuration(champion.duration, false)}
             </span>
-          ) : (
-            <span>
-              {champion.displayName}: {formatDuration(champion.duration, false)}
-            </span>
-          )}
-        </li>
-      ))}
-    </ul>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

@@ -1,0 +1,53 @@
+.footer {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: auto;
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.credit {
+  color: var(--color-text-subtle);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.credit a {
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.credit a:hover {
+  text-decoration: underline;
+}
+
+.githubLink {
+  align-items: center;
+  color: var(--color-text);
+  display: inline-flex;
+  font-size: 0.875rem;
+  font-weight: 600;
+  gap: var(--space-xs);
+  justify-content: center;
+  margin: var(--space-xs) auto 0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.githubLink:hover {
+  color: var(--color-accent);
+}
+
+.githubIcon {
+  height: 1.25rem;
+  width: 1.25rem;
+}
