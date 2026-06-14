@@ -28,6 +28,7 @@ No commitees la API key al repositorio.
 
 1. Conectá el repositorio a Vercel.
 2. Agregá `ZAFRONIX_API_KEY` como variable de entorno del proyecto.
-3. Deployá normalmente con `yarn build`.
+3. Usá Node.js **24.x** (declarado en `package.json` y `.nvmrc`).
+4. Deployá normalmente con `yarn build`.
 
 Cuando haya un nuevo campeón mundial, el sitio se actualizará automáticamente al vencer el cache del endpoint, sin necesidad de redeployar.
