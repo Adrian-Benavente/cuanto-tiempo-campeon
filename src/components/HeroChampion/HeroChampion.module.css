@@ -13,6 +13,7 @@
 }
 
 .flagWrapper {
+  align-items: center;
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
@@ -33,12 +34,16 @@
 }
 
 .championFlag {
+  background-position: center;
+  background-size: cover;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-glass);
   display: block;
+  flex-shrink: 0;
   font-size: 5rem;
   height: 4.5rem;
   line-height: 4.5rem;
+  margin-inline: auto;
   overflow: hidden;
   width: 7rem;
 }
@@ -47,6 +52,8 @@
   display: block;
   font-size: 4rem;
   line-height: 1;
+  margin-inline: auto;
+  text-align: center;
 }
 
 .content {
