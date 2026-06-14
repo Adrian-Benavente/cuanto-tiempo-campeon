@@ -13,8 +13,14 @@
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.08em;
-  margin: 0 0 var(--space-sm);
+  margin: 0 0 var(--space-xs);
   text-transform: uppercase;
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  margin: 0 0 var(--space-sm);
 }
 
 .list {
@@ -27,7 +33,22 @@
 }
 
 .list li {
+  display: flex;
+  flex-direction: column;
   font-size: 0.9375rem;
+  font-weight: 600;
+  gap: 0.125rem;
+}
+
+.stage {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.matchup {
   font-weight: 600;
 }
 

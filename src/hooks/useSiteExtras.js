@@ -21,7 +21,12 @@ export default function useSiteExtras(lastChampionDate) {
   const [aggregates, setAggregates] = useState([]);
   const [tournaments, setTournaments] = useState([]);
   const [worldCup2026, setWorldCup2026] = useState(null);
-  const [liveMatches, setLiveMatches] = useState([]);
+  const [liveMatches, setLiveMatches] = useState({
+    mode: "recent",
+    year: 2022,
+    matches: [],
+    source: "fallback",
+  });
 
   const championYear = getYearFromDate(lastChampionDate);
 
@@ -62,7 +67,12 @@ export default function useSiteExtras(lastChampionDate) {
       try {
         const payload = await fetchJson("/api/live-matches");
         if (!cancelled) {
-          setLiveMatches(payload?.matches ?? []);
+          setLiveMatches({
+            mode: payload?.mode ?? "recent",
+            year: payload?.year ?? 2022,
+            matches: payload?.matches ?? [],
+            source: payload?.source ?? "fallback",
+          });
         }
       } catch (error) {
         console.warn("Failed to load live matches:", error);

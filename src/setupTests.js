@@ -82,7 +82,21 @@ beforeEach(() => {
     if (String(url).includes("/api/live-matches")) {
       return Promise.resolve({
         ok: true,
-        json: async () => ({ matches: [], source: "fallback" }),
+        json: async () => ({
+          mode: "recent",
+          year: 2022,
+          matches: [
+            {
+              id: "wc2022-final",
+              stage: "Final",
+              homeTeam: "Argentina",
+              awayTeam: "Francia",
+              homeScore: 3,
+              awayScore: 3,
+            },
+          ],
+          source: "fallback",
+        }),
       });
     }
 

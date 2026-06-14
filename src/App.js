@@ -49,7 +49,11 @@ function MainExperience() {
   return (
     <>
       <WorldCupCountdown worldCup2026={worldCup2026} />
-      <LiveMatchesBanner matches={liveMatches} />
+      <LiveMatchesBanner
+        mode={liveMatches.mode}
+        year={liveMatches.year}
+        matches={liveMatches.matches}
+      />
       <PersonalizationToolbar />
       <HeroChampion />
       <ChampionFacts facts={facts} />
