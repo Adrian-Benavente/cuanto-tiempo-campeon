@@ -32,6 +32,7 @@ export default function useSiteExtras(lastChampionDate) {
   const [fixture, setFixture] = useState({
     year: null,
     matches: [],
+    standings: { groups: {} },
     source: "fallback",
   });
 
@@ -64,6 +65,7 @@ export default function useSiteExtras(lastChampionDate) {
           setFixture({
             year: fixturePayload?.year ?? null,
             matches: fixturePayload?.matches ?? [],
+            standings: fixturePayload?.standings ?? { groups: {} },
             source: fixturePayload?.source ?? "fallback",
           });
         }

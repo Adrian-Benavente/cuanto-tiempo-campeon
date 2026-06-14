@@ -1,8 +1,10 @@
 import React, { useMemo } from "react";
 import { useLocale } from "../../context/LocaleContext";
 import { groupMatchesByStage } from "../../utils/fixtureData";
+import { isGroupStageKey } from "../../utils/groupStandings";
 import { getMatchScores } from "../../utils/liveMatchData";
 import { getMatchSideDisplayName } from "../../utils/matchTeams";
+import GroupStandingsTable from "./GroupStandingsTable";
 import scoreboardStyles from "../LiveMatchesBanner/LiveMatchesBanner.module.css";
 import styles from "./WorldCupFixture.module.css";
 
@@ -93,6 +95,7 @@ export default function WorldCupFixture({ fixture }) {
   const { t, locale } = useLocale();
   const year = fixture?.year;
   const matches = fixture?.matches;
+  const standings = fixture?.standings;
 
   const sections = useMemo(
     () => groupMatchesByStage(matches ?? [], locale),
@@ -118,6 +121,13 @@ export default function WorldCupFixture({ fixture }) {
                 {section.matches.length}
               </span>
             </summary>
+            {isGroupStageKey(section.stageKey) ? (
+              <GroupStandingsTable
+                standings={standings}
+                stageKey={section.stageKey}
+                groupLabel={section.label}
+              />
+            ) : null}
             <ul className={styles.matchList}>
               {section.matches.map((match, index) => (
                 <li key={match.id ?? `${section.stageKey}-${index}`}>

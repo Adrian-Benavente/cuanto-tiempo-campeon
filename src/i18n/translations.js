@@ -63,6 +63,11 @@ export const translations = {
     fixtureTitle: "Fixture Mundial {year}",
     fixtureSubtitle: "Todos los partidos del torneo actual",
     fixtureTbd: "Por definir",
+    standingsTeam: "Equipo",
+    standingsPlayed: "PJ",
+    standingsGoalDiff: "DG",
+    standingsPoints: "Pts",
+    standingsAdvanced: "Clasificado",
     vs: "vs",
   },
   en: {
@@ -129,6 +134,11 @@ export const translations = {
     fixtureTitle: "World Cup {year} fixture",
     fixtureSubtitle: "Every match in the current tournament",
     fixtureTbd: "TBD",
+    standingsTeam: "Team",
+    standingsPlayed: "P",
+    standingsGoalDiff: "GD",
+    standingsPoints: "Pts",
+    standingsAdvanced: "Qualified",
     vs: "vs",
   },
 };

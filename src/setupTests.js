@@ -103,6 +103,7 @@ beforeEach(() => {
         json: async () => ({
           year: 2026,
           matches: [],
+          standings: { groups: {} },
           source: "fallback",
         }),
       });

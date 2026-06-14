@@ -1,4 +1,5 @@
 const { fetchMatchesForYear } = require("./fetch-matches");
+const { fetchStandingsForYear, getEmptyStandings } = require("./fetch-world-cup-standings");
 const { getCurrentWorldCupYear, getMatchDate } = require("./recent-matches");
 
 const TOURNAMENT_START = new Date("2026-06-11T16:00:00.000Z");
@@ -36,6 +37,7 @@ function getEmptyFixturePayload(now = new Date(), source = "fallback") {
   return {
     year: getCurrentWorldCupYear(now),
     matches: [],
+    standings: getEmptyStandings(),
     source,
   };
 }
@@ -51,16 +53,21 @@ async function getWorldCupFixture(apiKey, now = new Date()) {
     return {
       year,
       matches: [],
+      standings: getEmptyStandings(),
       source: "fallback",
     };
   }
 
   try {
-    const matches = await fetchMatchesForYear(year, apiKey);
+    const [matches, standings] = await Promise.all([
+      fetchMatchesForYear(year, apiKey),
+      fetchStandingsForYear(year, apiKey),
+    ]);
 
     return {
       year,
       matches: sortMatchesChronologically(matches),
+      standings,
       source: "zafronix",
     };
   } catch (error) {
@@ -69,6 +76,7 @@ async function getWorldCupFixture(apiKey, now = new Date()) {
     return {
       year,
       matches: [],
+      standings: getEmptyStandings(),
       source: "fallback",
     };
   }
