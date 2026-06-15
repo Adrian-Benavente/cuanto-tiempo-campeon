@@ -62,30 +62,35 @@ export default function WorldChampionsList({ aggregates = [] }) {
 
   return (
     <section aria-labelledby="ranking-title">
-      <div className={styles.header}>
-        <h2 className={styles.sectionTitle} id="ranking-title">
-          {t("rankingTitle")}
-        </h2>
-        <div className={styles.sortToggle}>
-          <button
-            className={
-              sortMode === "drought" ? styles.sortActive : styles.sortButton
-            }
-            onClick={() => setSortMode("drought")}
-            type="button"
-          >
-            {t("sortByDrought")}
-          </button>
-          <button
-            className={
-              sortMode === "stars" ? styles.sortActive : styles.sortButton
-            }
-            onClick={() => setSortMode("stars")}
-            type="button"
-          >
-            {t("sortByStars")}
-          </button>
+      <div className={styles.headerBlock}>
+        <div className={styles.header}>
+          <h2 className={styles.sectionTitle} id="ranking-title">
+            {t("rankingTitle")}
+          </h2>
+          <div className={styles.sortToggle}>
+            <button
+              className={
+                sortMode === "drought" ? styles.sortActive : styles.sortButton
+              }
+              onClick={() => setSortMode("drought")}
+              type="button"
+            >
+              {t("sortByDrought")}
+            </button>
+            <button
+              className={
+                sortMode === "stars" ? styles.sortActive : styles.sortButton
+              }
+              onClick={() => setSortMode("stars")}
+              type="button"
+            >
+              {t("sortByStars")}
+            </button>
+          </div>
         </div>
+        <p className={styles.barLegend}>
+          {sortMode === "stars" ? t("barLegendTitles") : t("barLegendDrought")}
+        </p>
       </div>
       <ul className={styles.rankingList}>
         {rankedChampions.map((champion, index) => {
@@ -126,7 +131,9 @@ export default function WorldChampionsList({ aggregates = [] }) {
                 {"★".repeat(champion.titles)}
               </span>
               <span className={styles.durationBadge}>
-                {formatDuration(champion.duration, false, locale)}
+                {sortMode === "stars"
+                  ? t("stars", { count: champion.titles })
+                  : formatDuration(champion.duration, false, locale)}
               </span>
             </div>
           </li>
