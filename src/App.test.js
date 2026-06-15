@@ -11,7 +11,7 @@ test("renders the current world champion title", async () => {
 test("renders the ranking section", async () => {
   render(<App />);
   expect(
-    await screen.findByText(/resto de campeones mundiales|other world champions/i)
+    await screen.findByText(/todos los campeones mundiales|all world champions/i)
   ).toBeInTheDocument();
 });
 

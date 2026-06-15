@@ -23,7 +23,7 @@ export default function WorldChampionsList({ aggregates = [] }) {
   );
 
   const rankedChampions = useMemo(() => {
-    const base = champions.slice(1).map((champion) => ({
+    const base = champions.map((champion) => ({
       ...champion,
       titles: getTitlesForSlug(champion.slug, aggregates),
       duration: intervalToDuration({
@@ -86,7 +86,7 @@ export default function WorldChampionsList({ aggregates = [] }) {
             }`}
             style={{ animationDelay: `${index * 60}ms` }}
           >
-            <span className={styles.rank}>#{index + 2}</span>
+            <span className={styles.rank}>#{index + 1}</span>
             <CountryFlag
               champion={champion}
               imageClassName={styles.countryFlag}
