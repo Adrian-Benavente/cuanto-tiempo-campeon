@@ -5,6 +5,7 @@ import { useSelectedCountry } from "../../context/SelectedCountryContext";
 import { useWorldChampionsContext } from "../../context/WorldChampionsContext";
 import useLiveNow from "../../hooks/useLiveNow";
 import { getDroughtRatio, getMaxDroughtMs } from "../../utils/droughtRatio";
+import { assignCompetitionRanks, compareByTitlesThenRecency } from "../../utils/competitionRank";
 import { getMaxTitles, getTitlesForSlug, getTitlesRatio } from "../../utils/championTitles";
 import { formatDuration } from "../../utils/formatDuration";
 import CountryFlag from "../CountryFlag/CountryFlag";
@@ -48,9 +49,8 @@ export default function WorldChampionsList({ aggregates = [] }) {
     });
 
     if (sortMode === "stars") {
-      return [...base].sort(
-        (a, b) => b.titles - a.titles || b.droughtRatio - a.droughtRatio
-      );
+      const sorted = [...base].sort(compareByTitlesThenRecency);
+      return assignCompetitionRanks(sorted, (champion) => champion.titles);
     }
 
     return base;
@@ -99,6 +99,9 @@ export default function WorldChampionsList({ aggregates = [] }) {
           const barLabel =
             sortMode === "stars" ? t("titlesBar") : t("droughtBar");
 
+          const rank =
+            sortMode === "stars" ? champion.displayRank : index + 1;
+
           return (
           <li
             key={champion.slug}
@@ -107,7 +110,7 @@ export default function WorldChampionsList({ aggregates = [] }) {
             }`}
             style={{ animationDelay: `${index * 60}ms` }}
           >
-            <span className={styles.rank}>#{index + 1}</span>
+            <span className={styles.rank}>#{rank}</span>
             <CountryFlag
               champion={champion}
               imageClassName={styles.countryFlag}
