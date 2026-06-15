@@ -1,10 +1,61 @@
-const CACHE_NAME = "cuanto-tiempo-campeon-v1";
-const SHELL_ASSETS = ["/", "/index.html", "/manifest.json", "/favicon.ico"];
+const CACHE_NAME = "cuanto-tiempo-campeon-__CACHE_VERSION__";
+const CACHE_PREFIX = "cuanto-tiempo-campeon-";
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL_ASSETS))
-  );
+function isNavigationRequest(request) {
+  if (request.mode === "navigate") {
+    return true;
+  }
+
+  const accept = request.headers.get("accept") ?? "";
+  return request.method === "GET" && accept.includes("text/html");
+}
+
+function isHashedStaticAsset(pathname) {
+  return pathname.startsWith("/static/");
+}
+
+async function networkFirst(request) {
+  try {
+    const response = await fetch(request);
+
+    if (response && response.status === 200 && response.type === "basic") {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(request, response.clone());
+    }
+
+    return response;
+  } catch (error) {
+    const cached = await caches.match(request);
+    if (cached) {
+      return cached;
+    }
+
+    const fallback = await caches.match("/index.html");
+    if (fallback) {
+      return fallback;
+    }
+
+    throw error;
+  }
+}
+
+async function cacheFirst(request) {
+  const cached = await caches.match(request);
+  if (cached) {
+    return cached;
+  }
+
+  const response = await fetch(request);
+
+  if (response && response.status === 200 && response.type === "basic") {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.put(request, response.clone());
+  }
+
+  return response;
+}
+
+self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
@@ -13,7 +64,7 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys
-          .filter((key) => key !== CACHE_NAME)
+          .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
           .map((key) => caches.delete(key))
       )
     )
@@ -28,6 +79,10 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(event.request.url);
 
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(
       fetch(event.request).catch(() =>
@@ -39,23 +94,19 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) {
-        return cached;
-      }
+  if (url.pathname === "/sw.js") {
+    return;
+  }
 
-      return fetch(event.request)
-        .then((response) => {
-          if (!response || response.status !== 200 || response.type !== "basic") {
-            return response;
-          }
+  if (isHashedStaticAsset(url.pathname)) {
+    event.respondWith(cacheFirst(event.request));
+    return;
+  }
 
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-          return response;
-        })
-        .catch(() => caches.match("/index.html"));
-    })
-  );
+  if (isNavigationRequest(event.request) || url.pathname === "/index.html") {
+    event.respondWith(networkFirst(event.request));
+    return;
+  }
+
+  event.respondWith(networkFirst(event.request));
 });
