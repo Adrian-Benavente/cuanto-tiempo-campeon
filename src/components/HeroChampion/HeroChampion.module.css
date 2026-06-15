@@ -78,6 +78,28 @@
   margin: 0;
 }
 
+.titlesRow {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: center;
+  margin: 0;
+}
+
+.starsBadge {
+  color: #ca8a04;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.titlesLabel {
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
 .countdown {
   display: grid;
   gap: var(--space-sm);
@@ -123,6 +145,10 @@
   .flagWrapper {
     flex-shrink: 0;
     margin: 0;
+  }
+
+  .titlesRow {
+    justify-content: flex-start;
   }
 
   .championFlag {

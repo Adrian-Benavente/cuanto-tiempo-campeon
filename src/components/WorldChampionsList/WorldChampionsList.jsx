@@ -23,9 +23,8 @@ export default function WorldChampionsList({ aggregates = [] }) {
   );
 
   const rankedChampions = useMemo(() => {
-    const base = champions.slice(1).map((champion, index) => ({
+    const base = champions.slice(1).map((champion) => ({
       ...champion,
-      rank: index + 2,
       titles: getTitlesForSlug(champion.slug, aggregates),
       duration: intervalToDuration({
         start: new Date(champion.lastChampionDate),
@@ -39,7 +38,9 @@ export default function WorldChampionsList({ aggregates = [] }) {
     }));
 
     if (sortMode === "stars") {
-      return [...base].sort((a, b) => b.titles - a.titles);
+      return [...base].sort(
+        (a, b) => b.titles - a.titles || b.droughtRatio - a.droughtRatio
+      );
     }
 
     return base;
@@ -85,7 +86,7 @@ export default function WorldChampionsList({ aggregates = [] }) {
             }`}
             style={{ animationDelay: `${index * 60}ms` }}
           >
-            <span className={styles.rank}>#{champion.rank}</span>
+            <span className={styles.rank}>#{index + 2}</span>
             <CountryFlag
               champion={champion}
               imageClassName={styles.countryFlag}

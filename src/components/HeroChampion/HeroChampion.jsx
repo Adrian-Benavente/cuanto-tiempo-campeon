@@ -7,13 +7,22 @@ import {
   getLiveCountdownParts,
   padCountdownValue,
 } from "../../utils/formatDuration";
+import { getTitlesForSlug } from "../../utils/championTitles";
 import CountryFlag from "../CountryFlag/CountryFlag";
 import styles from "./HeroChampion.module.css";
 
-export default function HeroChampion() {
+export default function HeroChampion({ aggregates = [] }) {
   const { t } = useLocale();
   const { lastChampion } = useWorldChampionsContext();
   const now = useLiveNow();
+
+  const titles = useMemo(() => {
+    if (!lastChampion) {
+      return 0;
+    }
+
+    return getTitlesForSlug(lastChampion.slug, aggregates);
+  }, [lastChampion, aggregates]);
 
   const countdownUnits = useMemo(
     () => [
@@ -60,6 +69,12 @@ export default function HeroChampion() {
         <h1 className={styles.title} id="hero-title">
           {t("currentChampionTitle", { country: lastChampion.displayName })}
         </h1>
+        <p className={styles.titlesRow} aria-label={t("stars", { count: titles })}>
+          <span aria-hidden="true" className={styles.starsBadge}>
+            {"★".repeat(titles)}
+          </span>
+          <span className={styles.titlesLabel}>{t("stars", { count: titles })}</span>
+        </p>
         <p className={styles.subtitle}>{t("subtitle")}</p>
 
         <div

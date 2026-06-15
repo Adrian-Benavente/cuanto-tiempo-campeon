@@ -63,7 +63,7 @@ function MainExperience() {
         matches={recentMatches.matches}
       />
       <PersonalizationToolbar />
-      <HeroChampion />
+      <HeroChampion aggregates={aggregates} />
       <ChampionFacts facts={facts} />
       <MyTeamSection />
       <DroughtMilestones />
