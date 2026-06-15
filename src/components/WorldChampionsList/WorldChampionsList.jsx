@@ -5,7 +5,7 @@ import { useSelectedCountry } from "../../context/SelectedCountryContext";
 import { useWorldChampionsContext } from "../../context/WorldChampionsContext";
 import useLiveNow from "../../hooks/useLiveNow";
 import { getDroughtRatio, getMaxDroughtMs } from "../../utils/droughtRatio";
-import { getTitlesForSlug } from "../../utils/championTitles";
+import { getMaxTitles, getTitlesForSlug, getTitlesRatio } from "../../utils/championTitles";
 import { formatDuration } from "../../utils/formatDuration";
 import CountryFlag from "../CountryFlag/CountryFlag";
 import styles from "./WorldChampionsList.module.css";
@@ -22,20 +22,30 @@ export default function WorldChampionsList({ aggregates = [] }) {
     [champions, now]
   );
 
+  const maxTitles = useMemo(
+    () => getMaxTitles(champions, aggregates),
+    [champions, aggregates]
+  );
+
   const rankedChampions = useMemo(() => {
-    const base = champions.map((champion) => ({
-      ...champion,
-      titles: getTitlesForSlug(champion.slug, aggregates),
-      duration: intervalToDuration({
-        start: new Date(champion.lastChampionDate),
-        end: now,
-      }),
-      droughtRatio: getDroughtRatio(
-        champion.lastChampionDate,
-        maxDroughtMs,
-        now
-      ),
-    }));
+    const base = champions.map((champion) => {
+      const titles = getTitlesForSlug(champion.slug, aggregates);
+
+      return {
+        ...champion,
+        titles,
+        duration: intervalToDuration({
+          start: new Date(champion.lastChampionDate),
+          end: now,
+        }),
+        droughtRatio: getDroughtRatio(
+          champion.lastChampionDate,
+          maxDroughtMs,
+          now
+        ),
+        titlesRatio: getTitlesRatio(titles, maxTitles),
+      };
+    });
 
     if (sortMode === "stars") {
       return [...base].sort(
@@ -44,7 +54,7 @@ export default function WorldChampionsList({ aggregates = [] }) {
     }
 
     return base;
-  }, [champions, now, aggregates, maxDroughtMs, sortMode]);
+  }, [champions, now, aggregates, maxDroughtMs, maxTitles, sortMode]);
 
   if (rankedChampions.length === 0) {
     return null;
@@ -78,7 +88,13 @@ export default function WorldChampionsList({ aggregates = [] }) {
         </div>
       </div>
       <ul className={styles.rankingList}>
-        {rankedChampions.map((champion, index) => (
+        {rankedChampions.map((champion, index) => {
+          const barRatio =
+            sortMode === "stars" ? champion.titlesRatio : champion.droughtRatio;
+          const barLabel =
+            sortMode === "stars" ? t("titlesBar") : t("droughtBar");
+
+          return (
           <li
             key={champion.slug}
             className={`${styles.rankingItem} ${
@@ -97,11 +113,11 @@ export default function WorldChampionsList({ aggregates = [] }) {
               <div
                 className={styles.droughtBar}
                 role="img"
-                aria-label={t("droughtBar")}
+                aria-label={barLabel}
               >
                 <span
                   className={styles.droughtFill}
-                  style={{ width: `${champion.droughtRatio * 100}%` }}
+                  style={{ width: `${barRatio * 100}%` }}
                 />
               </div>
             </div>
@@ -114,7 +130,8 @@ export default function WorldChampionsList({ aggregates = [] }) {
               </span>
             </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </section>
   );
