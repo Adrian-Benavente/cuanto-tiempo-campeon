@@ -10,7 +10,7 @@ El último campeón aparece destacado con su bandera y un fondo inspirado en los
 - **Últimos resultados** del torneo actual (2026+); los partidos en curso aparecen como "En desarrollo" sin marcador hasta que finalizan.
 - **Cuenta regresiva** al Mundial 2026.
 - **Datos del último título** del campeón (resumen de la final y trivia).
-- **Mi selección**: elegí tu país y mirá cuánto hace que no gana (o si es el campeón actual).
+- **Mi selección**: elegí tu país y mirá cuánto hace que no gana (o si es el campeón actual), con plantel del torneo actual cuando está disponible.
 - **Hitos de sequía** cuando un campeón se acerca a marcas redondas.
 - **Ranking** de campeones con barra de sequía relativa; orden por antigüedad del título o por estrellas.
 - **Línea de tiempo** de todos los Mundiales.
@@ -34,6 +34,7 @@ La app no llama a Zafronix desde el navegador. Usa **API Routes** en Vercel como
 | `/api/world-cup-2026` | Metadatos del Mundial 2026 |
 | `/api/live-matches` | Últimos resultados del torneo actual (incluye partidos en curso sin marcador) |
 | `/api/world-cup-fixture` | Fixture completo del torneo actual y tablas de posiciones por grupo |
+| `/api/team-roster` | Plantel de una selección en el torneo actual |
 | `/api/og` | Imagen Open Graph |
 | `/api/oembed` | oEmbed para embeber |
 

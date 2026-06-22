@@ -109,6 +109,41 @@ beforeEach(() => {
       });
     }
 
+    if (String(url).includes("/api/team-roster")) {
+      const team = new URL(String(url), "http://localhost").searchParams.get("team");
+
+      if (team === "argentina") {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            year: 2026,
+            team: "argentina",
+            players: [
+              {
+                jersey: 10,
+                name: "Lionel Messi",
+                position: "FW",
+                goals: 0,
+                captain: true,
+                club: "Inter Miami",
+              },
+            ],
+            source: "fallback",
+          }),
+        });
+      }
+
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          year: 2026,
+          team,
+          players: [],
+          source: "fallback",
+        }),
+      });
+    }
+
     return Promise.reject(new Error(`Unhandled fetch: ${url}`));
   });
 });

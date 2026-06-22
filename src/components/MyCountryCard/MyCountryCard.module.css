@@ -1,5 +1,4 @@
 .card {
-  align-items: center;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   background: var(--color-surface);
@@ -8,8 +7,15 @@
   box-shadow: var(--shadow-glass);
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-md);
   padding: var(--space-md) var(--space-lg);
+}
+
+.summary {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
   text-align: center;
 }
 
@@ -37,8 +43,106 @@
   margin: 0;
 }
 
+.rosterLoading {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+  text-align: center;
+}
+
+.rosterSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.rosterTitle {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin: 0;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.rosterTableWrap {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.rosterTable {
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.rosterCaption {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.rosterTable th,
+.rosterTable td {
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.5rem 0.375rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.rosterTable thead th {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rosterJerseyCol,
+.rosterPositionCol {
+  text-align: center;
+  white-space: nowrap;
+  width: 3rem;
+}
+
+.rosterPlayerCell {
+  font-weight: 500;
+  min-width: 0;
+}
+
+.rosterPlayerName {
+  display: block;
+}
+
+.rosterPlayerMeta {
+  color: var(--color-text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  font-weight: 500;
+  gap: 0.375rem;
+  margin-top: 0.125rem;
+}
+
+.rosterCaptain {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.rosterGoals {
+  color: var(--color-text-muted);
+}
+
 @media (min-width: 768px) {
-  .card {
+  .summary {
     flex-direction: row;
     text-align: left;
   }

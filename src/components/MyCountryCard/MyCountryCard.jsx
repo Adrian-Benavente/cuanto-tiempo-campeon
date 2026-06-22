@@ -4,15 +4,76 @@ import { useLocale } from "../../context/LocaleContext";
 import { useSelectedCountry } from "../../context/SelectedCountryContext";
 import { useWorldChampionsContext } from "../../context/WorldChampionsContext";
 import useLiveNow from "../../hooks/useLiveNow";
+import useTeamRoster from "../../hooks/useTeamRoster";
 import { formatDuration } from "../../utils/formatDuration";
 import CountryFlag from "../CountryFlag/CountryFlag";
 import styles from "./MyCountryCard.module.css";
+
+function RosterTable({ players, year, t }) {
+  if (!players.length) {
+    return null;
+  }
+
+  return (
+    <div className={styles.rosterSection}>
+      <h3 className={styles.rosterTitle}>
+        {t("myTeamRosterTitle", { year })}
+      </h3>
+      <div className={styles.rosterTableWrap}>
+        <table className={styles.rosterTable}>
+          <caption className={styles.rosterCaption}>
+            {t("myTeamRosterTitle", { year })}
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" className={styles.rosterJerseyCol}>
+                {t("rosterJersey")}
+              </th>
+              <th scope="col">{t("rosterPlayer")}</th>
+              <th scope="col" className={styles.rosterPositionCol}>
+                {t("rosterPosition")}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {players.map((player) => (
+              <tr key={`${player.jersey ?? "na"}-${player.name}`}>
+                <td className={styles.rosterJerseyCol}>{player.jersey ?? "—"}</td>
+                <th scope="row" className={styles.rosterPlayerCell}>
+                  <span className={styles.rosterPlayerName}>{player.name}</span>
+                  {player.captain || (player.goals ?? 0) > 0 ? (
+                    <span className={styles.rosterPlayerMeta}>
+                      {player.captain ? (
+                        <span className={styles.rosterCaptain} title={t("rosterCaptain")}>
+                          ©
+                        </span>
+                      ) : null}
+                      {(player.goals ?? 0) > 0 ? (
+                        <span className={styles.rosterGoals}>
+                          {t("rosterGoals", { count: player.goals })}
+                        </span>
+                      ) : null}
+                    </span>
+                  ) : null}
+                </th>
+                <td className={styles.rosterPositionCol}>
+                  {player.position ?? "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
 export default function MyCountryCard() {
   const { locale, t } = useLocale();
   const { selectedCountry } = useSelectedCountry();
   const { lastChampion } = useWorldChampionsContext();
   const now = useLiveNow();
+  const { year, players, isLoading } = useTeamRoster(selectedCountry?.slug);
 
   const message = useMemo(() => {
     if (!selectedCountry) {
@@ -46,12 +107,22 @@ export default function MyCountryCard() {
 
   return (
     <section className={styles.card} aria-live="polite">
-      <CountryFlag
-        champion={selectedCountry}
-        imageClassName={styles.flag}
-        fallbackClassName={styles.flagFallback}
-      />
-      <p className={styles.message}>{message}</p>
+      <div className={styles.summary}>
+        <CountryFlag
+          champion={selectedCountry}
+          imageClassName={styles.flag}
+          fallbackClassName={styles.flagFallback}
+        />
+        <p className={styles.message}>{message}</p>
+      </div>
+
+      {isLoading ? (
+        <p className={styles.rosterLoading} role="status">
+          {t("rosterLoading")}
+        </p>
+      ) : (
+        <RosterTable players={players} year={year} t={t} />
+      )}
     </section>
   );
 }
