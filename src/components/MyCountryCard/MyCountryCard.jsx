@@ -15,10 +15,11 @@ function RosterTable({ players, year, t }) {
   }
 
   return (
-    <div className={styles.rosterSection}>
-      <h3 className={styles.rosterTitle}>
-        {t("myTeamRosterTitle", { year })}
-      </h3>
+    <details className={styles.rosterSection}>
+      <summary className={styles.rosterSummary}>
+        <span>{t("myTeamRosterTitle", { year })}</span>
+        <span className={styles.rosterCount}>{players.length}</span>
+      </summary>
       <div className={styles.rosterTableWrap}>
         <table className={styles.rosterTable}>
           <caption className={styles.rosterCaption}>
@@ -64,7 +65,7 @@ function RosterTable({ players, year, t }) {
           </tbody>
         </table>
       </div>
-    </div>
+    </details>
   );
 }
 
