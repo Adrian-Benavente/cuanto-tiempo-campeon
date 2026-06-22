@@ -41,19 +41,21 @@ function RosterTable({ players, year, t }) {
               <tr key={`${player.jersey ?? "na"}-${player.name}`}>
                 <td className={styles.rosterJerseyCol}>{player.jersey ?? "—"}</td>
                 <th scope="row" className={styles.rosterPlayerCell}>
-                  <span className={styles.rosterPlayerName}>{player.name}</span>
-                  {player.captain || (player.goals ?? 0) > 0 ? (
-                    <span className={styles.rosterPlayerMeta}>
-                      {player.captain ? (
-                        <span className={styles.rosterCaptain} title={t("rosterCaptain")}>
-                          ©
-                        </span>
-                      ) : null}
-                      {(player.goals ?? 0) > 0 ? (
-                        <span className={styles.rosterGoals}>
-                          {t("rosterGoals", { count: player.goals })}
-                        </span>
-                      ) : null}
+                  <span className={styles.rosterPlayerLine}>
+                    <span className={styles.rosterPlayerName}>{player.name}</span>
+                    {player.captain ? (
+                      <span
+                        className={styles.rosterCaptainBadge}
+                        title={t("rosterCaptain")}
+                        aria-label={t("rosterCaptain")}
+                      >
+                        C
+                      </span>
+                    ) : null}
+                  </span>
+                  {(player.goals ?? 0) > 0 ? (
+                    <span className={styles.rosterGoals}>
+                      {t("rosterGoals", { count: player.goals })}
                     </span>
                   ) : null}
                 </th>
