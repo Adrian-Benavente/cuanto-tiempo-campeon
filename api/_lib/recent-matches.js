@@ -134,13 +134,133 @@ function selectRecentMatches(matches, limit = 5, now = new Date()) {
   return [...inProgress, ...finished].slice(0, limit);
 }
 
-function getFallbackRecentMatches(year = 2022) {
+function isValidTimeZone(timeZone) {
+  if (!timeZone || typeof timeZone !== "string") {
+    return false;
+  }
+
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function resolveTimeZone(timeZone) {
+  return isValidTimeZone(timeZone) ? timeZone : "UTC";
+}
+
+function getCalendarDateInTimeZone(date, timeZone) {
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(date);
+  } catch {
+    return null;
+  }
+}
+
+function isUpcomingMatch(match, now = new Date()) {
+  const status = (match?.status ?? "").toLowerCase();
+
+  if (status === "finished") {
+    return false;
+  }
+
+  if (hasScore(match)) {
+    return false;
+  }
+
+  if (isInProgressMatch(match, now)) {
+    return false;
+  }
+
+  const kickoffRaw = getKickoffRaw(match);
+
+  if (!kickoffRaw) {
+    return false;
+  }
+
+  const kickoffTime = new Date(kickoffRaw).getTime();
+
+  if (Number.isNaN(kickoffTime) || kickoffTime <= now.getTime()) {
+    return false;
+  }
+
+  return true;
+}
+
+function isMatchOnCalendarDay(match, now, timeZone) {
+  const kickoffRaw = getKickoffRaw(match);
+
+  if (!kickoffRaw) {
+    return false;
+  }
+
+  const kickoff = new Date(kickoffRaw);
+
+  if (Number.isNaN(kickoff.getTime())) {
+    return false;
+  }
+
+  const today = getCalendarDateInTimeZone(now, timeZone);
+  const matchDay = getCalendarDateInTimeZone(kickoff, timeZone);
+
+  return Boolean(today && matchDay && today === matchDay);
+}
+
+function selectUpcomingTodayMatches(
+  matches,
+  now = new Date(),
+  { timeZone = "UTC", limit = 12 } = {}
+) {
+  const tz = resolveTimeZone(timeZone);
+  const list = Array.isArray(matches) ? matches : [];
+
+  return list
+    .filter((match) => isUpcomingMatch(match, now))
+    .filter((match) => isMatchOnCalendarDay(match, now, tz))
+    .sort((left, right) => getMatchDate(left) - getMatchDate(right))
+    .slice(0, limit);
+}
+
+function buildLivePayload({
+  year,
+  matches = [],
+  upcomingToday = [],
+  source,
+}) {
+  const hasRecent = matches.length > 0;
+  const hasUpcoming = upcomingToday.length > 0;
+
+  let mode = "idle";
+
+  if (hasRecent) {
+    mode = "recent";
+  } else if (hasUpcoming) {
+    mode = "upcoming";
+  }
+
   return {
-    mode: "recent",
+    mode,
+    year,
+    matches,
+    upcomingToday,
+    source,
+  };
+}
+
+function getFallbackRecentMatches(year = 2022) {
+  return buildLivePayload({
     year,
     matches: FALLBACK_RECENT_2022,
+    upcomingToday: [],
     source: "fallback",
-  };
+  });
 }
 
 function getCurrentWorldCupYear(now = new Date()) {
@@ -149,12 +269,12 @@ function getCurrentWorldCupYear(now = new Date()) {
 }
 
 function getEmptyLivePayload(now = new Date(), source = "zafronix") {
-  return {
-    mode: "idle",
+  return buildLivePayload({
     year: getCurrentWorldCupYear(now) ?? now.getUTCFullYear(),
     matches: [],
+    upcomingToday: [],
     source,
-  };
+  });
 }
 
 function getRecentTournamentYears(now = new Date()) {
@@ -164,6 +284,8 @@ function getRecentTournamentYears(now = new Date()) {
 
 module.exports = {
   FALLBACK_RECENT_2022,
+  buildLivePayload,
+  getCalendarDateInTimeZone,
   getCurrentWorldCupYear,
   getEmptyLivePayload,
   getFallbackRecentMatches,
@@ -172,5 +294,10 @@ module.exports = {
   getRecentTournamentYears,
   hasScore,
   isInProgressMatch,
+  isMatchOnCalendarDay,
+  isUpcomingMatch,
+  isValidTimeZone,
+  resolveTimeZone,
   selectRecentMatches,
+  selectUpcomingTodayMatches,
 };

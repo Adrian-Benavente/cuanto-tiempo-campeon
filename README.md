@@ -8,6 +8,7 @@ El último campeón aparece destacado con su bandera y un fondo inspirado en los
 
 - **Contador en vivo** del campeón actual (días, horas, minutos y segundos).
 - **Últimos resultados** del torneo actual (2026+); los partidos en curso aparecen como "En desarrollo" sin marcador hasta que finalizan.
+- **Partidos de hoy** del torneo actual: cruces programados para el día según tu zona horaria local.
 - **Cuenta regresiva** al Mundial 2026.
 - **Datos del último título** del campeón (resumen de la final y trivia).
 - **Mi selección**: elegí tu país y mirá cuánto hace que no gana (o si es el campeón actual), con plantel del torneo actual cuando está disponible.
@@ -32,13 +33,13 @@ La app no llama a Zafronix desde el navegador. Usa **API Routes** en Vercel como
 | `/api/champion-aggregates` | Títulos por selección |
 | `/api/tournaments-history` | Historia de torneos |
 | `/api/world-cup-2026` | Metadatos del Mundial 2026 |
-| `/api/live-matches` | Últimos resultados del torneo actual (incluye partidos en curso sin marcador) |
+| `/api/live-matches` | Últimos resultados y partidos de hoy del torneo actual (`?tz=` opcional para la zona horaria del usuario) |
 | `/api/world-cup-fixture` | Fixture completo del torneo actual y tablas de posiciones por grupo |
 | `/api/team-roster` | Plantel de una selección en el torneo actual |
 | `/api/og` | Imagen Open Graph |
 | `/api/oembed` | oEmbed para embeber |
 
-Los partidos en curso se listan arriba con el texto **"En desarrollo"** (sin marcador), porque el plan Hobby de Zafronix no publica scores en tiempo real. Al finalizar, el resultado aparece en el próximo refresh (~5 min).
+Los partidos en curso se listan arriba con el texto **"En desarrollo"** (sin marcador), porque el plan Hobby de Zafronix no publica scores en tiempo real. Al finalizar, el resultado aparece en el próximo refresh (~5 min). Los partidos programados del día sí están disponibles en Hobby vía `GET /matches?year=YYYY`; solo los endpoints `/matches/live` y `/matches/stream` requieren Pro+.
 
 ### Variables de entorno
 

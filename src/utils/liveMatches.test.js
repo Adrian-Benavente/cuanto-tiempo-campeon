@@ -33,20 +33,37 @@ const FINISHED_MATCH = {
   kickoffUtc: "2026-06-14T01:00:00.000Z",
 };
 
+const UPCOMING_MATCH = {
+  id: "2026-020",
+  status: "scheduled",
+  homeTeam: "Brazil",
+  awayTeam: "Morocco",
+  result: null,
+  date: "2026-06-14",
+  kickoffUtc: "2026-06-14T22:00:00.000Z",
+};
+
 describe("getRecentMatches", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("returns in-progress matches first, then finished results", async () => {
-    fetchMatchesForYear.mockResolvedValue([FINISHED_MATCH, IN_PROGRESS_MATCH]);
+    fetchMatchesForYear.mockResolvedValue([
+      FINISHED_MATCH,
+      IN_PROGRESS_MATCH,
+      UPCOMING_MATCH,
+    ]);
 
-    const payload = await getRecentMatches("test-key", PRODUCTION_NOW);
+    const payload = await getRecentMatches("test-key", PRODUCTION_NOW, {
+      timeZone: "UTC",
+    });
 
     expect(payload).toEqual({
       mode: "recent",
       year: 2026,
       matches: [IN_PROGRESS_MATCH, FINISHED_MATCH],
+      upcomingToday: [UPCOMING_MATCH],
       source: "zafronix",
     });
   });
@@ -60,6 +77,23 @@ describe("getRecentMatches", () => {
       mode: "recent",
       year: 2026,
       matches: [FINISHED_MATCH],
+      upcomingToday: [],
+      source: "zafronix",
+    });
+  });
+
+  it("returns upcoming mode when only today's upcoming matches exist", async () => {
+    fetchMatchesForYear.mockResolvedValue([UPCOMING_MATCH]);
+
+    const payload = await getRecentMatches("test-key", PRODUCTION_NOW, {
+      timeZone: "UTC",
+    });
+
+    expect(payload).toEqual({
+      mode: "upcoming",
+      year: 2026,
+      matches: [],
+      upcomingToday: [UPCOMING_MATCH],
       source: "zafronix",
     });
   });
@@ -73,6 +107,7 @@ describe("getRecentMatches", () => {
       mode: "idle",
       year: 2026,
       matches: [],
+      upcomingToday: [],
       source: "zafronix",
     });
   });

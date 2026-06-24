@@ -5,7 +5,9 @@ const {
   getFallbackRecentMatches,
   getRecentTournamentYears,
   isInProgressMatch,
+  isUpcomingMatch,
   selectRecentMatches,
+  selectUpcomingTodayMatches,
 } = require("../../api/_lib/recent-matches");
 
 describe("selectRecentMatches", () => {
@@ -205,6 +207,119 @@ describe("isInProgressMatch", () => {
   });
 });
 
+describe("selectUpcomingTodayMatches", () => {
+  const now = new Date("2026-06-14T18:30:00.000Z");
+
+  it("returns future matches scheduled for today in the given timezone", () => {
+    const matches = [
+      {
+        id: "2026-020",
+        status: "scheduled",
+        result: null,
+        homeTeam: "Brazil",
+        awayTeam: "Morocco",
+        kickoffUtc: "2026-06-14T22:00:00.000Z",
+      },
+      {
+        id: "2026-021",
+        status: "scheduled",
+        result: null,
+        homeTeam: "France",
+        awayTeam: "Senegal",
+        kickoffUtc: "2026-06-15T01:00:00.000Z",
+      },
+      {
+        id: "2026-005",
+        status: "finished",
+        result: "0-1",
+        kickoffUtc: "2026-06-14T01:00:00.000Z",
+      },
+    ];
+
+    expect(
+      selectUpcomingTodayMatches(matches, now, {
+        timeZone: "America/Argentina/Buenos_Aires",
+      }).map((match) => match.id)
+    ).toEqual(["2026-020", "2026-021"]);
+  });
+
+  it("excludes matches that already started or finished", () => {
+    const matches = [
+      {
+        id: "2026-010",
+        status: "scheduled",
+        result: null,
+        kickoffUtc: "2026-06-14T17:00:00.000Z",
+      },
+      {
+        id: "2026-020",
+        status: "scheduled",
+        result: null,
+        kickoffUtc: "2026-06-14T22:00:00.000Z",
+      },
+    ];
+
+    expect(
+      selectUpcomingTodayMatches(matches, now, { timeZone: "UTC" }).map(
+        (match) => match.id
+      )
+    ).toEqual(["2026-020"]);
+  });
+
+  it("sorts upcoming matches by kickoff ascending", () => {
+    const matches = [
+      {
+        id: "late",
+        status: "scheduled",
+        result: null,
+        kickoffUtc: "2026-06-14T22:00:00.000Z",
+      },
+      {
+        id: "early",
+        status: "scheduled",
+        result: null,
+        kickoffUtc: "2026-06-14T20:00:00.000Z",
+      },
+    ];
+
+    expect(
+      selectUpcomingTodayMatches(matches, now, { timeZone: "UTC" }).map(
+        (match) => match.id
+      )
+    ).toEqual(["early", "late"]);
+  });
+});
+
+describe("isUpcomingMatch", () => {
+  const now = new Date("2026-06-14T18:30:00.000Z");
+
+  it("returns true for future scheduled matches without a result", () => {
+    expect(
+      isUpcomingMatch(
+        {
+          status: "scheduled",
+          result: null,
+          kickoffUtc: "2026-06-14T22:00:00.000Z",
+        },
+        now
+      )
+    ).toBe(true);
+  });
+
+  it("returns false for finished matches", () => {
+    expect(
+      isUpcomingMatch(
+        {
+          status: "finished",
+          result: "1-0",
+          kickoffUtc: "2026-06-14T22:00:00.000Z",
+        },
+        now
+      )
+    ).toBe(false);
+  });
+});
+
 describe("getFallbackRecentMatches", () => {
   it("returns recent mode with static 2022 results", () => {
     const payload = getFallbackRecentMatches(2022);
@@ -213,6 +328,7 @@ describe("getFallbackRecentMatches", () => {
       mode: "recent",
       year: 2022,
       matches: FALLBACK_RECENT_2022,
+      upcomingToday: [],
       source: "fallback",
     });
     expect(payload.matches).toHaveLength(5);
@@ -238,6 +354,7 @@ describe("current tournament helpers", () => {
       mode: "idle",
       year: 2024,
       matches: [],
+      upcomingToday: [],
       source: "fallback",
     });
   });

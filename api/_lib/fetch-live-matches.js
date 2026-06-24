@@ -1,20 +1,29 @@
 const { fetchMatchesForYear } = require("./fetch-matches");
 const {
+  buildLivePayload,
   getCurrentWorldCupYear,
   getEmptyLivePayload,
   selectRecentMatches,
+  selectUpcomingTodayMatches,
 } = require("./recent-matches");
 
-async function fetchRecentMatchesForYear(year, apiKey, now = new Date()) {
+async function fetchRecentMatchesForYear(
+  year,
+  apiKey,
+  now = new Date(),
+  { timeZone = "UTC" } = {}
+) {
   const matches = await fetchMatchesForYear(year, apiKey);
 
-  return {
+  return buildLivePayload({
     year,
     matches: selectRecentMatches(matches, 5, now),
-  };
+    upcomingToday: selectUpcomingTodayMatches(matches, now, { timeZone }),
+    source: "zafronix",
+  });
 }
 
-async function getRecentMatches(apiKey, now = new Date()) {
+async function getRecentMatches(apiKey, now = new Date(), { timeZone = "UTC" } = {}) {
   const currentWorldCupYear = getCurrentWorldCupYear(now);
 
   if (!apiKey || !currentWorldCupYear) {
@@ -22,19 +31,15 @@ async function getRecentMatches(apiKey, now = new Date()) {
   }
 
   try {
-    const { year, matches } = await fetchRecentMatchesForYear(
+    const payload = await fetchRecentMatchesForYear(
       currentWorldCupYear,
       apiKey,
-      now
+      now,
+      { timeZone }
     );
 
-    if (matches.length > 0) {
-      return {
-        mode: "recent",
-        year,
-        matches,
-        source: "zafronix",
-      };
+    if (payload.matches.length > 0 || payload.upcomingToday.length > 0) {
+      return payload;
     }
 
     return getEmptyLivePayload(now);

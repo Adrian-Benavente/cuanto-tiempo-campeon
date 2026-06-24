@@ -63,6 +63,18 @@
   white-space: nowrap;
 }
 
+.kickoffTime {
+  color: var(--color-accent);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.placeholderTeam {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
 .scoreboard {
   align-items: center;
   display: grid;

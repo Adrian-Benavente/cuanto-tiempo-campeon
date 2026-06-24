@@ -9,6 +9,7 @@ import Footer from "./components/Footer/Footer";
 import HeroChampion from "./components/HeroChampion/HeroChampion";
 import InstallPrompt from "./components/InstallPrompt/InstallPrompt";
 import LiveMatchesBanner from "./components/LiveMatchesBanner/LiveMatchesBanner";
+import TodayMatchesBanner from "./components/LiveMatchesBanner/TodayMatchesBanner";
 import LoadingSkeleton from "./components/LoadingSkeleton/LoadingSkeleton";
 import MyCountryCard from "./components/MyCountryCard/MyCountryCard";
 import ShareButton from "./components/ShareButton/ShareButton";
@@ -58,6 +59,10 @@ function MainExperience() {
   return (
     <>
       <WorldCupCountdown worldCup2026={worldCup2026} />
+      <TodayMatchesBanner
+        year={recentMatches.year}
+        matches={recentMatches.upcomingToday}
+      />
       <LiveMatchesBanner
         year={recentMatches.year}
         matches={recentMatches.matches}

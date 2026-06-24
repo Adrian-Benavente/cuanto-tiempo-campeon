@@ -10,10 +10,20 @@ export function getTeamName(team) {
   return team.name ?? team.displayName ?? team.shortName ?? "";
 }
 
+export function getKickoffRaw(match) {
+  if (match?.kickoffUtc) {
+    return match.kickoffUtc;
+  }
+
+  if (match?.date && match?.kickoff) {
+    return `${match.date}T${match.kickoff}:00Z`;
+  }
+
+  return null;
+}
+
 function getKickoffTime(match) {
-  const kickoffRaw =
-    match?.kickoffUtc ??
-    (match?.date && match?.kickoff ? `${match.date}T${match.kickoff}:00Z` : null);
+  const kickoffRaw = getKickoffRaw(match);
 
   if (!kickoffRaw) {
     return null;

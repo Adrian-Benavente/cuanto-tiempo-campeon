@@ -92,6 +92,7 @@ beforeEach(() => {
           mode: "idle",
           year: 2026,
           matches: [],
+          upcomingToday: [],
           source: "fallback",
         }),
       });

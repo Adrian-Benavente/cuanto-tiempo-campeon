@@ -2,6 +2,14 @@ import { useEffect, useState } from "react";
 
 const RECENT_POLL_MS = 300000;
 
+function getBrowserTimeZone() {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  } catch {
+    return "UTC";
+  }
+}
+
 async function fetchJson(url) {
   const response = await fetch(url);
   if (!response.ok) {
@@ -27,6 +35,7 @@ export default function useSiteExtras(lastChampionDate) {
     mode: "idle",
     year: 2022,
     matches: [],
+    upcomingToday: [],
     source: "fallback",
   });
   const [fixture, setFixture] = useState({
@@ -85,12 +94,16 @@ export default function useSiteExtras(lastChampionDate) {
 
     async function loadRecent() {
       try {
-        const payload = await fetchJson("/api/live-matches");
+        const timeZone = getBrowserTimeZone();
+        const payload = await fetchJson(
+          `/api/live-matches?tz=${encodeURIComponent(timeZone)}`
+        );
         if (!cancelled) {
           setRecentMatches({
             mode: payload?.mode ?? "idle",
             year: payload?.year ?? 2022,
             matches: payload?.matches ?? [],
+            upcomingToday: payload?.upcomingToday ?? [],
             source: payload?.source ?? "fallback",
           });
         }
