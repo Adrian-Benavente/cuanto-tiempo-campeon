@@ -8,7 +8,7 @@ El último campeón aparece destacado con su bandera y un fondo inspirado en los
 
 - **Contador en vivo** del campeón actual (días, horas, minutos y segundos).
 - **Últimos resultados** del torneo actual (2026+); los partidos en curso aparecen como "En desarrollo" sin marcador hasta que finalizan.
-- **Partidos de hoy** del torneo actual: cruces programados para el día según tu zona horaria local.
+- **Próximos partidos** del torneo actual: cruces programados para el día según tu zona horaria local.
 - **Cuenta regresiva** al Mundial 2026.
 - **Datos del último título** del campeón (resumen de la final y trivia).
 - **Mi selección**: elegí tu país y mirá cuánto hace que no gana (o si es el campeón actual), con plantel del torneo actual cuando está disponible.
