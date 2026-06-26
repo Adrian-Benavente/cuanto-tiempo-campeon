@@ -1,0 +1,130 @@
+.panel {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.title {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  margin: var(--space-xs) 0 0;
+}
+
+.projectionNote {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-style: italic;
+  margin: var(--space-xs) 0 0;
+}
+
+.tableWrap {
+  margin-top: var(--space-sm);
+  overflow-x: auto;
+  width: 100%;
+}
+
+.table {
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.caption {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.5rem 0.375rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table thead th {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.rankCol,
+.groupCol,
+.statCol,
+.statusCol {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.rankCol {
+  width: 2rem;
+}
+
+.groupCol {
+  width: 2.5rem;
+}
+
+.teamCell {
+  font-weight: 600;
+  min-width: 6rem;
+}
+
+.qualifiedRow {
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+
+.eliminatedRow {
+  opacity: 0.72;
+}
+
+.qualifiedBadge,
+.eliminatedBadge {
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 0.125rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.qualifiedBadge {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+  color: var(--color-accent);
+}
+
+.eliminatedBadge {
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 640px) {
+  .table {
+    font-size: 0.9375rem;
+  }
+}

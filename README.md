@@ -9,6 +9,7 @@ El último campeón aparece destacado con su bandera y un fondo inspirado en los
 - **Contador en vivo** del campeón actual (días, horas, minutos y segundos).
 - **Últimos resultados** del torneo actual (2026+); los partidos en curso aparecen como "En desarrollo" sin marcador hasta que finalizan.
 - **Próximos partidos** del torneo actual: cruces programados para el día según tu zona horaria local.
+- **Mejores terceros** del Mundial 2026: ranking de los 12 terceros con criterios FIFA (puntos, DG, GF, fair play y ranking FIFA de respaldo).
 - **Cuenta regresiva** al Mundial 2026.
 - **Datos del último título** del campeón (resumen de la final y trivia).
 - **Mi selección**: elegí tu país y mirá cuánto hace que no gana (o si es el campeón actual), con plantel del torneo actual cuando está disponible.
@@ -34,7 +35,7 @@ La app no llama a Zafronix desde el navegador. Usa **API Routes** en Vercel como
 | `/api/tournaments-history` | Historia de torneos |
 | `/api/world-cup-2026` | Metadatos del Mundial 2026 |
 | `/api/live-matches` | Últimos resultados y partidos de hoy del torneo actual (`?tz=` opcional para la zona horaria del usuario) |
-| `/api/world-cup-fixture` | Fixture completo del torneo actual y tablas de posiciones por grupo |
+| `/api/world-cup-fixture` | Fixture completo del torneo actual, tablas de posiciones por grupo y datos para mejores terceros |
 | `/api/team-roster` | Plantel de una selección en el torneo actual |
 | `/api/og` | Imagen Open Graph |
 | `/api/oembed` | oEmbed para embeber |

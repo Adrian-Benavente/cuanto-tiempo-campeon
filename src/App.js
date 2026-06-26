@@ -8,6 +8,7 @@ import EmbedView from "./components/EmbedView/EmbedView";
 import Footer from "./components/Footer/Footer";
 import HeroChampion from "./components/HeroChampion/HeroChampion";
 import InstallPrompt from "./components/InstallPrompt/InstallPrompt";
+import BestThirdPlaceTable from "./components/BestThirdPlaceTable/BestThirdPlaceTable";
 import LiveMatchesBanner from "./components/LiveMatchesBanner/LiveMatchesBanner";
 import TodayMatchesBanner from "./components/LiveMatchesBanner/TodayMatchesBanner";
 import LoadingSkeleton from "./components/LoadingSkeleton/LoadingSkeleton";
@@ -67,6 +68,7 @@ function MainExperience() {
         year={recentMatches.year}
         matches={recentMatches.matches}
       />
+      <BestThirdPlaceTable fixture={fixture} />
       <PersonalizationToolbar />
       <HeroChampion aggregates={aggregates} />
       <ChampionFacts facts={facts} />
