@@ -71,6 +71,16 @@ body::before {
   gap: var(--space-sm);
 }
 
+.matchBannersRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.matchBannersRow > * {
+  min-width: 0;
+}
+
 .toolbar button {
   width: 100%;
 }
@@ -112,5 +122,16 @@ body::before {
 
   .mainPanel {
     padding: var(--space-xl);
+  }
+
+  .matchBannersRow {
+    align-items: stretch;
+    display: grid;
+    gap: var(--space-lg);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .matchBannersRow > :only-child {
+    grid-column: 1 / -1;
   }
 }

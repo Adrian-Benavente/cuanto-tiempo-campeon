@@ -60,14 +60,16 @@ function MainExperience() {
   return (
     <>
       <WorldCupCountdown worldCup2026={worldCup2026} />
-      <TodayMatchesBanner
-        year={recentMatches.year}
-        matches={recentMatches.upcomingToday}
-      />
-      <LiveMatchesBanner
-        year={recentMatches.year}
-        matches={recentMatches.matches}
-      />
+      <div className="matchBannersRow">
+        <TodayMatchesBanner
+          year={recentMatches.year}
+          matches={recentMatches.upcomingToday}
+        />
+        <LiveMatchesBanner
+          year={recentMatches.year}
+          matches={recentMatches.matches}
+        />
+      </div>
       <BestThirdPlaceTable fixture={fixture} />
       <PersonalizationToolbar />
       <HeroChampion aggregates={aggregates} />
