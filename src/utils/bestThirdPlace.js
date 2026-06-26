@@ -1,24 +1,9 @@
 import { getTeamName } from "./liveMatchData";
-
-const GROUP_LETTERS = "ABCDEFGHIJKL".split("");
-
-function normalizeTeamKey(name) {
-  return String(name ?? "")
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
-
-function isGroupStageMatch(match) {
-  const stage = String(match?.stage ?? match?.stageRaw ?? "")
-    .trim()
-    .toLowerCase();
-
-  return /^group_[a-l]$/.test(stage);
-}
+import {
+  GROUP_LETTERS,
+  isGroupStageMatch,
+  normalizeTeamKey,
+} from "./groupStage";
 
 function cardDeduction(color) {
   const value = String(color ?? "").toLowerCase();
@@ -228,4 +213,4 @@ export function buildBestThirdPlaceTable({
   };
 }
 
-export { normalizeTeamKey };
+export { GROUP_LETTERS, normalizeTeamKey };

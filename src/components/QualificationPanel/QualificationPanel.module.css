@@ -73,6 +73,7 @@
 
 .rankCol,
 .groupCol,
+.positionCol,
 .statCol,
 .statusCol {
   text-align: center;
@@ -85,6 +86,10 @@
 
 .groupCol {
   width: 2.5rem;
+}
+
+.positionCol {
+  width: 3rem;
 }
 
 .teamCell {

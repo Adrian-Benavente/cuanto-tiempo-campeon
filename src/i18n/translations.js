@@ -51,6 +51,10 @@ export const translations = {
     bestThirdPlaceEliminated: "Eliminado",
     bestThirdPlaceProjection:
       "Proyección en vivo: el orden puede cambiar hasta que termine la fase de grupos.",
+    directQualifiersTitle: "Clasificados directos",
+    directQualifiersSubtitle: "Equipos que ya aseguraron el top 2 de su grupo",
+    directQualifiersPosition: "Puesto",
+    directQualifiersPositionValue: "{position}°",
     spotlightTitle: "Campeones en números",
     spotlightSubtitle: "Sequías activas, estrellas en juego y un récord de la historia",
     spotlightLabelLongest: "Sequía más larga",
@@ -144,6 +148,10 @@ export const translations = {
     bestThirdPlaceEliminated: "Eliminated",
     bestThirdPlaceProjection:
       "Live projection: order may change until the group stage ends.",
+    directQualifiersTitle: "Direct qualifiers",
+    directQualifiersSubtitle: "Teams that have secured a top-two group finish",
+    directQualifiersPosition: "Place",
+    directQualifiersPositionValue: "{position}",
     spotlightTitle: "Champions by the numbers",
     spotlightSubtitle: "Active droughts, stars at stake, and a record from history",
     spotlightLabelLongest: "Longest drought",

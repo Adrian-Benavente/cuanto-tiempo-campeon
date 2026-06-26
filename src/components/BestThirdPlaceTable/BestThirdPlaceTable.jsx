@@ -6,7 +6,7 @@ import {
   buildFifaRankLookup,
 } from "../../utils/bestThirdPlace";
 import { formatGoalDifference } from "../../utils/groupStandings";
-import styles from "./BestThirdPlaceTable.module.css";
+import styles from "../QualificationPanel/QualificationPanel.module.css";
 
 const fifaRankLookup = buildFifaRankLookup(fifaRankingSnapshot);
 
