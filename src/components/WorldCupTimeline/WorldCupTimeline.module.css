@@ -11,6 +11,13 @@
   text-transform: uppercase;
 }
 
+.hint {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  margin: 0 0 var(--space-md);
+}
+
 .scroller {
   margin: 0 calc(var(--space-md) * -1);
   overflow-x: auto;
@@ -26,24 +33,43 @@
   padding: 0;
 }
 
+.timeline > li {
+  list-style: none;
+}
+
 .item {
+  appearance: none;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-elevated);
+  color: inherit;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
+  font: inherit;
   gap: 0.25rem;
   min-width: 5.5rem;
   padding: var(--space-sm);
   text-align: center;
-  transition: transform 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+  width: 100%;
 }
 
 .item:hover {
   transform: translateY(-2px);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.itemSelected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
 }
 
 .year {

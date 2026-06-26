@@ -16,7 +16,7 @@ El último campeón aparece destacado con su bandera y un fondo inspirado en los
 - **Mi selección**: elegí tu país y mirá cuánto hace que no gana (o si es el campeón actual), con plantel del torneo actual cuando está disponible.
 - **Hitos de sequía** cuando un campeón se acerca a marcas redondas.
 - **Ranking** de campeones con barra de sequía relativa; orden por antigüedad del título o por estrellas.
-- **Línea de tiempo** de todos los Mundiales.
+- **Línea de tiempo** de todos los Mundiales, con comparación interactiva entre dos torneos.
 - **Campeones en números**: tarjetas editoriales sobre sequías y récords entre campeones mundiales.
 - **Fixture completo** del torneo actual, agrupado por fase en grilla responsiva, con tabla de posiciones por grupo durante el torneo.
 - **Compartir** enlace personalizado, vista **embebida** (`?embed=1&pais=…`) y **Open Graph** dinámico.
@@ -34,6 +34,7 @@ La app no llama a Zafronix desde el navegador. Usa **API Routes** en Vercel como
 | `/api/champion-facts` | Resumen y trivia del último mundial |
 | `/api/champion-aggregates` | Títulos por selección |
 | `/api/tournaments-history` | Historia de torneos |
+| `/api/compare` | Comparación lado a lado entre 2–6 Mundiales (`?years=1986,2022`) |
 | `/api/world-cup-2026` | Metadatos del Mundial 2026 |
 | `/api/live-matches` | Últimos resultados y partidos de hoy del torneo actual (`?tz=` opcional para la zona horaria del usuario) |
 | `/api/world-cup-fixture` | Fixture completo del torneo actual, tablas de posiciones por grupo y datos para mejores terceros |

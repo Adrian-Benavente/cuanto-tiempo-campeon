@@ -28,13 +28,15 @@ const FALLBACK_TOURNAMENTS = [
 ];
 
 function normalizeTournament(entry) {
-  const meta = resolveCountryMeta(entry.champion);
+  const meta = entry.champion ? resolveCountryMeta(entry.champion) : null;
+  const upcoming = entry.year >= 2026 && !entry.champion;
 
   return {
     year: entry.year,
-    champion: meta?.displayName ?? entry.champion,
+    champion: meta?.displayName ?? entry.champion ?? null,
     slug: meta?.slug ?? null,
     host: formatHost(entry.host ?? entry.hostCountry ?? entry.location ?? ""),
+    upcoming,
   };
 }
 
@@ -50,14 +52,31 @@ async function getTournamentsHistory(apiKey) {
     const payload = await zafronixFetch("/tournaments", apiKey);
     const raw = payload?.tournaments ?? payload ?? [];
     const tournaments = (Array.isArray(raw) ? raw : [])
-      .filter((entry) => entry?.year && entry?.champion && entry.year <= 2022)
+      .filter(
+        (entry) =>
+          entry?.year &&
+          entry.year <= 2026 &&
+          (entry.champion || entry.year === 2026)
+      )
       .map(normalizeTournament)
       .sort((a, b) => a.year - b.year);
 
+    const normalized = tournaments.length
+      ? tournaments
+      : FALLBACK_TOURNAMENTS.map(normalizeTournament);
+
+    if (!normalized.some((entry) => entry.year === 2026)) {
+      normalized.push(
+        normalizeTournament({
+          year: 2026,
+          champion: null,
+          host: "United States / Canada / Mexico",
+        })
+      );
+    }
+
     return {
-      tournaments: tournaments.length
-        ? tournaments
-        : FALLBACK_TOURNAMENTS.map(normalizeTournament),
+      tournaments: normalized,
       source: "zafronix",
     };
   } catch (error) {

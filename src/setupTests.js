@@ -65,8 +65,24 @@ beforeEach(() => {
         ok: true,
         json: async () => ({
           tournaments: [
+            { year: 2026, champion: null, host: "USA/Mexico/Canada", upcoming: true },
             { year: 2022, champion: "Argentina", host: "Qatar" },
             { year: 2018, champion: "Francia", host: "Russia" },
+            { year: 1986, champion: "Argentina", host: "Mexico" },
+          ],
+          source: "fallback",
+        }),
+      });
+    }
+
+    if (String(url).includes("/api/compare")) {
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          years: [1986, 2022],
+          rows: [
+            { year: 1986, champion: "Argentina", totalGoals: 132 },
+            { year: 2022, champion: "Argentina", totalGoals: 172 },
           ],
           source: "fallback",
         }),
