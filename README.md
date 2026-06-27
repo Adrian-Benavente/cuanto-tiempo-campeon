@@ -9,7 +9,7 @@ El último campeón aparece destacado con su bandera y un fondo inspirado en los
 - **Contador en vivo** del campeón actual (días, horas, minutos y segundos).
 - **Últimos resultados** del torneo actual (2026+); los partidos en curso aparecen como "En desarrollo" sin marcador hasta que finalizan.
 - **Próximos partidos** del torneo actual: cruces programados para el día según tu zona horaria local.
-- **Clasificados directos confirmados** del Mundial 2026: equipos ya confirmados en el top 2 de su grupo (grupo cerrado o marcado por la API).
+- **Clasificados** del Mundial 2026: equipos ya confirmados en el top 2 de su grupo.
 - **Mejores terceros** del Mundial 2026: ranking de los 12 terceros con criterios FIFA (puntos, DG, GF, fair play y ranking FIFA de respaldo).
 - **Cuenta regresiva** al Mundial 2026.
 - **Datos del último título** del campeón (resumen de la final y trivia).

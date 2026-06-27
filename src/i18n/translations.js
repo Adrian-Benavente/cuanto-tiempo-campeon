@@ -66,9 +66,8 @@ export const translations = {
     bestThirdPlaceEliminated: "Eliminado",
     bestThirdPlaceProjection:
       "Proyección en vivo: el orden puede cambiar hasta que termine la fase de grupos.",
-    directQualifiersTitle: "Clasificados directos confirmados",
-    directQualifiersSubtitle:
-      "Equipos ya confirmados en el top 2 de su grupo (grupo cerrado o marcado por la API)",
+    directQualifiersTitle: "Clasificados",
+    directQualifiersSubtitle: "Equipos ya confirmados en el top 2 de su grupo",
     directQualifiersPosition: "Puesto",
     directQualifiersPositionValue: "{position}°",
     spotlightTitle: "Campeones en números",
@@ -179,9 +178,8 @@ export const translations = {
     bestThirdPlaceEliminated: "Eliminated",
     bestThirdPlaceProjection:
       "Live projection: order may change until the group stage ends.",
-    directQualifiersTitle: "Confirmed direct qualifiers",
-    directQualifiersSubtitle:
-      "Teams confirmed in the top two of their group (group finished or marked by the API)",
+    directQualifiersTitle: "Qualified",
+    directQualifiersSubtitle: "Teams confirmed in the top two of their group",
     directQualifiersPosition: "Place",
     directQualifiersPositionValue: "{position}",
     spotlightTitle: "Champions by the numbers",
