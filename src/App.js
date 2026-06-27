@@ -9,7 +9,6 @@ import Footer from "./components/Footer/Footer";
 import HeroChampion from "./components/HeroChampion/HeroChampion";
 import InstallPrompt from "./components/InstallPrompt/InstallPrompt";
 import BestThirdPlaceTable from "./components/BestThirdPlaceTable/BestThirdPlaceTable";
-import DirectQualifiersTable from "./components/DirectQualifiersTable/DirectQualifiersTable";
 import LiveMatchesBanner from "./components/LiveMatchesBanner/LiveMatchesBanner";
 import TodayMatchesBanner from "./components/LiveMatchesBanner/TodayMatchesBanner";
 import LoadingSkeleton from "./components/LoadingSkeleton/LoadingSkeleton";
@@ -71,7 +70,6 @@ function MainExperience() {
           matches={recentMatches.matches}
         />
       </div>
-      <DirectQualifiersTable fixture={fixture} />
       <BestThirdPlaceTable fixture={fixture} />
       <PersonalizationToolbar />
       <HeroChampion aggregates={aggregates} />
