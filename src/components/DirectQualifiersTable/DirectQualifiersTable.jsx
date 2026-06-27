@@ -11,7 +11,6 @@ export default function DirectQualifiersTable({ fixture }) {
     () =>
       buildDirectQualifiersTable({
         standings: fixture?.standings,
-        matches: fixture?.matches ?? [],
         year: fixture?.year,
       }),
     [fixture]

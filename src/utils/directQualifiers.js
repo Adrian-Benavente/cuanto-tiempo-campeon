@@ -1,4 +1,4 @@
-import { GROUP_LETTERS, normalizeTeamKey } from "./groupStage";
+import { GROUP_LETTERS } from "./groupStage";
 
 function isMatchPlayed(match) {
   const status = (match?.status ?? "").toLowerCase();
@@ -35,24 +35,13 @@ export function getGroupRemainingMatches(matches, groupLetter) {
   });
 }
 
-const GROUP_MATCHES_PER_TEAM = 3;
-
-function getRemainingGamesForTeam(team, groupRows) {
-  const teamName = team?.team ?? team;
-  const row = (Array.isArray(groupRows) ? groupRows : []).find(
-    (entry) => normalizeTeamKey(entry.team) === normalizeTeamKey(teamName)
-  );
-
-  return Math.max(0, GROUP_MATCHES_PER_TEAM - (row?.played ?? 0));
-}
-
 function hasGroupActivity(groupRows) {
   return (Array.isArray(groupRows) ? groupRows : []).some(
     (row) => (row?.played ?? 0) > 0
   );
 }
 
-function isGroupComplete(groupRows) {
+export function isGroupComplete(groupRows) {
   if (!Array.isArray(groupRows) || groupRows.length < 4) {
     return false;
   }
@@ -60,32 +49,20 @@ function isGroupComplete(groupRows) {
   return groupRows.every((row) => (row?.played ?? 0) >= 3);
 }
 
-export function hasClinchedTopTwo(team, groupRows, remainingMatches) {
+export function isConfirmedDirectQualifier(team, groupRows) {
   if (!team?.team) {
     return false;
+  }
+
+  if (team.advanced === true) {
+    return true;
   }
 
   if (isGroupComplete(groupRows)) {
     return team.position === 1 || team.position === 2;
   }
 
-  const minPoints = team.points ?? 0;
-  let rivalsAhead = 0;
-
-  (Array.isArray(groupRows) ? groupRows : []).forEach((rival) => {
-    if (normalizeTeamKey(rival.team) === normalizeTeamKey(team.team)) {
-      return;
-    }
-
-    const rivalRemaining = getRemainingGamesForTeam(rival, groupRows);
-    const maxPoints = (rival.points ?? 0) + 3 * rivalRemaining;
-
-    if (maxPoints > minPoints) {
-      rivalsAhead += 1;
-    }
-  });
-
-  return rivalsAhead <= 1;
+  return false;
 }
 
 function compareDirectQualifierRows(left, right) {
@@ -104,7 +81,7 @@ function compareDirectQualifierRows(left, right) {
   return (right.points ?? 0) - (left.points ?? 0);
 }
 
-export function buildDirectQualifiersTable({ standings, matches = [], year }) {
+export function buildDirectQualifiersTable({ standings, year }) {
   if (year !== 2026) {
     return { rows: [] };
   }
@@ -119,10 +96,8 @@ export function buildDirectQualifiersTable({ standings, matches = [], year }) {
       return;
     }
 
-    const remainingMatches = getGroupRemainingMatches(matches, letter);
-
     groupRows.forEach((team) => {
-      if (!hasClinchedTopTwo(team, groupRows, remainingMatches)) {
+      if (!isConfirmedDirectQualifier(team, groupRows)) {
         return;
       }
 

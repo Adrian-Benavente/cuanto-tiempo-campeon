@@ -1,7 +1,8 @@
 import {
   buildDirectQualifiersTable,
   getGroupRemainingMatches,
-  hasClinchedTopTwo,
+  isConfirmedDirectQualifier,
+  isGroupComplete,
 } from "./directQualifiers";
 
 const GROUP_A_STANDINGS = [
@@ -16,6 +17,20 @@ const GROUP_B_IN_PROGRESS = [
   { team: "Brazil", position: 2, points: 4, goalDifference: 1, goalsFor: 3, played: 2 },
   { team: "Scotland", position: 3, points: 3, goalDifference: 0, goalsFor: 2, played: 2 },
   { team: "Haiti", position: 4, points: 0, goalDifference: -3, goalsFor: 0, played: 2 },
+];
+
+const GROUP_H_BEFORE_FINAL = [
+  { team: "Spain", position: 1, points: 4, goalDifference: 2, played: 2 },
+  { team: "Uruguay", position: 2, points: 2, goalDifference: 0, played: 2 },
+  { team: "Cape Verde", position: 3, points: 2, goalDifference: 0, played: 2 },
+  { team: "Saudi Arabia", position: 4, points: 1, goalDifference: -2, played: 2 },
+];
+
+const GROUP_H_COMPLETE = [
+  { team: "Spain", position: 1, points: 7, goalDifference: 4, played: 3 },
+  { team: "Cape Verde", position: 2, points: 3, goalDifference: 0, played: 3 },
+  { team: "Uruguay", position: 3, points: 2, goalDifference: -1, played: 3 },
+  { team: "Saudi Arabia", position: 4, points: 1, goalDifference: -3, played: 3 },
 ];
 
 describe("getGroupRemainingMatches", () => {
@@ -44,45 +59,45 @@ describe("getGroupRemainingMatches", () => {
   });
 });
 
-describe("hasClinchedTopTwo", () => {
-  it("marks positions 1 and 2 as clinched when the group is complete", () => {
-    const remaining = [];
-
-    expect(hasClinchedTopTwo(GROUP_A_STANDINGS[0], GROUP_A_STANDINGS, remaining)).toBe(
+describe("isConfirmedDirectQualifier", () => {
+  it("marks positions 1 and 2 as confirmed when the group is complete", () => {
+    expect(isConfirmedDirectQualifier(GROUP_A_STANDINGS[0], GROUP_A_STANDINGS)).toBe(
       true
     );
-    expect(hasClinchedTopTwo(GROUP_A_STANDINGS[1], GROUP_A_STANDINGS, remaining)).toBe(
+    expect(isConfirmedDirectQualifier(GROUP_A_STANDINGS[1], GROUP_A_STANDINGS)).toBe(
       true
     );
-    expect(hasClinchedTopTwo(GROUP_A_STANDINGS[2], GROUP_A_STANDINGS, remaining)).toBe(
+    expect(isConfirmedDirectQualifier(GROUP_A_STANDINGS[2], GROUP_A_STANDINGS)).toBe(
       false
     );
   });
 
-  it("detects a clinched leader when rivals cannot reach their points floor", () => {
+  it("confirms a team when Zafronix sets advanced before the group closes", () => {
     const standings = [
-      { team: "Mexico", position: 1, points: 7, played: 2 },
+      { team: "Mexico", position: 1, points: 7, played: 2, advanced: true },
       { team: "South Korea", position: 2, points: 4, played: 2 },
       { team: "South Africa", position: 3, points: 1, played: 2 },
       { team: "Qatar", position: 4, points: 0, played: 2 },
     ];
-    const remaining = [
-      { stage: "group_a", homeTeam: "Mexico", awayTeam: "Qatar", status: "scheduled" },
-      { stage: "group_a", homeTeam: "South Korea", awayTeam: "South Africa", status: "scheduled" },
-    ];
 
-    expect(hasClinchedTopTwo(standings[0], standings, remaining)).toBe(true);
+    expect(isConfirmedDirectQualifier(standings[0], standings)).toBe(true);
+    expect(isConfirmedDirectQualifier(standings[1], standings)).toBe(false);
   });
 
-  it("does not mark a team as clinched when a rival can still overtake on points", () => {
-    const remaining = [
-      { stage: "group_b", homeTeam: "Scotland", awayTeam: "Haiti", status: "scheduled" },
-      { stage: "group_b", homeTeam: "Brazil", awayTeam: "Switzerland", status: "scheduled" },
-    ];
-
+  it("does not confirm provisional top-two teams while the group is still open", () => {
     expect(
-      hasClinchedTopTwo(GROUP_B_IN_PROGRESS[1], GROUP_B_IN_PROGRESS, remaining)
+      isConfirmedDirectQualifier(GROUP_B_IN_PROGRESS[1], GROUP_B_IN_PROGRESS)
     ).toBe(false);
+    expect(
+      isConfirmedDirectQualifier(GROUP_H_BEFORE_FINAL[1], GROUP_H_BEFORE_FINAL)
+    ).toBe(false);
+  });
+});
+
+describe("isGroupComplete", () => {
+  it("returns true only when every team has played three matches", () => {
+    expect(isGroupComplete(GROUP_A_STANDINGS)).toBe(true);
+    expect(isGroupComplete(GROUP_B_IN_PROGRESS)).toBe(false);
   });
 });
 
@@ -96,7 +111,7 @@ describe("buildDirectQualifiersTable", () => {
     ).toEqual([]);
   });
 
-  it("includes clinched teams from completed and live groups", () => {
+  it("includes confirmed teams from completed groups only", () => {
     const { rows } = buildDirectQualifiersTable({
       standings: {
         groups: {
@@ -104,17 +119,55 @@ describe("buildDirectQualifiersTable", () => {
           B: GROUP_B_IN_PROGRESS,
         },
       },
-      matches: [
-        { stage: "group_b", homeTeam: "Scotland", awayTeam: "Haiti", status: "scheduled" },
-        { stage: "group_b", homeTeam: "Brazil", awayTeam: "Switzerland", status: "scheduled" },
-      ],
       year: 2026,
     });
 
     expect(rows.map((row) => row.team)).toEqual(["Mexico", "South Korea"]);
   });
 
-  it("returns no rows when no group has clinched teams yet", () => {
+  it("lists no teams from an open group before the final matchday", () => {
+    const { rows } = buildDirectQualifiersTable({
+      standings: {
+        groups: {
+          H: GROUP_H_BEFORE_FINAL,
+        },
+      },
+      year: 2026,
+    });
+
+    expect(rows).toEqual([]);
+  });
+
+  it("lists final top-two teams after the group closes", () => {
+    const { rows } = buildDirectQualifiersTable({
+      standings: {
+        groups: {
+          H: GROUP_H_COMPLETE,
+        },
+      },
+      year: 2026,
+    });
+
+    expect(rows.map((row) => row.team)).toEqual(["Spain", "Cape Verde"]);
+  });
+
+  it("includes advanced teams even when the group is still open", () => {
+    const standings = [
+      { team: "Mexico", position: 1, points: 7, played: 2, advanced: true },
+      { team: "South Korea", position: 2, points: 4, played: 2, advanced: true },
+      { team: "South Africa", position: 3, points: 1, played: 2 },
+      { team: "Qatar", position: 4, points: 0, played: 2 },
+    ];
+
+    const { rows } = buildDirectQualifiersTable({
+      standings: { groups: { A: standings } },
+      year: 2026,
+    });
+
+    expect(rows.map((row) => row.team)).toEqual(["Mexico", "South Korea"]);
+  });
+
+  it("returns no rows when no group has confirmed teams yet", () => {
     const standings = {
       groups: {
         B: [
@@ -129,7 +182,6 @@ describe("buildDirectQualifiersTable", () => {
     expect(
       buildDirectQualifiersTable({
         standings,
-        matches: [],
         year: 2026,
       }).rows
     ).toEqual([]);
