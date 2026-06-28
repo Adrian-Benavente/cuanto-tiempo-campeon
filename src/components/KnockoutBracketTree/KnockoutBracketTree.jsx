@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { Bracket } from "bracketkit";
 import { useLocale } from "../../context/LocaleContext";
+import useBracketDimensions from "../../hooks/useBracketDimensions";
 import {
   buildBracketkitRounds,
   hasKnockoutBracket,
@@ -11,8 +12,13 @@ import styles from "./KnockoutBracketTree.module.css";
 
 export default function KnockoutBracketTree({ bracket }) {
   const { t } = useLocale();
+  const scrollRef = useRef(null);
 
   const rounds = useMemo(() => buildBracketkitRounds(bracket), [bracket]);
+  const { matchWidth, connectorWidth } = useBracketDimensions(
+    scrollRef,
+    rounds.length
+  );
 
   if (!hasKnockoutBracket(bracket)) {
     return null;
@@ -24,12 +30,12 @@ export default function KnockoutBracketTree({ bracket }) {
         {t("knockoutBracketTitle")}
       </h2>
 
-      <div className={styles.scrollWrap}>
+      <div ref={scrollRef} className={styles.scrollWrap}>
         <Bracket
           className={styles.bracketRoot}
           rounds={rounds}
-          matchWidth={64}
-          connectorWidth={28}
+          matchWidth={matchWidth}
+          connectorWidth={connectorWidth}
           matchGap={6}
           renderRoundHeader={(round) => (
             <span className={styles.roundLabel}>{round.shortLabel}</span>

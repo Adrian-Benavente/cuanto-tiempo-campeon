@@ -15,6 +15,15 @@ describe("resolveTeamMeta", () => {
     expect(resolveTeamMeta("South Africa")?.countryCode).toBe("ZA");
     expect(resolveTeamMeta("Côte d'Ivoire")?.slug).toBe("costa-de-marfil");
   });
+
+  it("resolves previously missing World Cup 2026 teams", () => {
+    expect(resolveTeamMeta("Algeria")?.countryCode).toBe("DZ");
+    expect(resolveTeamMeta("Egypt")?.countryCode).toBe("EG");
+    expect(resolveTeamMeta("DR Congo")?.countryCode).toBe("CD");
+    expect(resolveTeamMeta("Bosnia and Herzegovina")?.countryCode).toBe("BA");
+    expect(resolveTeamMeta("Cape Verde")?.countryCode).toBe("CV");
+    expect(resolveTeamMeta("Cabo Verde")?.slug).toBe("cabo-verde");
+  });
 });
 
 describe("getFifaThreeLetterCode", () => {
@@ -27,6 +36,21 @@ describe("getFifaThreeLetterCode", () => {
       "KOR"
     );
     expect(getFifaThreeLetterCode(resolveTeamMeta("Iran"), "Iran")).toBe("IRN");
+  });
+
+  it("returns FIFA codes for previously missing teams", () => {
+    expect(getFifaThreeLetterCode(resolveTeamMeta("Algeria"), "Algeria")).toBe("ALG");
+    expect(getFifaThreeLetterCode(resolveTeamMeta("Egypt"), "Egypt")).toBe("EGY");
+    expect(getFifaThreeLetterCode(resolveTeamMeta("DR Congo"), "DR Congo")).toBe("COD");
+    expect(
+      getFifaThreeLetterCode(
+        resolveTeamMeta("Bosnia and Herzegovina"),
+        "Bosnia and Herzegovina"
+      )
+    ).toBe("BIH");
+    expect(getFifaThreeLetterCode(resolveTeamMeta("Cape Verde"), "Cape Verde")).toBe(
+      "CPV"
+    );
   });
 
   it("falls back to the first three letters of the API name", () => {

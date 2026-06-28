@@ -110,3 +110,13 @@
     font-size: 0.5625rem;
   }
 }
+
+@media (min-width: 641px) {
+  .scrollWrap {
+    overflow-x: visible;
+  }
+
+  .bracketRoot {
+    width: 100%;
+  }
+}
