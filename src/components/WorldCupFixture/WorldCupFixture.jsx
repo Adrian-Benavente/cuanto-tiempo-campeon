@@ -1,45 +1,13 @@
 import React, { useMemo } from "react";
 import { useLocale } from "../../context/LocaleContext";
 import { groupMatchesByStage } from "../../utils/fixtureData";
+import { formatMatchDateTime } from "../../utils/formatMatchDateTime";
 import { isGroupStageKey } from "../../utils/groupStandings";
 import { getMatchScores } from "../../utils/liveMatchData";
 import { getMatchSideDisplayName } from "../../utils/matchTeams";
 import GroupStandingsTable from "./GroupStandingsTable";
 import scoreboardStyles from "../LiveMatchesBanner/LiveMatchesBanner.module.css";
 import styles from "./WorldCupFixture.module.css";
-
-function formatMatchDateTime(match, locale) {
-  const rawDate = match?.date ?? match?.dateIso;
-
-  if (!rawDate) {
-    return null;
-  }
-
-  const kickoff = match?.kickoff;
-  const dateTime = kickoff
-    ? new Date(`${rawDate}T${kickoff}:00`)
-    : new Date(rawDate);
-
-  if (Number.isNaN(dateTime.getTime())) {
-    return null;
-  }
-
-  const dateLabel = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "es-AR", {
-    day: "numeric",
-    month: "short",
-  }).format(dateTime);
-
-  if (!kickoff) {
-    return dateLabel;
-  }
-
-  const timeLabel = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "es-AR", {
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(dateTime);
-
-  return `${dateLabel} · ${timeLabel}`;
-}
 
 function FixtureMatchCard({ match }) {
   const { locale, t } = useLocale();
@@ -48,14 +16,17 @@ function FixtureMatchCard({ match }) {
   const away = getMatchSideDisplayName(match, "away", tbdLabel);
   const { homeScore, awayScore } = getMatchScores(match);
   const hasScore = homeScore != null && awayScore != null;
-  const dateTime = formatMatchDateTime(match, locale);
+  const formattedDateTime = formatMatchDateTime(match, locale);
 
   return (
     <article className={scoreboardStyles.recentCard}>
-      {dateTime ? (
+      {formattedDateTime ? (
         <div className={styles.matchMeta}>
-          <time className={scoreboardStyles.recentCardDate} dateTime={match.date}>
-            {dateTime}
+          <time
+            className={scoreboardStyles.recentCardDate}
+            dateTime={formattedDateTime.dateTime}
+          >
+            {formattedDateTime.label}
           </time>
         </div>
       ) : null}

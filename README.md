@@ -17,7 +17,7 @@ El último campeón aparece destacado con su bandera y un fondo inspirado en los
 - **Ranking** de campeones con barra de sequía relativa; orden por antigüedad del título o por estrellas.
 - **Línea de tiempo** de todos los Mundiales, con comparación interactiva entre dos torneos.
 - **Campeones en números**: tarjetas editoriales sobre sequías y récords entre campeones mundiales.
-- **Fixture completo** del torneo actual, agrupado por fase en grilla responsiva, con tabla de posiciones por grupo durante el torneo.
+- **Fixture completo** del torneo actual, agrupado por fase en grilla responsiva, con tabla de posiciones por grupo durante el torneo. Los horarios del fixture y de los próximos partidos se muestran en la zona horaria local del navegador.
 - **Compartir** enlace personalizado, vista **embebida** (`?embed=1&pais=…`) y **Open Graph** dinámico.
 - **Español / inglés** (selector en el footer).
 
