@@ -6,7 +6,16 @@ jest.mock("../../api/_lib/fetch-matches", () => ({
   fetchMatchesForYear: jest.fn(),
 }));
 
+jest.mock("../../api/_lib/fetch-bracket", () => ({
+  ...jest.requireActual("../../api/_lib/fetch-bracket"),
+  fetchBracketForYear: jest.fn(),
+}));
+
 const { fetchMatchesForYear } = require("../../api/_lib/fetch-matches");
+const {
+  buildBracketLookup,
+  fetchBracketForYear,
+} = require("../../api/_lib/fetch-bracket");
 const { getRecentMatches } = require("../../api/_lib/fetch-live-matches");
 
 const PRODUCTION_NOW = new Date("2026-06-14T18:30:00.000Z");
@@ -46,6 +55,7 @@ const UPCOMING_MATCH = {
 describe("getRecentMatches", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    fetchBracketForYear.mockResolvedValue(new Map());
   });
 
   it("returns in-progress matches first, then finished results", async () => {
@@ -109,6 +119,48 @@ describe("getRecentMatches", () => {
       matches: [],
       upcomingToday: [],
       source: "zafronix",
+    });
+  });
+
+  it("resolves knockout placeholders in upcoming matches via bracket data", async () => {
+    const upcomingKnockout = {
+      id: "2026-073",
+      stage: "round_of_32",
+      status: "scheduled",
+      homeTeam: "2A",
+      awayTeam: "2B",
+      homeRef: "2A",
+      awayRef: "2B",
+      result: null,
+      date: "2026-06-28",
+      kickoffUtc: "2026-06-28T19:00:00.000Z",
+    };
+
+    fetchMatchesForYear.mockResolvedValue([upcomingKnockout]);
+    fetchBracketForYear.mockResolvedValue(
+      buildBracketLookup({
+        stages: {
+          round_of_32: [
+            {
+              matchId: "2026-073",
+              homeRef: "2A",
+              awayRef: "2B",
+              home: "Mexico",
+              away: "Brazil",
+            },
+          ],
+        },
+      })
+    );
+
+    const payload = await getRecentMatches("test-key", new Date("2026-06-28T12:00:00.000Z"), {
+      timeZone: "UTC",
+    });
+
+    expect(payload.mode).toBe("upcoming");
+    expect(payload.upcomingToday[0]).toMatchObject({
+      homeTeam: "Mexico",
+      awayTeam: "Brazil",
     });
   });
 });
