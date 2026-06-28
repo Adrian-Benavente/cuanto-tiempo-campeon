@@ -1,4 +1,5 @@
 const { fetchMatchesForYear } = require("./fetch-matches");
+const { fetchBracketForYear } = require("./fetch-bracket");
 const { fetchStandingsForYear, getEmptyStandings } = require("./fetch-world-cup-standings");
 const { getCurrentWorldCupYear, getMatchDate } = require("./recent-matches");
 
@@ -9,6 +10,97 @@ const FIXTURE_CACHE_DURING =
   "public, s-maxage=21600, stale-while-revalidate=86400";
 const FIXTURE_CACHE_PRE =
   "public, s-maxage=86400, stale-while-revalidate=604800";
+
+const KNOCKOUT_STAGES = new Set([
+  "round_of_32",
+  "r32",
+  "round_of_16",
+  "r16",
+  "quarter_final",
+  "qf",
+  "semi_final",
+  "sf",
+  "third_place",
+  "thirdplace",
+  "final",
+]);
+
+const BRACKET_PLACEHOLDER_PATTERN =
+  /^(?:\d+[A-L]|W\d+|L\d+|3[A-L]+)$/i;
+
+function isBracketPlaceholder(value) {
+  if (!value || typeof value !== "string") {
+    return false;
+  }
+
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return false;
+  }
+
+  return BRACKET_PLACEHOLDER_PATTERN.test(trimmed);
+}
+
+function normalizeStage(stage) {
+  return String(stage ?? "")
+    .trim()
+    .toLowerCase()
+    .replace("thirdplace", "third_place");
+}
+
+function isKnockoutMatch(match) {
+  const stage = normalizeStage(match?.stage ?? match?.stageRaw);
+  return KNOCKOUT_STAGES.has(stage);
+}
+
+function getMatchId(match) {
+  return String(match?.id ?? match?.matchId ?? "");
+}
+
+function enrichMatchesWithBracket(matches, bracketLookup) {
+  if (!bracketLookup?.size) {
+    return matches;
+  }
+
+  return (Array.isArray(matches) ? matches : []).map((match) => {
+    if (!isKnockoutMatch(match)) {
+      return match;
+    }
+
+    const slot = bracketLookup.get(getMatchId(match));
+
+    if (!slot) {
+      return match;
+    }
+
+    const enriched = { ...match };
+
+    if (slot.home && !isBracketPlaceholder(slot.home)) {
+      enriched.homeTeam = slot.home;
+      enriched.home = slot.home;
+    }
+
+    if (slot.away && !isBracketPlaceholder(slot.away)) {
+      enriched.awayTeam = slot.away;
+      enriched.away = slot.away;
+    }
+
+    if (slot.homeRef) {
+      enriched.homeRef = slot.homeRef;
+    }
+
+    if (slot.awayRef) {
+      enriched.awayRef = slot.awayRef;
+    }
+
+    return enriched;
+  });
+}
+
+function isWorldCupInProgress(now = new Date()) {
+  return now >= TOURNAMENT_START && now <= TOURNAMENT_END;
+}
 
 function sortMatchesChronologically(matches) {
   return (Array.isArray(matches) ? matches : []).slice().sort((left, right) => {
@@ -59,14 +151,18 @@ async function getWorldCupFixture(apiKey, now = new Date()) {
   }
 
   try {
-    const [matches, standings] = await Promise.all([
+    const [matches, standings, bracketLookup] = await Promise.all([
       fetchMatchesForYear(year, apiKey),
       fetchStandingsForYear(year, apiKey),
+      fetchBracketForYear(year, apiKey),
     ]);
 
     return {
       year,
-      matches: sortMatchesChronologically(matches),
+      matches: enrichMatchesWithBracket(
+        sortMatchesChronologically(matches),
+        bracketLookup
+      ),
       standings,
       source: "zafronix",
     };
@@ -85,8 +181,10 @@ async function getWorldCupFixture(apiKey, now = new Date()) {
 module.exports = {
   FIXTURE_CACHE_DURING,
   FIXTURE_CACHE_PRE,
+  enrichMatchesWithBracket,
   getEmptyFixturePayload,
   getFixtureCacheControl,
   getWorldCupFixture,
+  isWorldCupInProgress,
   sortMatchesChronologically,
 };

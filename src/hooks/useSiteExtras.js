@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 
 const RECENT_POLL_MS = 300000;
+const FIXTURE_POLL_MS = 600000;
+const WC_2026_START = new Date("2026-06-11T16:00:00.000Z");
+const WC_2026_END = new Date("2026-07-19T18:00:00.000Z");
+
+function isWorldCup2026InProgress(now = new Date()) {
+  return now >= WC_2026_START && now <= WC_2026_END;
+}
 
 function getBrowserTimeZone() {
   try {
@@ -114,6 +121,38 @@ export default function useSiteExtras(lastChampionDate) {
 
     loadRecent();
     const interval = setInterval(loadRecent, RECENT_POLL_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isWorldCup2026InProgress()) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    async function loadFixture() {
+      try {
+        const fixturePayload = await fetchJson("/api/world-cup-fixture");
+
+        if (!cancelled) {
+          setFixture({
+            year: fixturePayload?.year ?? null,
+            matches: fixturePayload?.matches ?? [],
+            standings: fixturePayload?.standings ?? { groups: {} },
+            source: fixturePayload?.source ?? "fallback",
+          });
+        }
+      } catch (error) {
+        console.warn("Failed to refresh world cup fixture:", error);
+      }
+    }
+
+    const interval = setInterval(loadFixture, FIXTURE_POLL_MS);
 
     return () => {
       cancelled = true;

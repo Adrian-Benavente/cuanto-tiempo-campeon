@@ -25,11 +25,11 @@ export function getMatchSideRawName(match, side) {
   const ref = isHome ? match?.homeRef : match?.awayRef;
   const teamName = getTeamName(team);
 
-  if (teamName) {
+  if (teamName && !isBracketPlaceholder(teamName)) {
     return teamName;
   }
 
-  if (typeof ref === "string" && ref.trim()) {
+  if (typeof ref === "string" && ref.trim() && !isBracketPlaceholder(ref.trim())) {
     return ref.trim();
   }
 

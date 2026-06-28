@@ -28,11 +28,30 @@ describe("getMatchSideDisplayName", () => {
     });
   });
 
-  it("falls back to homeRef and awayRef", () => {
+  it("shows TBD when only bracket refs are available", () => {
     const match = { homeRef: "W73", awayTeam: "Brasil" };
 
-    expect(getMatchSideRawName(match, "home")).toBe("W73");
+    expect(getMatchSideRawName(match, "home")).toBe("");
     expect(getMatchSideDisplayName(match, "home", "TBD").isPlaceholder).toBe(true);
+    expect(getMatchSideDisplayName(match, "away", "TBD").isPlaceholder).toBe(false);
+  });
+
+  it("prefers resolved team names over bracket refs", () => {
+    const match = {
+      homeTeam: "Mexico",
+      awayTeam: "Brazil",
+      homeRef: "2A",
+      awayRef: "2B",
+    };
+
+    expect(getMatchSideDisplayName(match, "home", "Por definir")).toEqual({
+      name: "Mexico",
+      isPlaceholder: false,
+    });
+    expect(getMatchSideDisplayName(match, "away", "Por definir")).toEqual({
+      name: "Brazil",
+      isPlaceholder: false,
+    });
   });
 });
 
