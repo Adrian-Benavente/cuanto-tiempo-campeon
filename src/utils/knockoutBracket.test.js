@@ -79,4 +79,42 @@ describe("buildBracketkitRounds", () => {
     expect(tbdMatch.home.isTbd).toBe(true);
     expect(tbdMatch.away.isTbd).toBe(true);
   });
+
+  it("shows corrected rivals for Germany and France in the bracket tree", () => {
+    const bracket = {
+      year: 2026,
+      rounds: [
+        {
+          id: "round_of_32",
+          matches: [
+            {
+              matchId: "2026-074",
+              home: "Germany",
+              away: "Paraguay",
+              homeScore: null,
+              awayScore: null,
+              winner: null,
+            },
+            {
+              matchId: "2026-077",
+              home: "France",
+              away: "Sweden",
+              homeScore: null,
+              awayScore: null,
+              winner: null,
+            },
+          ],
+        },
+      ],
+    };
+
+    const rounds = buildBracketkitRounds(bracket);
+    const p74 = rounds[0].matches[0];
+    const p77 = rounds[0].matches[1];
+
+    expect(p74.home.fifaCode).toBe("GER");
+    expect(p74.away.fifaCode).toBe("PAR");
+    expect(p77.home.fifaCode).toBe("FRA");
+    expect(p77.away.fifaCode).toBe("SWE");
+  });
 });

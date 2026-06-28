@@ -6,6 +6,7 @@ const {
   getEmptyKnockoutBracket,
 } = require("./fetch-bracket");
 const { fetchStandingsForYear, getEmptyStandings } = require("./fetch-world-cup-standings");
+const { resolveKnockoutSideName } = require("./resolve-bracket-ref");
 const { getCurrentWorldCupYear, getMatchDate } = require("./recent-matches");
 
 const TOURNAMENT_START = new Date("2026-06-11T16:00:00.000Z");
@@ -30,23 +31,6 @@ const KNOCKOUT_STAGES = new Set([
   "final",
 ]);
 
-const BRACKET_PLACEHOLDER_PATTERN =
-  /^(?:\d+[A-L]|W\d+|L\d+|3[A-L]+)$/i;
-
-function isBracketPlaceholder(value) {
-  if (!value || typeof value !== "string") {
-    return false;
-  }
-
-  const trimmed = value.trim();
-
-  if (!trimmed) {
-    return false;
-  }
-
-  return BRACKET_PLACEHOLDER_PATTERN.test(trimmed);
-}
-
 function normalizeStage(stage) {
   return String(stage ?? "")
     .trim()
@@ -63,7 +47,7 @@ function getMatchId(match) {
   return String(match?.id ?? match?.matchId ?? "");
 }
 
-function enrichMatchesWithBracket(matches, bracketLookup) {
+function enrichMatchesWithBracket(matches, bracketLookup, { standings } = {}) {
   if (!bracketLookup?.size) {
     return matches;
   }
@@ -80,15 +64,29 @@ function enrichMatchesWithBracket(matches, bracketLookup) {
     }
 
     const enriched = { ...match };
+    const context = { standings, matches };
 
-    if (slot.home && !isBracketPlaceholder(slot.home)) {
-      enriched.homeTeam = slot.home;
-      enriched.home = slot.home;
+    const resolvedHome = resolveKnockoutSideName({
+      match,
+      slot,
+      side: "home",
+      ...context,
+    });
+    const resolvedAway = resolveKnockoutSideName({
+      match,
+      slot,
+      side: "away",
+      ...context,
+    });
+
+    if (resolvedHome) {
+      enriched.homeTeam = resolvedHome;
+      enriched.home = resolvedHome;
     }
 
-    if (slot.away && !isBracketPlaceholder(slot.away)) {
-      enriched.awayTeam = slot.away;
-      enriched.away = slot.away;
+    if (resolvedAway) {
+      enriched.awayTeam = resolvedAway;
+      enriched.away = resolvedAway;
     }
 
     if (slot.homeRef) {
@@ -171,12 +169,12 @@ async function getWorldCupFixture(apiKey, now = new Date()) {
       ? buildBracketLookup(bracketPayload)
       : new Map();
     const bracket = bracketPayload
-      ? buildKnockoutBracket(bracketPayload, sortedMatches)
+      ? buildKnockoutBracket(bracketPayload, sortedMatches, standings)
       : getEmptyKnockoutBracket(year);
 
     return {
       year,
-      matches: enrichMatchesWithBracket(sortedMatches, bracketLookup),
+      matches: enrichMatchesWithBracket(sortedMatches, bracketLookup, { standings }),
       standings,
       bracket,
       source: "zafronix",

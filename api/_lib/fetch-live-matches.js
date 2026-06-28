@@ -1,6 +1,7 @@
 const { fetchBracketForYear } = require("./fetch-bracket");
 const { fetchMatchesForYear } = require("./fetch-matches");
 const { enrichMatchesWithBracket } = require("./fetch-world-cup-fixture");
+const { fetchStandingsForYear } = require("./fetch-world-cup-standings");
 const {
   buildLivePayload,
   getCurrentWorldCupYear,
@@ -15,11 +16,12 @@ async function fetchRecentMatchesForYear(
   now = new Date(),
   { timeZone = "UTC" } = {}
 ) {
-  const [rawMatches, bracketLookup] = await Promise.all([
+  const [rawMatches, bracketLookup, standings] = await Promise.all([
     fetchMatchesForYear(year, apiKey),
     fetchBracketForYear(year, apiKey),
+    fetchStandingsForYear(year, apiKey),
   ]);
-  const matches = enrichMatchesWithBracket(rawMatches, bracketLookup);
+  const matches = enrichMatchesWithBracket(rawMatches, bracketLookup, { standings });
 
   return buildLivePayload({
     year,

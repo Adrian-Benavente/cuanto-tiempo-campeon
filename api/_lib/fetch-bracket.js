@@ -1,5 +1,6 @@
 const { zafronixFetch } = require("./zafronix-client");
 const { getMatchScores } = require("./zafronix-normalize");
+const { resolveKnockoutSideName } = require("./resolve-bracket-ref");
 
 const KNOCKOUT_ROUND_ORDER = [
   "round_of_32",
@@ -136,7 +137,7 @@ function normalizeBracketSlot(slot) {
   };
 }
 
-function normalizeKnockoutMatchSlot(slot, matchById) {
+function normalizeKnockoutMatchSlot(slot, matchById, { standings, matches } = {}) {
   const base = normalizeBracketSlot(slot);
 
   if (!base) {
@@ -157,8 +158,24 @@ function normalizeKnockoutMatchSlot(slot, matchById) {
     bracketAwayScore != null ? bracketAwayScore : fixtureScores.awayScore ?? null;
   const winner = bracketWinner ?? fixtureWinner ?? null;
 
+  const context = { standings, matches };
+  const resolvedHome = resolveKnockoutSideName({
+    match: fixtureMatch,
+    slot: base,
+    side: "home",
+    ...context,
+  });
+  const resolvedAway = resolveKnockoutSideName({
+    match: fixtureMatch,
+    slot: base,
+    side: "away",
+    ...context,
+  });
+
   return {
     ...base,
+    home: resolvedHome,
+    away: resolvedAway,
     homeScore,
     awayScore,
     winner,
@@ -200,9 +217,10 @@ function buildBracketLookup(payload) {
   return lookup;
 }
 
-function buildKnockoutBracket(payload, matches = []) {
+function buildKnockoutBracket(payload, matches = [], standings = null) {
   const stages = payload?.stages ?? {};
   const matchById = buildMatchIdLookup(matches);
+  const context = { standings, matches };
   const rounds = [];
 
   KNOCKOUT_ROUND_ORDER.forEach((roundId) => {
@@ -213,7 +231,7 @@ function buildKnockoutBracket(payload, matches = []) {
     }
 
     const normalizedMatches = slots
-      .map((slot) => normalizeKnockoutMatchSlot(slot, matchById))
+      .map((slot) => normalizeKnockoutMatchSlot(slot, matchById, context))
       .filter(Boolean);
 
     if (normalizedMatches.length) {

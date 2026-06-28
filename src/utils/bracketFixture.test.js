@@ -187,6 +187,15 @@ describe("buildKnockoutBracket", () => {
   });
 
   it("orders round of 32 matches for the official FIFA bracket tree", () => {
+    const standings = {
+      groups: {
+        E: [{ position: 2, team: "Germany" }],
+        F: [{ position: 2, team: "Paraguay" }],
+        I: [{ position: 2, team: "France" }],
+        H: [{ position: 2, team: "Sweden" }],
+      },
+    };
+
     const bracket = buildKnockoutBracket(
       {
         year: 2026,
@@ -201,8 +210,10 @@ describe("buildKnockoutBracket", () => {
             {
               matchId: "2026-074",
               matchNo: 74,
+              homeRef: "2E",
+              awayRef: "2F",
               home: "Germany",
-              away: "Paraguay",
+              away: "Sweden",
             },
             {
               matchId: "2026-075",
@@ -213,8 +224,10 @@ describe("buildKnockoutBracket", () => {
             {
               matchId: "2026-077",
               matchNo: 77,
+              homeRef: "2I",
+              awayRef: "2H",
               home: "France",
-              away: "Sweden",
+              away: "Paraguay",
             },
           ],
           round_of_16: [
@@ -233,11 +246,18 @@ describe("buildKnockoutBracket", () => {
           ],
         },
       },
-      []
+      [],
+      standings
     );
 
     expect(bracket.rounds[0].matches.map(getMatchNo)).toEqual([74, 77, 73, 75]);
     expect(bracket.rounds[1].matches.map(getMatchNo)).toEqual([89, 90]);
+
+    const p74 = bracket.rounds[0].matches.find((match) => match.matchNo === 74);
+    const p77 = bracket.rounds[0].matches.find((match) => match.matchNo === 77);
+
+    expect(p74).toMatchObject({ home: "Germany", away: "Paraguay" });
+    expect(p77).toMatchObject({ home: "France", away: "Sweden" });
   });
 });
 
@@ -296,5 +316,67 @@ describe("enrichMatchesWithBracket", () => {
     ];
 
     expect(enrichMatchesWithBracket(matches, bracketLookup)).toEqual(matches);
+  });
+
+  it("resolves swapped Zafronix names from FIFA refs and standings", () => {
+    const standings = {
+      groups: {
+        E: [{ position: 2, team: "Germany" }],
+        F: [{ position: 2, team: "Paraguay" }],
+        I: [{ position: 2, team: "France" }],
+        H: [{ position: 2, team: "Sweden" }],
+      },
+    };
+    const lookup = buildBracketLookup({
+      stages: {
+        round_of_32: [
+          {
+            matchId: "2026-074",
+            matchNo: 74,
+            homeRef: "2E",
+            awayRef: "2F",
+            home: "Germany",
+            away: "Sweden",
+          },
+          {
+            matchId: "2026-077",
+            matchNo: 77,
+            homeRef: "2I",
+            awayRef: "2H",
+            home: "France",
+            away: "Paraguay",
+          },
+        ],
+      },
+    });
+    const matches = [
+      {
+        id: "2026-074",
+        stage: "round_of_32",
+        homeRef: "2E",
+        awayRef: "2F",
+        homeTeam: "Germany",
+        awayTeam: "Sweden",
+      },
+      {
+        id: "2026-077",
+        stage: "round_of_32",
+        homeRef: "2I",
+        awayRef: "2H",
+        homeTeam: "France",
+        awayTeam: "Paraguay",
+      },
+    ];
+
+    const enriched = enrichMatchesWithBracket(matches, lookup, { standings });
+
+    expect(enriched[0]).toMatchObject({
+      homeTeam: "Germany",
+      awayTeam: "Paraguay",
+    });
+    expect(enriched[1]).toMatchObject({
+      homeTeam: "France",
+      awayTeam: "Sweden",
+    });
   });
 });

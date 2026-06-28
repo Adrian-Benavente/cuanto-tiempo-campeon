@@ -6,6 +6,10 @@ jest.mock("../../api/_lib/fetch-matches", () => ({
   fetchMatchesForYear: jest.fn(),
 }));
 
+jest.mock("../../api/_lib/fetch-world-cup-standings", () => ({
+  fetchStandingsForYear: jest.fn(),
+}));
+
 jest.mock("../../api/_lib/fetch-bracket", () => ({
   ...jest.requireActual("../../api/_lib/fetch-bracket"),
   fetchBracketForYear: jest.fn(),
@@ -16,6 +20,7 @@ const {
   buildBracketLookup,
   fetchBracketForYear,
 } = require("../../api/_lib/fetch-bracket");
+const { fetchStandingsForYear } = require("../../api/_lib/fetch-world-cup-standings");
 const { getRecentMatches } = require("../../api/_lib/fetch-live-matches");
 
 const PRODUCTION_NOW = new Date("2026-06-14T18:30:00.000Z");
@@ -56,6 +61,7 @@ describe("getRecentMatches", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     fetchBracketForYear.mockResolvedValue(new Map());
+    fetchStandingsForYear.mockResolvedValue({ groups: {} });
   });
 
   it("returns in-progress matches first, then finished results", async () => {

@@ -75,4 +75,22 @@ describe("groupMatchesByStage", () => {
     expect(sections[0].label).toBe("Grupo A");
     expect(sections[2].label).toBe("Cuartos de final");
   });
+
+  it("orders knockout matches by FIFA match number within each stage", () => {
+    const matches = [
+      { id: "2026-077", stage: "round_of_32", date: "2026-06-30" },
+      { id: "2026-073", stage: "round_of_32", date: "2026-06-28" },
+      { id: "2026-074", stage: "round_of_32", date: "2026-06-29" },
+    ];
+
+    const roundOf32 = groupMatchesByStage(matches, "es").find(
+      (section) => section.stageKey === "round_of_32"
+    );
+
+    expect(roundOf32.matches.map((match) => match.id)).toEqual([
+      "2026-073",
+      "2026-074",
+      "2026-077",
+    ]);
+  });
 });
