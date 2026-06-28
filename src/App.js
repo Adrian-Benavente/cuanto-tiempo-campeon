@@ -73,6 +73,7 @@ function MainExperience() {
       </div>
       <KnockoutBracketTree bracket={fixture?.bracket} />
       <BestThirdPlaceTable fixture={fixture} />
+      <WorldCupFixture fixture={fixture} />
       <PersonalizationToolbar />
       <HeroChampion aggregates={aggregates} />
       <ChampionFacts facts={facts} />
@@ -91,7 +92,6 @@ function MainExperience() {
           tournaments={tournaments}
         />
       </main>
-      <WorldCupFixture fixture={fixture} />
     </>
   );
 }
