@@ -66,6 +66,8 @@ export const translations = {
     bestThirdPlaceEliminated: "Eliminado",
     bestThirdPlaceProjection:
       "Proyección en vivo: el orden puede cambiar hasta que termine la fase de grupos.",
+    knockoutBracketTitle: "Llave eliminatoria",
+    knockoutBracketTbd: "Por definir",
     spotlightTitle: "Campeones en números",
     spotlightSubtitle: "Sequías activas, estrellas en juego y un récord de la historia",
     spotlightLabelLongest: "Sequía más larga",
@@ -174,6 +176,8 @@ export const translations = {
     bestThirdPlaceEliminated: "Eliminated",
     bestThirdPlaceProjection:
       "Live projection: order may change until the group stage ends.",
+    knockoutBracketTitle: "Knockout bracket",
+    knockoutBracketTbd: "To be determined",
     spotlightTitle: "Champions by the numbers",
     spotlightSubtitle: "Active droughts, stars at stake, and a record from history",
     spotlightLabelLongest: "Longest drought",

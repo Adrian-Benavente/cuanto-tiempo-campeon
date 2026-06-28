@@ -49,6 +49,7 @@ export default function useSiteExtras(lastChampionDate) {
     year: null,
     matches: [],
     standings: { groups: {} },
+    bracket: { year: null, rounds: [] },
     source: "fallback",
   });
 
@@ -82,6 +83,7 @@ export default function useSiteExtras(lastChampionDate) {
             year: fixturePayload?.year ?? null,
             matches: fixturePayload?.matches ?? [],
             standings: fixturePayload?.standings ?? { groups: {} },
+            bracket: fixturePayload?.bracket ?? { year: null, rounds: [] },
             source: fixturePayload?.source ?? "fallback",
           });
         }
@@ -144,6 +146,7 @@ export default function useSiteExtras(lastChampionDate) {
             year: fixturePayload?.year ?? null,
             matches: fixturePayload?.matches ?? [],
             standings: fixturePayload?.standings ?? { groups: {} },
+            bracket: fixturePayload?.bracket ?? { year: null, rounds: [] },
             source: fixturePayload?.source ?? "fallback",
           });
         }

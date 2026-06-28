@@ -9,6 +9,7 @@ import Footer from "./components/Footer/Footer";
 import HeroChampion from "./components/HeroChampion/HeroChampion";
 import InstallPrompt from "./components/InstallPrompt/InstallPrompt";
 import BestThirdPlaceTable from "./components/BestThirdPlaceTable/BestThirdPlaceTable";
+import KnockoutBracketTree from "./components/KnockoutBracketTree/KnockoutBracketTree";
 import LiveMatchesBanner from "./components/LiveMatchesBanner/LiveMatchesBanner";
 import TodayMatchesBanner from "./components/LiveMatchesBanner/TodayMatchesBanner";
 import LoadingSkeleton from "./components/LoadingSkeleton/LoadingSkeleton";
@@ -71,6 +72,7 @@ function MainExperience() {
         />
       </div>
       <BestThirdPlaceTable fixture={fixture} />
+      <KnockoutBracketTree bracket={fixture?.bracket} />
       <PersonalizationToolbar />
       <HeroChampion aggregates={aggregates} />
       <ChampionFacts facts={facts} />

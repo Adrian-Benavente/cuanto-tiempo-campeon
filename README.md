@@ -36,7 +36,7 @@ La app no llama a Zafronix desde el navegador. Usa **API Routes** en Vercel como
 | `/api/compare` | Comparación lado a lado entre 2–6 Mundiales (`?years=1986,2022`) |
 | `/api/world-cup-2026` | Metadatos del Mundial 2026 |
 | `/api/live-matches` | Últimos resultados y partidos de hoy del torneo actual, con cruces KO resueltos vía `/bracket` (`?tz=` opcional para la zona horaria del usuario) |
-| `/api/world-cup-fixture` | Fixture del torneo actual con cruces KO resueltos vía `/bracket`, tablas por grupo y datos para mejores terceros |
+| `/api/world-cup-fixture` | Fixture del torneo actual con cruces KO resueltos vía `/bracket`, tablas por grupo, datos para mejores terceros y llave eliminatoria (`bracket.rounds`) |
 | `/api/team-roster` | Plantel de una selección en el torneo actual |
 | `/api/og` | Imagen Open Graph |
 | `/api/oembed` | oEmbed para embeber |

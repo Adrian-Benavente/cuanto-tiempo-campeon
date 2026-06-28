@@ -1,4 +1,4 @@
-const { buildBracketLookup } = require("../../api/_lib/fetch-bracket");
+const { buildBracketLookup, buildKnockoutBracket } = require("../../api/_lib/fetch-bracket");
 const { enrichMatchesWithBracket } = require("../../api/_lib/fetch-world-cup-fixture");
 
 describe("buildBracketLookup", () => {
@@ -35,6 +35,81 @@ describe("buildBracketLookup", () => {
       awayRef: "2B",
     });
     expect(lookup.get("2026-104")?.home).toBeNull();
+  });
+});
+
+describe("buildKnockoutBracket", () => {
+  const bracketPayload = {
+    year: 2026,
+    stages: {
+      round_of_32: [
+        {
+          matchId: "2026-073",
+          home: "Mexico",
+          away: "Brazil",
+          homeScore: null,
+          awayScore: null,
+          winner: null,
+        },
+      ],
+      round_of_16: [
+        {
+          matchId: "2026-089",
+          home: null,
+          away: null,
+          homeRef: "W73",
+          awayRef: "W74",
+        },
+      ],
+      third_place: [
+        {
+          matchId: "2026-103",
+          home: null,
+          away: null,
+        },
+      ],
+      final: [
+        {
+          matchId: "2026-104",
+          home: null,
+          away: null,
+          homeRef: "W101",
+          awayRef: "W102",
+        },
+      ],
+    },
+  };
+
+  it("returns rounds in fixed order and excludes third place", () => {
+    const bracket = buildKnockoutBracket(bracketPayload, []);
+
+    expect(bracket.year).toBe(2026);
+    expect(bracket.rounds.map((round) => round.id)).toEqual([
+      "round_of_32",
+      "round_of_16",
+      "final",
+    ]);
+  });
+
+  it("merges scores and winner from fixture matches when bracket slots are empty", () => {
+    const matches = [
+      {
+        id: "2026-073",
+        homeScore: 2,
+        awayScore: 1,
+        winner: "Mexico",
+      },
+    ];
+
+    const bracket = buildKnockoutBracket(bracketPayload, matches);
+    const r32Match = bracket.rounds[0].matches[0];
+
+    expect(r32Match).toMatchObject({
+      matchId: "2026-073",
+      homeScore: 2,
+      awayScore: 1,
+      winner: "Mexico",
+    });
   });
 });
 

@@ -1,5 +1,10 @@
 const { fetchMatchesForYear } = require("./fetch-matches");
-const { fetchBracketForYear } = require("./fetch-bracket");
+const {
+  buildBracketLookup,
+  buildKnockoutBracket,
+  fetchBracketPayload,
+  getEmptyKnockoutBracket,
+} = require("./fetch-bracket");
 const { fetchStandingsForYear, getEmptyStandings } = require("./fetch-world-cup-standings");
 const { getCurrentWorldCupYear, getMatchDate } = require("./recent-matches");
 
@@ -126,10 +131,13 @@ function getFixtureCacheControl(now = new Date()) {
 }
 
 function getEmptyFixturePayload(now = new Date(), source = "fallback") {
+  const year = getCurrentWorldCupYear(now);
+
   return {
-    year: getCurrentWorldCupYear(now),
+    year,
     matches: [],
     standings: getEmptyStandings(),
+    bracket: getEmptyKnockoutBracket(year),
     source,
   };
 }
@@ -146,24 +154,31 @@ async function getWorldCupFixture(apiKey, now = new Date()) {
       year,
       matches: [],
       standings: getEmptyStandings(),
+      bracket: getEmptyKnockoutBracket(year),
       source: "fallback",
     };
   }
 
   try {
-    const [matches, standings, bracketLookup] = await Promise.all([
+    const [matches, standings, bracketPayload] = await Promise.all([
       fetchMatchesForYear(year, apiKey),
       fetchStandingsForYear(year, apiKey),
-      fetchBracketForYear(year, apiKey),
+      fetchBracketPayload(year, apiKey),
     ]);
+
+    const sortedMatches = sortMatchesChronologically(matches);
+    const bracketLookup = bracketPayload
+      ? buildBracketLookup(bracketPayload)
+      : new Map();
+    const bracket = bracketPayload
+      ? buildKnockoutBracket(bracketPayload, sortedMatches)
+      : getEmptyKnockoutBracket(year);
 
     return {
       year,
-      matches: enrichMatchesWithBracket(
-        sortMatchesChronologically(matches),
-        bracketLookup
-      ),
+      matches: enrichMatchesWithBracket(sortedMatches, bracketLookup),
       standings,
+      bracket,
       source: "zafronix",
     };
   } catch (error) {
@@ -173,6 +188,7 @@ async function getWorldCupFixture(apiKey, now = new Date()) {
       year,
       matches: [],
       standings: getEmptyStandings(),
+      bracket: getEmptyKnockoutBracket(year),
       source: "fallback",
     };
   }
