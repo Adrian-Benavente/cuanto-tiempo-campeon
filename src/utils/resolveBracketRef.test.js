@@ -221,6 +221,86 @@ describe("fixCrossedFeederNames", () => {
     expect(fixed[0]).toMatchObject({ away: "Paraguay" });
     expect(fixed[1]).toMatchObject({ away: "Sweden" });
   });
+
+  it("uncrosses swapped away teams using group membership without position rows", () => {
+    const standings = {
+      groups: {
+        F: [
+          { team: "Netherlands" },
+          { team: "Paraguay" },
+          { team: "Tunisia" },
+        ],
+        H: [
+          { team: "Spain" },
+          { team: "Sweden" },
+          { team: "Ukraine" },
+        ],
+      },
+    };
+    const feeders = [
+      {
+        matchId: "2026-074",
+        matchNo: 74,
+        homeRef: "2E",
+        awayRef: "2F",
+        home: "Germany",
+        away: "Sweden",
+      },
+      {
+        matchId: "2026-077",
+        matchNo: 77,
+        homeRef: "2I",
+        awayRef: "2H",
+        home: "France",
+        away: "Paraguay",
+      },
+    ];
+    const parents = [
+      { matchId: "2026-089", homeRef: "W74", awayRef: "W77" },
+    ];
+
+    const fixed = fixCrossedFeederNames(feeders, parents, { standings });
+
+    expect(fixed[0]).toMatchObject({ away: "Paraguay" });
+    expect(fixed[1]).toMatchObject({ away: "Sweden" });
+  });
+
+  it("uncrosses Belgium/Switzerland feeders with Senegal and Algeria swapped", () => {
+    const standings = {
+      groups: {
+        G: [{ team: "Belgium" }, { team: "Iran" }],
+        J: [{ team: "Algeria" }, { team: "Tunisia" }],
+        I: [{ team: "Senegal" }, { team: "Norway" }],
+        L: [{ team: "Switzerland" }, { team: "Canada" }],
+      },
+    };
+    const feeders = [
+      {
+        matchId: "2026-080",
+        matchNo: 80,
+        homeRef: "2G",
+        awayRef: "2I",
+        home: "Belgium",
+        away: "Algeria",
+      },
+      {
+        matchId: "2026-081",
+        matchNo: 81,
+        homeRef: "2L",
+        awayRef: "2J",
+        home: "Switzerland",
+        away: "Senegal",
+      },
+    ];
+    const parents = [
+      { matchId: "2026-093", homeRef: "W80", awayRef: "W81" },
+    ];
+
+    const fixed = fixCrossedFeederNames(feeders, parents, { standings });
+
+    expect(fixed[0]).toMatchObject({ away: "Senegal" });
+    expect(fixed[1]).toMatchObject({ away: "Algeria" });
+  });
 });
 
 describe("applyCrossedFeederFixesToMatches", () => {

@@ -260,6 +260,87 @@ describe("buildKnockoutBracket", () => {
     expect(p77).toMatchObject({ home: "France", away: "Sweden" });
   });
 
+  it("uncrosses permuted away teams using group membership without position rows", () => {
+    const standings = {
+      groups: {
+        F: [{ team: "Netherlands" }, { team: "Paraguay" }],
+        H: [{ team: "Spain" }, { team: "Sweden" }],
+        G: [{ team: "Belgium" }],
+        J: [{ team: "Algeria" }],
+        I: [{ team: "Senegal" }],
+        L: [{ team: "Switzerland" }],
+      },
+    };
+
+    const bracket = buildKnockoutBracket(
+      {
+        year: 2026,
+        stages: {
+          round_of_32: [
+            {
+              matchId: "2026-074",
+              matchNo: 74,
+              homeRef: "2E",
+              awayRef: "2F",
+              home: "Germany",
+              away: "Sweden",
+            },
+            {
+              matchId: "2026-077",
+              matchNo: 77,
+              homeRef: "2I",
+              awayRef: "2H",
+              home: "France",
+              away: "Paraguay",
+            },
+            {
+              matchId: "2026-080",
+              matchNo: 80,
+              homeRef: "2G",
+              awayRef: "2I",
+              home: "Belgium",
+              away: "Algeria",
+            },
+            {
+              matchId: "2026-081",
+              matchNo: 81,
+              homeRef: "2L",
+              awayRef: "2J",
+              home: "Switzerland",
+              away: "Senegal",
+            },
+          ],
+          round_of_16: [
+            {
+              matchId: "2026-089",
+              matchNo: 89,
+              homeRef: "W74",
+              awayRef: "W77",
+            },
+            {
+              matchId: "2026-093",
+              matchNo: 93,
+              homeRef: "W80",
+              awayRef: "W81",
+            },
+          ],
+        },
+      },
+      [],
+      standings
+    );
+
+    const p74 = bracket.rounds[0].matches.find((match) => match.matchNo === 74);
+    const p77 = bracket.rounds[0].matches.find((match) => match.matchNo === 77);
+    const p80 = bracket.rounds[0].matches.find((match) => match.matchNo === 80);
+    const p81 = bracket.rounds[0].matches.find((match) => match.matchNo === 81);
+
+    expect(p74).toMatchObject({ away: "Paraguay" });
+    expect(p77).toMatchObject({ away: "Sweden" });
+    expect(p80).toMatchObject({ away: "Senegal" });
+    expect(p81).toMatchObject({ away: "Algeria" });
+  });
+
   it("keeps distinct third-place rivals from the bracket instead of one global third", () => {
     const standings = {
       groups: {

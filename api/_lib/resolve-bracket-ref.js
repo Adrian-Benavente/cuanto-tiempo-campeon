@@ -90,9 +90,130 @@ function parseBestThirdRef(ref) {
 }
 
 function getStandingsRows(standings, group) {
-  const rows = standings?.groups?.[group];
+  const groups = standings?.groups;
+
+  if (!groups || typeof groups !== "object") {
+    return [];
+  }
+
+  const upper = String(group ?? "").toUpperCase();
+  const rows = groups[upper] ?? groups[upper.toLowerCase()];
 
   return Array.isArray(rows) ? rows : [];
+}
+
+function normalizeTeamKey(name) {
+  return String(name ?? "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function getGroupLetterFromMatch(match) {
+  const stage = String(match?.stage ?? match?.stageRaw ?? "")
+    .trim()
+    .toLowerCase();
+  const stageMatch = stage.match(/^group_([a-l])$/);
+
+  return stageMatch ? stageMatch[1].toUpperCase() : null;
+}
+
+function isGroupStageMatch(match) {
+  return getGroupLetterFromMatch(match) != null;
+}
+
+function buildTeamGroupLookup(standings, matches = []) {
+  const lookup = new Map();
+
+  GROUP_LETTERS.forEach((letter) => {
+    getStandingsRows(standings, letter).forEach((row) => {
+      const team = getTeamString(row?.team);
+
+      if (!team) {
+        return;
+      }
+
+      lookup.set(normalizeTeamKey(team), {
+        team,
+        group: letter,
+        position:
+          row?.position != null && !Number.isNaN(Number(row.position))
+            ? Number(row.position)
+            : null,
+      });
+    });
+  });
+
+  (Array.isArray(matches) ? matches : []).forEach((match) => {
+    if (!isGroupStageMatch(match)) {
+      return;
+    }
+
+    const letter = getGroupLetterFromMatch(match);
+
+    if (!letter) {
+      return;
+    }
+
+    [match.homeTeam, match.awayTeam, match.home, match.away].forEach((value) => {
+      const team = getTeamString(value);
+
+      if (!team) {
+        return;
+      }
+
+      const key = normalizeTeamKey(team);
+
+      if (!lookup.has(key)) {
+        lookup.set(key, { team, group: letter, position: null });
+      }
+    });
+  });
+
+  return lookup;
+}
+
+function teamMatchesGroupPositionRef(teamMeta, parsedRef) {
+  if (!teamMeta || !parsedRef) {
+    return false;
+  }
+
+  if (teamMeta.group !== parsedRef.group) {
+    return false;
+  }
+
+  if (teamMeta.position == null) {
+    return true;
+  }
+
+  return teamMeta.position === parsedRef.position;
+}
+
+function pickTeamForGroupPositionRef(ref, candidates, teamGroupLookup) {
+  const parsed = parseGroupPositionRef(ref);
+
+  if (!parsed || !teamGroupLookup?.size) {
+    return null;
+  }
+
+  for (const candidate of candidates) {
+    const team = getTeamString(candidate);
+
+    if (!team) {
+      continue;
+    }
+
+    const meta = teamGroupLookup.get(normalizeTeamKey(team));
+
+    if (teamMatchesGroupPositionRef(meta, parsed)) {
+      return meta?.team ?? team;
+    }
+  }
+
+  return null;
 }
 
 function hasStandingsActivityForGroup(standings, group) {
@@ -266,25 +387,25 @@ function getSideName(match, side) {
   return getTeamString(match?.[nameKey] ?? match?.[teamKey]);
 }
 
-function isCrossedFeederSide(feederA, feederB, side, { standings } = {}) {
+function isCrossedFeederSide(feederA, feederB, side, context = {}) {
   const refKey = side === "home" ? "homeRef" : "awayRef";
   const refA = feederA[refKey];
   const refB = feederB[refKey];
+  const parsedA = parseGroupPositionRef(refA);
+  const parsedB = parseGroupPositionRef(refB);
 
-  if (!refA || !refB) {
+  if (!parsedA || !parsedB) {
     return false;
   }
 
-  if (!parseGroupPositionRef(refA) || !parseGroupPositionRef(refB)) {
+  if (parsedA.group === parsedB.group) {
     return false;
   }
 
-  const resolvedA = resolveGroupPositionRef(refA, standings);
-  const resolvedB = resolveGroupPositionRef(refB, standings);
   const bracketA = getSideName(feederA, side);
   const bracketB = getSideName(feederB, side);
 
-  if (!resolvedA || !resolvedB || !bracketA || !bracketB) {
+  if (!bracketA || !bracketB) {
     return false;
   }
 
@@ -292,11 +413,19 @@ function isCrossedFeederSide(feederA, feederB, side, { standings } = {}) {
     return false;
   }
 
-  if (bracketA === resolvedA && bracketB === resolvedB) {
+  const teamGroupLookup = buildTeamGroupLookup(context.standings, context.matches);
+  const metaA = teamGroupLookup.get(normalizeTeamKey(bracketA));
+  const metaB = teamGroupLookup.get(normalizeTeamKey(bracketB));
+
+  if (!metaA || !metaB) {
     return false;
   }
 
-  return bracketA === resolvedB && bracketB === resolvedA;
+  if (metaA.group === parsedA.group && metaB.group === parsedB.group) {
+    return false;
+  }
+
+  return metaA.group === parsedB.group && metaB.group === parsedA.group;
 }
 
 function fixCrossedFeederNames(feederMatches, parentMatches, context = {}) {
@@ -308,6 +437,7 @@ function fixCrossedFeederNames(feederMatches, parentMatches, context = {}) {
     return feederMatches;
   }
 
+  const teamGroupLookup = buildTeamGroupLookup(context.standings, context.matches);
   const updated = feederMatches.map((match) => ({ ...match }));
   const byNo = new Map();
 
@@ -342,11 +472,27 @@ function fixCrossedFeederNames(feederMatches, parentMatches, context = {}) {
       }
 
       const refKey = side === "home" ? "homeRef" : "awayRef";
-      const resolvedA = resolveGroupPositionRef(feederA[refKey], context.standings);
-      const resolvedB = resolveGroupPositionRef(feederB[refKey], context.standings);
+      const bracketA = getSideName(feederA, side);
+      const bracketB = getSideName(feederB, side);
+      const candidates = [bracketA, bracketB];
+      const teamForA = pickTeamForGroupPositionRef(
+        feederA[refKey],
+        candidates,
+        teamGroupLookup
+      );
+      const teamForB = pickTeamForGroupPositionRef(
+        feederB[refKey],
+        candidates,
+        teamGroupLookup
+      );
 
-      setSideName(feederA, side, resolvedA);
-      setSideName(feederB, side, resolvedB);
+      if (teamForA) {
+        setSideName(feederA, side, teamForA);
+      }
+
+      if (teamForB) {
+        setSideName(feederB, side, teamForB);
+      }
     });
   });
 
@@ -485,12 +631,15 @@ module.exports = {
   GROUP_LETTERS,
   applyCrossedFeederFixesToMatches,
   buildMatchesByNo,
+  buildTeamGroupLookup,
   fixCrossedFeederNames,
   hasStandingsActivityForGroup,
   isBracketPlaceholder,
+  normalizeTeamKey,
   parseBestThirdRef,
   parseGroupPositionRef,
   parseWinnerRef,
+  pickTeamForGroupPositionRef,
   resolveBestThirdRef,
   resolveBracketRef,
   resolveGroupPositionRef,
