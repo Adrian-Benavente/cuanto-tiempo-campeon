@@ -1,6 +1,9 @@
 const { zafronixFetch } = require("./zafronix-client");
 const { getMatchScores } = require("./zafronix-normalize");
-const { resolveKnockoutSideName } = require("./resolve-bracket-ref");
+const {
+  fixCrossedFeederNames,
+  resolveKnockoutSideName,
+} = require("./resolve-bracket-ref");
 
 const KNOCKOUT_ROUND_ORDER = [
   "round_of_32",
@@ -241,6 +244,17 @@ function buildKnockoutBracket(payload, matches = [], standings = null) {
       });
     }
   });
+
+  for (let index = 0; index < rounds.length - 1; index += 1) {
+    rounds[index] = {
+      ...rounds[index],
+      matches: fixCrossedFeederNames(
+        rounds[index].matches,
+        rounds[index + 1].matches,
+        context
+      ),
+    };
+  }
 
   sortBracketRoundsForTree(rounds);
 

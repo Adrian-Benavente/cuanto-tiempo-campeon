@@ -89,14 +89,24 @@ function parseBestThirdRef(ref) {
   return match[1].toUpperCase().split("");
 }
 
-function getStandingsRow(standings, group, position) {
+function getStandingsRows(standings, group) {
   const rows = standings?.groups?.[group];
 
-  if (!Array.isArray(rows)) {
-    return null;
-  }
+  return Array.isArray(rows) ? rows : [];
+}
 
-  return rows.find((row) => row?.position === position) ?? null;
+function hasStandingsActivityForGroup(standings, group) {
+  return getStandingsRows(standings, group).some(
+    (row) => (row?.played ?? 0) > 0 || (row?.points ?? 0) > 0
+  );
+}
+
+function getStandingsRow(standings, group, position) {
+  const rows = getStandingsRows(standings, group);
+
+  return (
+    rows.find((row) => Number(row?.position) === Number(position)) ?? null
+  );
 }
 
 function resolveGroupPositionRef(ref, standings) {
@@ -235,9 +245,192 @@ function resolveBracketRef(ref, { standings, matches } = {}) {
 
   return (
     resolveGroupPositionRef(trimmed, standings) ??
-    resolveBestThirdRef(trimmed, standings) ??
     resolveWinnerMatchRef(trimmed, matchesByNo)
   );
+}
+
+function setSideName(match, side, name) {
+  if (side === "home") {
+    match.home = name;
+    match.homeTeam = name;
+  } else {
+    match.away = name;
+    match.awayTeam = name;
+  }
+}
+
+function getSideName(match, side) {
+  const nameKey = side === "home" ? "home" : "away";
+  const teamKey = side === "home" ? "homeTeam" : "awayTeam";
+
+  return getTeamString(match?.[nameKey] ?? match?.[teamKey]);
+}
+
+function isCrossedFeederSide(feederA, feederB, side, { standings } = {}) {
+  const refKey = side === "home" ? "homeRef" : "awayRef";
+  const refA = feederA[refKey];
+  const refB = feederB[refKey];
+
+  if (!refA || !refB) {
+    return false;
+  }
+
+  if (!parseGroupPositionRef(refA) || !parseGroupPositionRef(refB)) {
+    return false;
+  }
+
+  const resolvedA = resolveGroupPositionRef(refA, standings);
+  const resolvedB = resolveGroupPositionRef(refB, standings);
+  const bracketA = getSideName(feederA, side);
+  const bracketB = getSideName(feederB, side);
+
+  if (!resolvedA || !resolvedB || !bracketA || !bracketB) {
+    return false;
+  }
+
+  if (isBracketPlaceholder(bracketA) || isBracketPlaceholder(bracketB)) {
+    return false;
+  }
+
+  if (bracketA === resolvedA && bracketB === resolvedB) {
+    return false;
+  }
+
+  return bracketA === resolvedB && bracketB === resolvedA;
+}
+
+function fixCrossedFeederNames(feederMatches, parentMatches, context = {}) {
+  if (!Array.isArray(feederMatches) || !feederMatches.length) {
+    return feederMatches;
+  }
+
+  if (!Array.isArray(parentMatches) || !parentMatches.length) {
+    return feederMatches;
+  }
+
+  const updated = feederMatches.map((match) => ({ ...match }));
+  const byNo = new Map();
+
+  updated.forEach((match) => {
+    const matchNo = getMatchNo(match);
+
+    if (matchNo != null) {
+      byNo.set(matchNo, match);
+    }
+  });
+
+  parentMatches.forEach((parent) => {
+    const feederNos = [
+      parseWinnerRef(parent.homeRef),
+      parseWinnerRef(parent.awayRef),
+    ].filter((matchNo) => matchNo != null);
+
+    if (feederNos.length !== 2) {
+      return;
+    }
+
+    const feederA = byNo.get(feederNos[0]);
+    const feederB = byNo.get(feederNos[1]);
+
+    if (!feederA || !feederB) {
+      return;
+    }
+
+    ["home", "away"].forEach((side) => {
+      if (!isCrossedFeederSide(feederA, feederB, side, context)) {
+        return;
+      }
+
+      const refKey = side === "home" ? "homeRef" : "awayRef";
+      const resolvedA = resolveGroupPositionRef(feederA[refKey], context.standings);
+      const resolvedB = resolveGroupPositionRef(feederB[refKey], context.standings);
+
+      setSideName(feederA, side, resolvedA);
+      setSideName(feederB, side, resolvedB);
+    });
+  });
+
+  return updated;
+}
+
+function getMatchIdFromMatch(match) {
+  return String(match?.id ?? match?.matchId ?? "");
+}
+
+function applyCrossedFeederFixesToMatches(matches, bracketLookup, standings) {
+  if (!bracketLookup?.size || !Array.isArray(matches)) {
+    return matches;
+  }
+
+  const slots = Array.from(bracketLookup.values());
+  const parentSlots = slots.filter(
+    (slot) =>
+      parseWinnerRef(slot.homeRef) != null || parseWinnerRef(slot.awayRef) != null
+  );
+
+  if (!parentSlots.length) {
+    return matches;
+  }
+
+  const context = { standings, matches };
+  const matchByNo = new Map();
+  const result = matches.map((match) => {
+    const matchId = getMatchIdFromMatch(match);
+    const slot = bracketLookup.get(matchId);
+    const copy = { ...match };
+
+    if (slot?.homeRef) {
+      copy.homeRef = slot.homeRef;
+    }
+
+    if (slot?.awayRef) {
+      copy.awayRef = slot.awayRef;
+    }
+
+    const matchNo = getMatchNo(copy);
+
+    if (matchNo != null && slot) {
+      matchByNo.set(matchNo, copy);
+    }
+
+    return copy;
+  });
+
+  if (!matchByNo.size) {
+    return result;
+  }
+
+  const fixedFeeders = fixCrossedFeederNames(
+    Array.from(matchByNo.values()),
+    parentSlots,
+    context
+  );
+  const fixedByNo = new Map();
+
+  fixedFeeders.forEach((match) => {
+    const matchNo = getMatchNo(match);
+
+    if (matchNo != null) {
+      fixedByNo.set(matchNo, match);
+    }
+  });
+
+  return result.map((match) => {
+    const matchNo = getMatchNo(match);
+    const fixed = matchNo != null ? fixedByNo.get(matchNo) : null;
+
+    if (!fixed) {
+      return match;
+    }
+
+    return {
+      ...match,
+      homeTeam: fixed.homeTeam ?? fixed.home ?? match.homeTeam,
+      awayTeam: fixed.awayTeam ?? fixed.away ?? match.awayTeam,
+      home: fixed.home ?? fixed.homeTeam ?? match.home,
+      away: fixed.away ?? fixed.awayTeam ?? match.away,
+    };
+  });
 }
 
 function resolveKnockoutSideName({
@@ -251,11 +444,27 @@ function resolveKnockoutSideName({
   const nameKey = side === "home" ? "home" : "away";
   const teamKey = side === "home" ? "homeTeam" : "awayTeam";
   const ref = slot?.[refKey] ?? match?.[refKey];
+  const matchesByNo = buildMatchesByNo(matches);
 
-  const fromRef = resolveBracketRef(ref, { standings, matches });
+  if (parseWinnerRef(ref) != null) {
+    const winner = resolveWinnerMatchRef(ref, matchesByNo);
 
-  if (fromRef) {
-    return fromRef;
+    if (winner) {
+      return winner;
+    }
+  }
+
+  const groupPosition = parseGroupPositionRef(ref);
+
+  if (
+    groupPosition &&
+    hasStandingsActivityForGroup(standings, groupPosition.group)
+  ) {
+    const fromStandings = resolveGroupPositionRef(ref, standings);
+
+    if (fromStandings) {
+      return fromStandings;
+    }
   }
 
   const slotName = getTeamString(slot?.[nameKey]);
@@ -274,10 +483,14 @@ function resolveKnockoutSideName({
 
 module.exports = {
   GROUP_LETTERS,
+  applyCrossedFeederFixesToMatches,
   buildMatchesByNo,
+  fixCrossedFeederNames,
+  hasStandingsActivityForGroup,
   isBracketPlaceholder,
   parseBestThirdRef,
   parseGroupPositionRef,
+  parseWinnerRef,
   resolveBestThirdRef,
   resolveBracketRef,
   resolveGroupPositionRef,

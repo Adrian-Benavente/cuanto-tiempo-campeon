@@ -1,4 +1,6 @@
 const {
+  applyCrossedFeederFixesToMatches,
+  fixCrossedFeederNames,
   parseBestThirdRef,
   parseGroupPositionRef,
   resolveBestThirdRef,
@@ -11,13 +13,40 @@ const { buildMatchesByNo } = require("../../api/_lib/resolve-bracket-ref");
 
 const STANDINGS = {
   groups: {
-    E: [{ position: 2, team: "Germany" }],
-    F: [{ position: 2, team: "Paraguay" }],
-    I: [{ position: 2, team: "France" }],
-    H: [{ position: 2, team: "Sweden" }],
-    A: [{ position: 3, team: "Mexico", points: 6, goalDifference: 2, goalsFor: 5 }],
-    B: [{ position: 3, team: "Japan", points: 4, goalDifference: 0, goalsFor: 3 }],
-    C: [{ position: 3, team: "Chile", points: 3, goalDifference: -1, goalsFor: 2 }],
+    E: [{ position: 2, team: "Germany", played: 2, points: 4 }],
+    F: [{ position: 2, team: "Paraguay", played: 2, points: 3 }],
+    I: [{ position: 2, team: "France", played: 2, points: 6 }],
+    H: [{ position: 2, team: "Sweden", played: 2, points: 4 }],
+    A: [
+      {
+        position: 3,
+        team: "Mexico",
+        points: 6,
+        goalDifference: 2,
+        goalsFor: 5,
+        played: 3,
+      },
+    ],
+    B: [
+      {
+        position: 3,
+        team: "Japan",
+        points: 4,
+        goalDifference: 0,
+        goalsFor: 3,
+        played: 3,
+      },
+    ],
+    C: [
+      {
+        position: 3,
+        team: "Chile",
+        points: 3,
+        goalDifference: -1,
+        goalsFor: 2,
+        played: 3,
+      },
+    ],
   },
 };
 
@@ -38,6 +67,16 @@ describe("resolveGroupPositionRef", () => {
   it("returns the team in the requested group position", () => {
     expect(resolveGroupPositionRef("2E", STANDINGS)).toBe("Germany");
     expect(resolveGroupPositionRef("2F", STANDINGS)).toBe("Paraguay");
+  });
+
+  it("coerces string positions from the API", () => {
+    const standings = {
+      groups: {
+        A: [{ position: "2", team: "Poland" }],
+      },
+    };
+
+    expect(resolveGroupPositionRef("2A", standings)).toBe("Poland");
   });
 });
 
@@ -65,23 +104,21 @@ describe("resolveWinnerMatchRef", () => {
   });
 });
 
+describe("resolveBracketRef", () => {
+  it("does not resolve third-place refs for knockout names", () => {
+    expect(resolveBracketRef("3ABC", { standings: STANDINGS, matches: [] })).toBeNull();
+  });
+});
+
 describe("resolveKnockoutSideName", () => {
-  it("prefers FIFA refs over swapped Zafronix bracket names", () => {
+  it("prefers concrete bracket names over third-place refs", () => {
     const slot = {
-      homeRef: "2E",
-      awayRef: "2F",
-      home: "Germany",
-      away: "Sweden",
+      homeRef: "1A",
+      awayRef: "3ABCDF",
+      home: "Mexico",
+      away: "Japan",
     };
 
-    expect(
-      resolveKnockoutSideName({
-        slot,
-        side: "home",
-        standings: STANDINGS,
-        matches: [],
-      })
-    ).toBe("Germany");
     expect(
       resolveKnockoutSideName({
         slot,
@@ -89,7 +126,40 @@ describe("resolveKnockoutSideName", () => {
         standings: STANDINGS,
         matches: [],
       })
-    ).toBe("Paraguay");
+    ).toBe("Japan");
+  });
+
+  it("resolves group position refs when the group has standings activity", () => {
+    const slot = {
+      homeRef: "2A",
+      awayRef: "2B",
+      home: "2A",
+      away: "2B",
+    };
+
+    const standings = {
+      groups: {
+        A: [{ position: 2, team: "Mexico", played: 1, points: 3 }],
+        B: [{ position: 2, team: "Brazil", played: 1, points: 3 }],
+      },
+    };
+
+    expect(
+      resolveKnockoutSideName({
+        slot,
+        side: "home",
+        standings,
+        matches: [],
+      })
+    ).toBe("Mexico");
+    expect(
+      resolveKnockoutSideName({
+        slot,
+        side: "away",
+        standings,
+        matches: [],
+      })
+    ).toBe("Brazil");
   });
 
   it("resolves winner refs from match results", () => {
@@ -110,5 +180,107 @@ describe("resolveKnockoutSideName", () => {
         matches,
       })
     ).toBe("Germany");
+
+    expect(
+      resolveKnockoutSideName({
+        slot: { homeRef: "W74", awayRef: "W77" },
+        side: "home",
+        standings: STANDINGS,
+        matches,
+      })
+    ).toBe("Germany");
+  });
+});
+
+describe("fixCrossedFeederNames", () => {
+  it("uncrosses swapped away teams between sibling feeders", () => {
+    const feeders = [
+      {
+        matchId: "2026-074",
+        matchNo: 74,
+        homeRef: "2E",
+        awayRef: "2F",
+        home: "Germany",
+        away: "Sweden",
+      },
+      {
+        matchId: "2026-077",
+        matchNo: 77,
+        homeRef: "2I",
+        awayRef: "2H",
+        home: "France",
+        away: "Paraguay",
+      },
+    ];
+    const parents = [
+      { matchId: "2026-089", homeRef: "W74", awayRef: "W77" },
+    ];
+
+    const fixed = fixCrossedFeederNames(feeders, parents, { standings: STANDINGS });
+
+    expect(fixed[0]).toMatchObject({ away: "Paraguay" });
+    expect(fixed[1]).toMatchObject({ away: "Sweden" });
+  });
+});
+
+describe("applyCrossedFeederFixesToMatches", () => {
+  it("applies feeder uncrossing to enriched fixture matches", () => {
+    const bracketLookup = new Map([
+      [
+        "2026-074",
+        {
+          matchId: "2026-074",
+          matchNo: 74,
+          homeRef: "2E",
+          awayRef: "2F",
+          home: "Germany",
+          away: "Sweden",
+        },
+      ],
+      [
+        "2026-077",
+        {
+          matchId: "2026-077",
+          matchNo: 77,
+          homeRef: "2I",
+          awayRef: "2H",
+          home: "France",
+          away: "Paraguay",
+        },
+      ],
+      [
+        "2026-089",
+        {
+          matchId: "2026-089",
+          matchNo: 89,
+          homeRef: "W74",
+          awayRef: "W77",
+        },
+      ],
+    ]);
+
+    const matches = [
+      {
+        id: "2026-074",
+        stage: "round_of_32",
+        homeTeam: "Germany",
+        awayTeam: "Sweden",
+      },
+      {
+        id: "2026-077",
+        stage: "round_of_32",
+        homeTeam: "France",
+        awayTeam: "Paraguay",
+      },
+    ];
+
+    const fixed = applyCrossedFeederFixesToMatches(
+      matches,
+      bracketLookup,
+      STANDINGS
+    );
+
+    expect(fixed[0]).toMatchObject({ awayTeam: "Paraguay" });
+    expect(fixed[1]).toMatchObject({ awayTeam: "Sweden" });
   });
 });

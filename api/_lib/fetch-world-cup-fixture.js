@@ -6,7 +6,10 @@ const {
   getEmptyKnockoutBracket,
 } = require("./fetch-bracket");
 const { fetchStandingsForYear, getEmptyStandings } = require("./fetch-world-cup-standings");
-const { resolveKnockoutSideName } = require("./resolve-bracket-ref");
+const {
+  applyCrossedFeederFixesToMatches,
+  resolveKnockoutSideName,
+} = require("./resolve-bracket-ref");
 const { getCurrentWorldCupYear, getMatchDate } = require("./recent-matches");
 
 const TOURNAMENT_START = new Date("2026-06-11T16:00:00.000Z");
@@ -52,7 +55,7 @@ function enrichMatchesWithBracket(matches, bracketLookup, { standings } = {}) {
     return matches;
   }
 
-  return (Array.isArray(matches) ? matches : []).map((match) => {
+  const enriched = (Array.isArray(matches) ? matches : []).map((match) => {
     if (!isKnockoutMatch(match)) {
       return match;
     }
@@ -63,7 +66,7 @@ function enrichMatchesWithBracket(matches, bracketLookup, { standings } = {}) {
       return match;
     }
 
-    const enriched = { ...match };
+    const next = { ...match };
     const context = { standings, matches };
 
     const resolvedHome = resolveKnockoutSideName({
@@ -80,25 +83,27 @@ function enrichMatchesWithBracket(matches, bracketLookup, { standings } = {}) {
     });
 
     if (resolvedHome) {
-      enriched.homeTeam = resolvedHome;
-      enriched.home = resolvedHome;
+      next.homeTeam = resolvedHome;
+      next.home = resolvedHome;
     }
 
     if (resolvedAway) {
-      enriched.awayTeam = resolvedAway;
-      enriched.away = resolvedAway;
+      next.awayTeam = resolvedAway;
+      next.away = resolvedAway;
     }
 
     if (slot.homeRef) {
-      enriched.homeRef = slot.homeRef;
+      next.homeRef = slot.homeRef;
     }
 
     if (slot.awayRef) {
-      enriched.awayRef = slot.awayRef;
+      next.awayRef = slot.awayRef;
     }
 
-    return enriched;
+    return next;
   });
+
+  return applyCrossedFeederFixesToMatches(enriched, bracketLookup, standings);
 }
 
 function isWorldCupInProgress(now = new Date()) {

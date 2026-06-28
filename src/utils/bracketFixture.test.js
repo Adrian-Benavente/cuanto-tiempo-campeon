@@ -259,6 +259,68 @@ describe("buildKnockoutBracket", () => {
     expect(p74).toMatchObject({ home: "Germany", away: "Paraguay" });
     expect(p77).toMatchObject({ home: "France", away: "Sweden" });
   });
+
+  it("keeps distinct third-place rivals from the bracket instead of one global third", () => {
+    const standings = {
+      groups: {
+        H: [
+          {
+            position: 3,
+            team: "Sweden",
+            points: 6,
+            goalDifference: 2,
+            goalsFor: 4,
+            played: 3,
+          },
+        ],
+        A: [
+          {
+            position: 3,
+            team: "Mexico",
+            points: 3,
+            goalDifference: 0,
+            goalsFor: 2,
+            played: 3,
+          },
+        ],
+      },
+    };
+
+    const bracket = buildKnockoutBracket(
+      {
+        year: 2026,
+        stages: {
+          round_of_32: [
+            {
+              matchId: "2026-073",
+              matchNo: 73,
+              homeRef: "1A",
+              awayRef: "3CEFHI",
+              home: "Mexico",
+              away: "USA",
+            },
+            {
+              matchId: "2026-075",
+              matchNo: 75,
+              homeRef: "1B",
+              awayRef: "3ABCDF",
+              home: "Switzerland",
+              away: "Chile",
+            },
+          ],
+        },
+      },
+      [],
+      standings
+    );
+
+    const p73 = bracket.rounds[0].matches.find((match) => match.matchNo === 73);
+    const p75 = bracket.rounds[0].matches.find((match) => match.matchNo === 75);
+
+    expect(p73).toMatchObject({ home: "Mexico", away: "USA" });
+    expect(p75).toMatchObject({ home: "Switzerland", away: "Chile" });
+    expect(p73.away).not.toBe(p75.away);
+  });
 });
 
 describe("enrichMatchesWithBracket", () => {
@@ -345,6 +407,14 @@ describe("enrichMatchesWithBracket", () => {
             awayRef: "2H",
             home: "France",
             away: "Paraguay",
+          },
+        ],
+        round_of_16: [
+          {
+            matchId: "2026-089",
+            matchNo: 89,
+            homeRef: "W74",
+            awayRef: "W77",
           },
         ],
       },
