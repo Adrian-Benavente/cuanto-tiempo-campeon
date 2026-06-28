@@ -5,7 +5,7 @@ import styles from "./KnockoutBracketTree.module.css";
 export default function BracketTeamRow({ team, tbdLabel }) {
   if (team.isTbd) {
     return (
-      <div className={styles.teamRow} aria-label={tbdLabel}>
+      <div className={styles.teamRow} aria-label={tbdLabel} title={tbdLabel}>
         <span className={styles.tbdSlot} aria-hidden="true" />
       </div>
     );
@@ -16,12 +16,14 @@ export default function BracketTeamRow({ team, tbdLabel }) {
     countryCode: team.meta?.countryCode,
     displayName: team.meta?.displayName ?? team.apiName,
   };
+  const tooltipLabel = team.meta?.displayName ?? team.apiName;
 
   return (
     <div
       className={`${styles.teamRow} ${team.won ? styles.teamWon : ""} ${
         team.lost ? styles.teamLost : ""
       }`}
+      title={tooltipLabel}
     >
       <CountryFlag
         champion={champion}
