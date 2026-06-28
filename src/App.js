@@ -71,8 +71,8 @@ function MainExperience() {
           matches={recentMatches.matches}
         />
       </div>
-      <BestThirdPlaceTable fixture={fixture} />
       <KnockoutBracketTree bracket={fixture?.bracket} />
+      <BestThirdPlaceTable fixture={fixture} />
       <PersonalizationToolbar />
       <HeroChampion aggregates={aggregates} />
       <ChampionFacts facts={facts} />
