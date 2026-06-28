@@ -143,6 +143,7 @@ function buildTeamGroupLookup(standings, matches = []) {
           row?.position != null && !Number.isNaN(Number(row.position))
             ? Number(row.position)
             : null,
+        advanced: row?.advanced === true,
       });
     });
   });
@@ -214,6 +215,94 @@ function pickTeamForGroupPositionRef(ref, candidates, teamGroupLookup) {
   }
 
   return null;
+}
+
+function isQualifiedThirdPlace(teamMeta) {
+  if (!teamMeta) {
+    return false;
+  }
+
+  if (teamMeta.position === 3) {
+    return true;
+  }
+
+  return teamMeta.advanced === true;
+}
+
+function teamBelongsToBestThirdRef(teamMeta, ref) {
+  const groupLetters = parseBestThirdRef(ref);
+
+  if (!groupLetters?.length || !teamMeta) {
+    return false;
+  }
+
+  if (!groupLetters.includes(teamMeta.group)) {
+    return false;
+  }
+
+  return isQualifiedThirdPlace(teamMeta);
+}
+
+function getGroupOrderInBestThirdRef(group, ref) {
+  const groupLetters = parseBestThirdRef(ref);
+
+  if (!groupLetters?.length || !group) {
+    return -1;
+  }
+
+  return groupLetters.indexOf(group);
+}
+
+function pickTeamForBestThirdRef(ref, candidates, teamGroupLookup) {
+  const groupLetters = parseBestThirdRef(ref);
+
+  if (!groupLetters?.length || !teamGroupLookup?.size) {
+    return null;
+  }
+
+  const eligible = [];
+
+  for (const candidate of candidates) {
+    const team = getTeamString(candidate);
+
+    if (!team) {
+      continue;
+    }
+
+    const meta = teamGroupLookup.get(normalizeTeamKey(team));
+
+    if (teamBelongsToBestThirdRef(meta, ref)) {
+      eligible.push({
+        team: meta?.team ?? team,
+        order: getGroupOrderInBestThirdRef(meta.group, ref),
+      });
+    }
+  }
+
+  if (!eligible.length) {
+    return null;
+  }
+
+  eligible.sort((left, right) => left.order - right.order);
+
+  return eligible[0].team;
+}
+
+function getSharedBestThirdGroups(refA, refB) {
+  const groupsA = parseBestThirdRef(refA);
+  const groupsB = parseBestThirdRef(refB);
+
+  if (!groupsA?.length || !groupsB?.length) {
+    return [];
+  }
+
+  const groupsBSet = new Set(groupsB);
+
+  return groupsA.filter((letter) => groupsBSet.has(letter));
+}
+
+function shouldPairBestThirdCrossCandidates(refA, refB) {
+  return getSharedBestThirdGroups(refA, refB).length >= 2;
 }
 
 function hasStandingsActivityForGroup(standings, group) {
@@ -387,7 +476,7 @@ function getSideName(match, side) {
   return getTeamString(match?.[nameKey] ?? match?.[teamKey]);
 }
 
-function isCrossedFeederSide(feederA, feederB, side, context = {}) {
+function isCrossedGroupPositionFeederSide(feederA, feederB, side, context = {}) {
   const refKey = side === "home" ? "homeRef" : "awayRef";
   const refA = feederA[refKey];
   const refB = feederB[refKey];
@@ -428,12 +517,147 @@ function isCrossedFeederSide(feederA, feederB, side, context = {}) {
   return metaA.group === parsedB.group && metaB.group === parsedA.group;
 }
 
-function fixCrossedFeederNames(feederMatches, parentMatches, context = {}) {
-  if (!Array.isArray(feederMatches) || !feederMatches.length) {
-    return feederMatches;
+function isCrossedBestThirdFeederSide(feederA, feederB, side, context = {}) {
+  const refKey = side === "home" ? "homeRef" : "awayRef";
+  const refA = feederA[refKey];
+  const refB = feederB[refKey];
+
+  if (!parseBestThirdRef(refA) || !parseBestThirdRef(refB)) {
+    return false;
   }
 
-  if (!Array.isArray(parentMatches) || !parentMatches.length) {
+  const bracketA = getSideName(feederA, side);
+  const bracketB = getSideName(feederB, side);
+
+  if (!bracketA || !bracketB) {
+    return false;
+  }
+
+  if (isBracketPlaceholder(bracketA) || isBracketPlaceholder(bracketB)) {
+    return false;
+  }
+
+  if (bracketA === bracketB) {
+    return false;
+  }
+
+  const teamGroupLookup = buildTeamGroupLookup(context.standings, context.matches);
+  const metaA = teamGroupLookup.get(normalizeTeamKey(bracketA));
+  const metaB = teamGroupLookup.get(normalizeTeamKey(bracketB));
+
+  if (!metaA || !metaB) {
+    return false;
+  }
+
+  if (metaA.group === metaB.group) {
+    return false;
+  }
+
+  if (
+    !teamBelongsToBestThirdRef(metaA, refA) ||
+    !teamBelongsToBestThirdRef(metaB, refB) ||
+    !teamBelongsToBestThirdRef(metaA, refB) ||
+    !teamBelongsToBestThirdRef(metaB, refA)
+  ) {
+    return false;
+  }
+
+  const orderAInRefA = getGroupOrderInBestThirdRef(metaA.group, refA);
+  const orderBInRefA = getGroupOrderInBestThirdRef(metaB.group, refA);
+
+  if (orderAInRefA < 0 || orderBInRefA < 0 || orderAInRefA === orderBInRefA) {
+    return false;
+  }
+
+  return orderAInRefA > orderBInRefA;
+}
+
+function isCrossedFeederSide(feederA, feederB, side, context = {}) {
+  const refKey = side === "home" ? "homeRef" : "awayRef";
+  const refA = feederA[refKey];
+  const refB = feederB[refKey];
+
+  if (parseBestThirdRef(refA) && parseBestThirdRef(refB)) {
+    return isCrossedBestThirdFeederSide(feederA, feederB, side, context);
+  }
+
+  if (parseGroupPositionRef(refA) && parseGroupPositionRef(refB)) {
+    return isCrossedGroupPositionFeederSide(feederA, feederB, side, context);
+  }
+
+  return false;
+}
+
+function tryFixCrossedFeederPair(feederA, feederB, side, context, teamGroupLookup) {
+  if (!isCrossedFeederSide(feederA, feederB, side, context)) {
+    return false;
+  }
+
+  const refKey = side === "home" ? "homeRef" : "awayRef";
+  const bracketA = getSideName(feederA, side);
+  const bracketB = getSideName(feederB, side);
+  const candidates = [bracketA, bracketB];
+  const refA = feederA[refKey];
+  const refB = feederB[refKey];
+  const isBestThird = parseBestThirdRef(refA) != null;
+  const teamForA = isBestThird
+    ? pickTeamForBestThirdRef(refA, candidates, teamGroupLookup)
+    : pickTeamForGroupPositionRef(refA, candidates, teamGroupLookup);
+  const remainingCandidates = teamForA
+    ? candidates.filter(
+        (candidate) =>
+          normalizeTeamKey(getTeamString(candidate)) !==
+          normalizeTeamKey(teamForA)
+      )
+    : candidates;
+  const teamForB = isBestThird
+    ? pickTeamForBestThirdRef(refB, remainingCandidates, teamGroupLookup)
+    : pickTeamForGroupPositionRef(refB, remainingCandidates, teamGroupLookup);
+
+  if (teamForA) {
+    setSideName(feederA, side, teamForA);
+  }
+
+  if (teamForB) {
+    setSideName(feederB, side, teamForB);
+  }
+
+  return Boolean(teamForA || teamForB);
+}
+
+function fixOverlappingBestThirdCrosses(feederMatches, context, teamGroupLookup) {
+  const orderedMatches = feederMatches
+    .filter((match) => getMatchNo(match) != null)
+    .slice()
+    .sort((left, right) => getMatchNo(left) - getMatchNo(right));
+
+  for (let index = 0; index < orderedMatches.length; index += 1) {
+    const feederA = orderedMatches[index];
+    const refA = feederA.awayRef;
+
+    if (!parseBestThirdRef(refA)) {
+      continue;
+    }
+
+    for (let nextIndex = index + 1; nextIndex < orderedMatches.length; nextIndex += 1) {
+      const feederB = orderedMatches[nextIndex];
+      const refB = feederB.awayRef;
+
+      if (!parseBestThirdRef(refB)) {
+        continue;
+      }
+
+      if (!shouldPairBestThirdCrossCandidates(refA, refB)) {
+        continue;
+      }
+
+      tryFixCrossedFeederPair(feederA, feederB, "away", context, teamGroupLookup);
+    }
+  }
+}
+
+function fixCrossedFeederNames(feederMatches, parentMatches, context = {}) {
+  if (!Array.isArray(feederMatches) || !feederMatches.length) {
     return feederMatches;
   }
 
@@ -449,7 +673,7 @@ function fixCrossedFeederNames(feederMatches, parentMatches, context = {}) {
     }
   });
 
-  parentMatches.forEach((parent) => {
+  (Array.isArray(parentMatches) ? parentMatches : []).forEach((parent) => {
     const feederNos = [
       parseWinnerRef(parent.homeRef),
       parseWinnerRef(parent.awayRef),
@@ -459,42 +683,20 @@ function fixCrossedFeederNames(feederMatches, parentMatches, context = {}) {
       return;
     }
 
-    const feederA = byNo.get(feederNos[0]);
-    const feederB = byNo.get(feederNos[1]);
+    const [feederNoA, feederNoB] = feederNos.slice().sort((left, right) => left - right);
+    const feederA = byNo.get(feederNoA);
+    const feederB = byNo.get(feederNoB);
 
     if (!feederA || !feederB) {
       return;
     }
 
     ["home", "away"].forEach((side) => {
-      if (!isCrossedFeederSide(feederA, feederB, side, context)) {
-        return;
-      }
-
-      const refKey = side === "home" ? "homeRef" : "awayRef";
-      const bracketA = getSideName(feederA, side);
-      const bracketB = getSideName(feederB, side);
-      const candidates = [bracketA, bracketB];
-      const teamForA = pickTeamForGroupPositionRef(
-        feederA[refKey],
-        candidates,
-        teamGroupLookup
-      );
-      const teamForB = pickTeamForGroupPositionRef(
-        feederB[refKey],
-        candidates,
-        teamGroupLookup
-      );
-
-      if (teamForA) {
-        setSideName(feederA, side, teamForA);
-      }
-
-      if (teamForB) {
-        setSideName(feederB, side, teamForB);
-      }
+      tryFixCrossedFeederPair(feederA, feederB, side, context, teamGroupLookup);
     });
   });
+
+  fixOverlappingBestThirdCrosses(updated, context, teamGroupLookup);
 
   return updated;
 }
@@ -513,10 +715,6 @@ function applyCrossedFeederFixesToMatches(matches, bracketLookup, standings) {
     (slot) =>
       parseWinnerRef(slot.homeRef) != null || parseWinnerRef(slot.awayRef) != null
   );
-
-  if (!parentSlots.length) {
-    return matches;
-  }
 
   const context = { standings, matches };
   const matchByNo = new Map();
@@ -633,16 +831,20 @@ module.exports = {
   buildMatchesByNo,
   buildTeamGroupLookup,
   fixCrossedFeederNames,
+  getSharedBestThirdGroups,
   hasStandingsActivityForGroup,
   isBracketPlaceholder,
   normalizeTeamKey,
   parseBestThirdRef,
   parseGroupPositionRef,
   parseWinnerRef,
+  pickTeamForBestThirdRef,
   pickTeamForGroupPositionRef,
   resolveBestThirdRef,
   resolveBracketRef,
   resolveGroupPositionRef,
   resolveKnockoutSideName,
   resolveWinnerMatchRef,
+  shouldPairBestThirdCrossCandidates,
+  teamBelongsToBestThirdRef,
 };

@@ -1,6 +1,7 @@
 const {
   applyCrossedFeederFixesToMatches,
   fixCrossedFeederNames,
+  getSharedBestThirdGroups,
   parseBestThirdRef,
   parseGroupPositionRef,
   resolveBestThirdRef,
@@ -8,6 +9,7 @@ const {
   resolveGroupPositionRef,
   resolveKnockoutSideName,
   resolveWinnerMatchRef,
+  shouldPairBestThirdCrossCandidates,
 } = require("../../api/_lib/resolve-bracket-ref");
 const { buildMatchesByNo } = require("../../api/_lib/resolve-bracket-ref");
 
@@ -60,6 +62,19 @@ describe("parseGroupPositionRef", () => {
 describe("parseBestThirdRef", () => {
   it("parses best-third group combinations", () => {
     expect(parseBestThirdRef("3ABC")).toEqual(["A", "B", "C"]);
+  });
+});
+
+describe("getSharedBestThirdGroups", () => {
+  it("returns the intersection of group letters in two 3X refs", () => {
+    expect(getSharedBestThirdGroups("3ABCDF", "3CDFGH")).toEqual(["C", "D", "F"]);
+    expect(getSharedBestThirdGroups("3AEHIJ", "3EFGIJ")).toEqual(["E", "I", "J"]);
+  });
+
+  it("flags pairs with enough overlap for cross correction", () => {
+    expect(shouldPairBestThirdCrossCandidates("3ABCDF", "3CDFGH")).toBe(true);
+    expect(shouldPairBestThirdCrossCandidates("3AEHIJ", "3EFGIJ")).toBe(true);
+    expect(shouldPairBestThirdCrossCandidates("3ABCDF", "3AEHIJ")).toBe(false);
   });
 });
 
@@ -300,6 +315,185 @@ describe("fixCrossedFeederNames", () => {
 
     expect(fixed[0]).toMatchObject({ away: "Senegal" });
     expect(fixed[1]).toMatchObject({ away: "Algeria" });
+  });
+
+  it("uncrosses Zafronix 3X third-place refs for Germany and France feeders", () => {
+    const standings = {
+      groups: {
+        D: [
+          { team: "USA", position: 1, advanced: true },
+          { team: "Australia", position: 2, advanced: true },
+          { team: "Paraguay", position: 3, advanced: true },
+          { team: "Türkiye", position: 4 },
+        ],
+        F: [
+          { team: "Netherlands", position: 1, advanced: true },
+          { team: "Japan", position: 2, advanced: true },
+          { team: "Sweden", position: 3, advanced: true },
+          { team: "Tunisia", position: 4 },
+        ],
+      },
+    };
+    const feeders = [
+      {
+        matchId: "2026-074",
+        matchNo: 74,
+        homeRef: "1E",
+        awayRef: "3ABCDF",
+        home: "Germany",
+        away: "Sweden",
+      },
+      {
+        matchId: "2026-077",
+        matchNo: 77,
+        homeRef: "1I",
+        awayRef: "3CDFGH",
+        home: "France",
+        away: "Paraguay",
+      },
+    ];
+    const parents = [
+      { matchId: "2026-089", homeRef: "W74", awayRef: "W77" },
+    ];
+
+    const fixed = fixCrossedFeederNames(feeders, parents, { standings });
+
+    expect(fixed[0]).toMatchObject({ away: "Paraguay" });
+    expect(fixed[1]).toMatchObject({ away: "Sweden" });
+  });
+
+  it("uncrosses Zafronix 3X third-place refs for Belgium and Switzerland feeders", () => {
+    const standings = {
+      groups: {
+        I: [
+          { team: "France", position: 1, advanced: true },
+          { team: "Norway", position: 2, advanced: true },
+          { team: "Senegal", position: 3, advanced: true },
+          { team: "Iraq", position: 4 },
+        ],
+        J: [
+          { team: "Argentina", position: 1, advanced: true },
+          { team: "Austria", position: 2, advanced: true },
+          { team: "Algeria", position: 3, advanced: true },
+          { team: "Jordan", position: 4 },
+        ],
+      },
+    };
+    const feeders = [
+      {
+        matchId: "2026-082",
+        matchNo: 82,
+        homeRef: "1G",
+        awayRef: "3AEHIJ",
+        home: "Belgium",
+        away: "Algeria",
+      },
+      {
+        matchId: "2026-085",
+        matchNo: 85,
+        homeRef: "1B",
+        awayRef: "3EFGIJ",
+        home: "Switzerland",
+        away: "Senegal",
+      },
+    ];
+    const parents = [
+      { matchId: "2026-094", homeRef: "W81", awayRef: "W82" },
+      { matchId: "2026-096", homeRef: "W85", awayRef: "W87" },
+    ];
+
+    const fixed = fixCrossedFeederNames(feeders, parents, { standings });
+
+    expect(fixed.find((match) => match.matchNo === 82)).toMatchObject({
+      away: "Senegal",
+    });
+    expect(fixed.find((match) => match.matchNo === 85)).toMatchObject({
+      away: "Algeria",
+    });
+  });
+
+  it("uncrosses 3X third-place refs via overlapping pools without sibling parents", () => {
+    const standings = {
+      groups: {
+        I: [
+          { team: "France", position: 1, advanced: true },
+          { team: "Norway", position: 2, advanced: true },
+          { team: "Senegal", position: 3, advanced: true },
+          { team: "Iraq", position: 4 },
+        ],
+        J: [
+          { team: "Argentina", position: 1, advanced: true },
+          { team: "Austria", position: 2, advanced: true },
+          { team: "Algeria", position: 3, advanced: true },
+          { team: "Jordan", position: 4 },
+        ],
+      },
+    };
+    const feeders = [
+      {
+        matchId: "2026-082",
+        matchNo: 82,
+        homeRef: "1G",
+        awayRef: "3AEHIJ",
+        home: "Belgium",
+        away: "Algeria",
+      },
+      {
+        matchId: "2026-085",
+        matchNo: 85,
+        homeRef: "1B",
+        awayRef: "3EFGIJ",
+        home: "Switzerland",
+        away: "Senegal",
+      },
+    ];
+
+    const fixed = fixCrossedFeederNames(feeders, [], { standings });
+
+    expect(fixed.find((match) => match.matchNo === 82)).toMatchObject({
+      away: "Senegal",
+    });
+    expect(fixed.find((match) => match.matchNo === 85)).toMatchObject({
+      away: "Algeria",
+    });
+  });
+
+  it("does not modify 3X pairs without enough overlapping groups", () => {
+    const standings = {
+      groups: {
+        I: [
+          { team: "Senegal", position: 3, advanced: true },
+        ],
+        J: [
+          { team: "Algeria", position: 3, advanced: true },
+        ],
+      },
+    };
+    const feeders = [
+      {
+        matchId: "2026-082",
+        matchNo: 82,
+        homeRef: "1G",
+        awayRef: "3AEHIJ",
+        away: "Algeria",
+      },
+      {
+        matchId: "2026-090",
+        matchNo: 90,
+        homeRef: "1H",
+        awayRef: "3KLMNO",
+        away: "Senegal",
+      },
+    ];
+
+    const fixed = fixCrossedFeederNames(feeders, [], { standings });
+
+    expect(fixed.find((match) => match.matchNo === 82)).toMatchObject({
+      away: "Algeria",
+    });
+    expect(fixed.find((match) => match.matchNo === 90)).toMatchObject({
+      away: "Senegal",
+    });
   });
 });
 

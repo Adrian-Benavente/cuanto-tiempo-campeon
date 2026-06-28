@@ -341,6 +341,178 @@ describe("buildKnockoutBracket", () => {
     expect(p81).toMatchObject({ away: "Algeria" });
   });
 
+  it("uncrosses Zafronix 3X third-place away refs from production data", () => {
+    const standings = {
+      groups: {
+        D: [
+          { team: "USA", position: 1, advanced: true },
+          { team: "Australia", position: 2, advanced: true },
+          { team: "Paraguay", position: 3, advanced: true },
+          { team: "Türkiye", position: 4 },
+        ],
+        F: [
+          { team: "Netherlands", position: 1, advanced: true },
+          { team: "Japan", position: 2, advanced: true },
+          { team: "Sweden", position: 3, advanced: true },
+          { team: "Tunisia", position: 4 },
+        ],
+        I: [
+          { team: "France", position: 1, advanced: true },
+          { team: "Norway", position: 2, advanced: true },
+          { team: "Senegal", position: 3, advanced: true },
+          { team: "Iraq", position: 4 },
+        ],
+        J: [
+          { team: "Argentina", position: 1, advanced: true },
+          { team: "Austria", position: 2, advanced: true },
+          { team: "Algeria", position: 3, advanced: true },
+          { team: "Jordan", position: 4 },
+        ],
+      },
+    };
+
+    const bracket = buildKnockoutBracket(
+      {
+        year: 2026,
+        stages: {
+          round_of_32: [
+            {
+              matchId: "2026-074",
+              matchNo: 74,
+              homeRef: "1E",
+              awayRef: "3ABCDF",
+              home: "Germany",
+              away: "Sweden",
+            },
+            {
+              matchId: "2026-077",
+              matchNo: 77,
+              homeRef: "1I",
+              awayRef: "3CDFGH",
+              home: "France",
+              away: "Paraguay",
+            },
+            {
+              matchId: "2026-082",
+              matchNo: 82,
+              homeRef: "1G",
+              awayRef: "3AEHIJ",
+              home: "Belgium",
+              away: "Algeria",
+            },
+            {
+              matchId: "2026-085",
+              matchNo: 85,
+              homeRef: "1B",
+              awayRef: "3EFGIJ",
+              home: "Switzerland",
+              away: "Senegal",
+            },
+          ],
+          round_of_16: [
+            {
+              matchId: "2026-089",
+              matchNo: 89,
+              homeRef: "W74",
+              awayRef: "W77",
+            },
+            {
+              matchId: "2026-094",
+              matchNo: 94,
+              homeRef: "W81",
+              awayRef: "W82",
+            },
+            {
+              matchId: "2026-096",
+              matchNo: 96,
+              homeRef: "W85",
+              awayRef: "W87",
+            },
+          ],
+        },
+      },
+      [],
+      standings
+    );
+
+    const p74 = bracket.rounds[0].matches.find((match) => match.matchNo === 74);
+    const p77 = bracket.rounds[0].matches.find((match) => match.matchNo === 77);
+    const p82 = bracket.rounds[0].matches.find((match) => match.matchNo === 82);
+    const p85 = bracket.rounds[0].matches.find((match) => match.matchNo === 85);
+
+    expect(p74).toMatchObject({ home: "Germany", away: "Paraguay" });
+    expect(p77).toMatchObject({ home: "France", away: "Sweden" });
+    expect(p82).toMatchObject({ home: "Belgium", away: "Senegal" });
+    expect(p85).toMatchObject({ home: "Switzerland", away: "Algeria" });
+  });
+
+  it("uncrosses 3X away refs via overlapping pools with FIFA parents", () => {
+    const standings = {
+      groups: {
+        I: [
+          { team: "France", position: 1, advanced: true },
+          { team: "Norway", position: 2, advanced: true },
+          { team: "Senegal", position: 3, advanced: true },
+          { team: "Iraq", position: 4 },
+        ],
+        J: [
+          { team: "Argentina", position: 1, advanced: true },
+          { team: "Austria", position: 2, advanced: true },
+          { team: "Algeria", position: 3, advanced: true },
+          { team: "Jordan", position: 4 },
+        ],
+      },
+    };
+
+    const bracket = buildKnockoutBracket(
+      {
+        year: 2026,
+        stages: {
+          round_of_32: [
+            {
+              matchId: "2026-082",
+              matchNo: 82,
+              homeRef: "1G",
+              awayRef: "3AEHIJ",
+              home: "Belgium",
+              away: "Algeria",
+            },
+            {
+              matchId: "2026-085",
+              matchNo: 85,
+              homeRef: "1B",
+              awayRef: "3EFGIJ",
+              home: "Switzerland",
+              away: "Senegal",
+            },
+          ],
+          round_of_16: [
+            {
+              matchId: "2026-094",
+              matchNo: 94,
+              homeRef: "W81",
+              awayRef: "W82",
+            },
+            {
+              matchId: "2026-096",
+              matchNo: 96,
+              homeRef: "W85",
+              awayRef: "W87",
+            },
+          ],
+        },
+      },
+      [],
+      standings
+    );
+
+    const p82 = bracket.rounds[0].matches.find((match) => match.matchNo === 82);
+    const p85 = bracket.rounds[0].matches.find((match) => match.matchNo === 85);
+
+    expect(p82).toMatchObject({ away: "Senegal" });
+    expect(p85).toMatchObject({ away: "Algeria" });
+  });
+
   it("keeps distinct third-place rivals from the bracket instead of one global third", () => {
     const standings = {
       groups: {

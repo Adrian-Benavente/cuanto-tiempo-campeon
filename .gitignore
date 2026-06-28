@@ -25,3 +25,5 @@ yarn-error.log*
 
 # JetBrains config
 .idea
+.vercel
+.env*
