@@ -9,6 +9,8 @@ const KNOCKOUT_ROUND_ORDER = [
   "final",
 ];
 
+const WINNER_REF_PATTERN = /^W(\d+)$/i;
+
 function getTeamString(value) {
   if (!value) {
     return null;
@@ -26,6 +28,95 @@ function getMatchIdFromSlot(slot) {
   return String(slot?.matchId ?? slot?.id ?? "");
 }
 
+function parseMatchNoFromId(matchId) {
+  const match = String(matchId ?? "").match(/-(\d+)$/);
+
+  return match ? Number(match[1]) : null;
+}
+
+function getMatchNo(match) {
+  if (match?.matchNo != null && !Number.isNaN(Number(match.matchNo))) {
+    return Number(match.matchNo);
+  }
+
+  return parseMatchNoFromId(match?.matchId);
+}
+
+function parseWinnerRef(ref) {
+  if (!ref || typeof ref !== "string") {
+    return null;
+  }
+
+  const match = ref.trim().match(WINNER_REF_PATTERN);
+
+  return match ? Number(match[1]) : null;
+}
+
+function orderRoundMatchesForTree(currentRound, nextRound) {
+  if (!Array.isArray(currentRound) || !currentRound.length) {
+    return currentRound;
+  }
+
+  if (!Array.isArray(nextRound) || !nextRound.length) {
+    return currentRound;
+  }
+
+  const matchesByNo = new Map();
+
+  currentRound.forEach((match) => {
+    const matchNo = getMatchNo(match);
+
+    if (matchNo != null) {
+      matchesByNo.set(matchNo, match);
+    }
+  });
+
+  const ordered = [];
+  const used = new Set();
+
+  nextRound.forEach((nextMatch) => {
+    [nextMatch.homeRef, nextMatch.awayRef].forEach((ref) => {
+      const feederNo = parseWinnerRef(ref);
+
+      if (feederNo == null || !matchesByNo.has(feederNo) || used.has(feederNo)) {
+        return;
+      }
+
+      ordered.push(matchesByNo.get(feederNo));
+      used.add(feederNo);
+    });
+  });
+
+  currentRound.forEach((match) => {
+    const matchNo = getMatchNo(match);
+
+    if (matchNo != null && !used.has(matchNo)) {
+      ordered.push(match);
+      used.add(matchNo);
+    }
+  });
+
+  return ordered.length === currentRound.length ? ordered : currentRound;
+}
+
+function sortBracketRoundsForTree(rounds) {
+  if (!Array.isArray(rounds) || rounds.length < 2) {
+    return rounds;
+  }
+
+  for (let index = rounds.length - 2; index >= 0; index -= 1) {
+    rounds[index] = {
+      ...rounds[index],
+      matches: orderRoundMatchesForTree(
+        rounds[index].matches,
+        rounds[index + 1].matches
+      ),
+    };
+  }
+
+  return rounds;
+}
+
 function normalizeBracketSlot(slot) {
   const matchId = slot?.matchId ?? slot?.id;
 
@@ -33,8 +124,11 @@ function normalizeBracketSlot(slot) {
     return null;
   }
 
+  const normalizedMatchId = String(matchId);
+
   return {
-    matchId: String(matchId),
+    matchId: normalizedMatchId,
+    matchNo: slot?.matchNo ?? parseMatchNoFromId(normalizedMatchId),
     home: getTeamString(slot.home ?? slot.homeTeam),
     away: getTeamString(slot.away ?? slot.awayTeam),
     homeRef: slot.homeRef ?? null,
@@ -130,6 +224,8 @@ function buildKnockoutBracket(payload, matches = []) {
     }
   });
 
+  sortBracketRoundsForTree(rounds);
+
   return {
     year: payload?.year ?? null,
     rounds,
@@ -173,6 +269,10 @@ module.exports = {
   fetchBracketForYear,
   fetchBracketPayload,
   getEmptyKnockoutBracket,
+  getMatchNo,
   normalizeBracketSlot,
   normalizeKnockoutMatchSlot,
+  orderRoundMatchesForTree,
+  parseWinnerRef,
+  sortBracketRoundsForTree,
 };

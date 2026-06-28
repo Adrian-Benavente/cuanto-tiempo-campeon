@@ -1,4 +1,11 @@
-const { buildBracketLookup, buildKnockoutBracket } = require("../../api/_lib/fetch-bracket");
+const {
+  buildBracketLookup,
+  buildKnockoutBracket,
+  getMatchNo,
+  orderRoundMatchesForTree,
+  parseWinnerRef,
+  sortBracketRoundsForTree,
+} = require("../../api/_lib/fetch-bracket");
 const { enrichMatchesWithBracket } = require("../../api/_lib/fetch-world-cup-fixture");
 
 describe("buildBracketLookup", () => {
@@ -29,12 +36,78 @@ describe("buildBracketLookup", () => {
 
     expect(lookup.get("2026-073")).toEqual({
       matchId: "2026-073",
+      matchNo: 73,
       home: "Mexico",
       away: null,
       homeRef: "2A",
       awayRef: "2B",
     });
     expect(lookup.get("2026-104")?.home).toBeNull();
+  });
+});
+
+describe("parseWinnerRef", () => {
+  it("parses FIFA winner placeholders", () => {
+    expect(parseWinnerRef("W73")).toBe(73);
+    expect(parseWinnerRef("w74")).toBe(74);
+    expect(parseWinnerRef("2A")).toBeNull();
+  });
+});
+
+describe("orderRoundMatchesForTree", () => {
+  it("orders round of 32 feeders based on round of 16 winner refs", () => {
+    const roundOf32 = [
+      { matchId: "2026-073", matchNo: 73, home: "South Africa", away: "Canada" },
+      { matchId: "2026-074", matchNo: 74, home: "Germany", away: "Paraguay" },
+      { matchId: "2026-075", matchNo: 75, home: "Netherlands", away: "Morocco" },
+      { matchId: "2026-077", matchNo: 77, home: "France", away: "Sweden" },
+    ];
+    const roundOf16 = [
+      { matchId: "2026-089", matchNo: 89, homeRef: "W74", awayRef: "W77" },
+      { matchId: "2026-090", matchNo: 90, homeRef: "W73", awayRef: "W75" },
+    ];
+
+    expect(orderRoundMatchesForTree(roundOf32, roundOf16).map(getMatchNo)).toEqual([
+      74, 77, 73, 75,
+    ]);
+  });
+});
+
+describe("sortBracketRoundsForTree", () => {
+  it("propagates ordering from later rounds back to earlier rounds", () => {
+    const rounds = [
+      {
+        id: "round_of_16",
+        matches: [
+          { matchId: "2026-090", matchNo: 90, homeRef: "W73", awayRef: "W75" },
+          { matchId: "2026-089", matchNo: 89, homeRef: "W74", awayRef: "W77" },
+        ],
+      },
+      {
+        id: "quarter_final",
+        matches: [
+          { matchId: "2026-097", matchNo: 97, homeRef: "W89", awayRef: "W90" },
+        ],
+      },
+      {
+        id: "semi_final",
+        matches: [
+          { matchId: "2026-101", matchNo: 101, homeRef: "W97", awayRef: "W98" },
+          { matchId: "2026-102", matchNo: 102, homeRef: "W99", awayRef: "W100" },
+        ],
+      },
+      {
+        id: "final",
+        matches: [
+          { matchId: "2026-104", matchNo: 104, homeRef: "W101", awayRef: "W102" },
+        ],
+      },
+    ];
+
+    sortBracketRoundsForTree(rounds);
+
+    expect(rounds[0].matches.map(getMatchNo)).toEqual([89, 90]);
+    expect(rounds[2].matches.map(getMatchNo)).toEqual([101, 102]);
   });
 });
 
@@ -106,10 +179,65 @@ describe("buildKnockoutBracket", () => {
 
     expect(r32Match).toMatchObject({
       matchId: "2026-073",
+      matchNo: 73,
       homeScore: 2,
       awayScore: 1,
       winner: "Mexico",
     });
+  });
+
+  it("orders round of 32 matches for the official FIFA bracket tree", () => {
+    const bracket = buildKnockoutBracket(
+      {
+        year: 2026,
+        stages: {
+          round_of_32: [
+            {
+              matchId: "2026-073",
+              matchNo: 73,
+              home: "South Africa",
+              away: "Canada",
+            },
+            {
+              matchId: "2026-074",
+              matchNo: 74,
+              home: "Germany",
+              away: "Paraguay",
+            },
+            {
+              matchId: "2026-075",
+              matchNo: 75,
+              home: "Netherlands",
+              away: "Morocco",
+            },
+            {
+              matchId: "2026-077",
+              matchNo: 77,
+              home: "France",
+              away: "Sweden",
+            },
+          ],
+          round_of_16: [
+            {
+              matchId: "2026-089",
+              matchNo: 89,
+              homeRef: "W74",
+              awayRef: "W77",
+            },
+            {
+              matchId: "2026-090",
+              matchNo: 90,
+              homeRef: "W73",
+              awayRef: "W75",
+            },
+          ],
+        },
+      },
+      []
+    );
+
+    expect(bracket.rounds[0].matches.map(getMatchNo)).toEqual([74, 77, 73, 75]);
+    expect(bracket.rounds[1].matches.map(getMatchNo)).toEqual([89, 90]);
   });
 });
 
