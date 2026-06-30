@@ -8,7 +8,7 @@
 .bracketRoot {
   --bracket-line-color: var(--color-text-subtle);
   --bracket-connector-color: var(--bracket-line-color);
-  --bracket-connector-width: 1.5px;
+  --bracket-connector-width: 1px;
   color: var(--bracket-line-color);
   min-width: min-content;
   padding-bottom: var(--space-xs);
