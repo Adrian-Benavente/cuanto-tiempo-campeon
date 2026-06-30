@@ -56,6 +56,8 @@ export const translations = {
     todayMatchesSubtitle: "Mundial {year}",
     kickoffAt: "{time}",
     matchInProgress: "En desarrollo",
+    scoreWithPenalties:
+      "{homeScore} a {awayScore}, {homePenalties}–{awayPenalties} en penales",
     noRecentResults: "Aún no hay resultados del torneo",
     bestThirdPlaceTitle: "Mejores terceros",
     bestThirdPlaceSubtitle: "Los 8 primeros avanzan a dieciseisavos de final",
@@ -166,6 +168,8 @@ export const translations = {
     todayMatchesSubtitle: "World Cup {year}",
     kickoffAt: "{time}",
     matchInProgress: "In progress",
+    scoreWithPenalties:
+      "{homeScore} to {awayScore}, {homePenalties}–{awayPenalties} on penalties",
     noRecentResults: "No tournament results yet",
     bestThirdPlaceTitle: "Best third-place teams",
     bestThirdPlaceSubtitle: "The top 8 advance to the Round of 32",

@@ -2,10 +2,11 @@ import React from "react";
 import { useLocale } from "../../context/LocaleContext";
 import { formatMatchStageFromMatch } from "../../utils/formatMatchStage";
 import {
-  getMatchScores,
+  getMatchScoreDisplay,
   getTeamName,
   isMatchInProgress,
 } from "../../utils/liveMatchData";
+import MatchScoreLine from "../MatchScoreLine/MatchScoreLine";
 import styles from "./LiveMatchesBanner.module.css";
 
 function formatMatchDate(date, locale) {
@@ -30,7 +31,8 @@ export default function RecentMatchCard({ match }) {
   const homeTeam = getTeamName(match.homeTeam ?? match.home);
   const awayTeam = getTeamName(match.awayTeam ?? match.away);
   const inProgress = isMatchInProgress(match);
-  const { homeScore, awayScore } = getMatchScores(match);
+  const { homeScore, awayScore, homePenalties, awayPenalties } =
+    getMatchScoreDisplay(match);
   const hasScore = !inProgress && homeScore != null && awayScore != null;
   const stage = formatMatchStageFromMatch(match, locale);
   const matchDate = formatMatchDate(match.date, locale);
@@ -58,11 +60,12 @@ export default function RecentMatchCard({ match }) {
               {t("matchInProgress")}
             </span>
           ) : hasScore ? (
-            <span className={styles.scoreLine}>
-              <span className={styles.scoreValue}>{homeScore}</span>
-              <span className={styles.scoreSeparator}>-</span>
-              <span className={styles.scoreValue}>{awayScore}</span>
-            </span>
+            <MatchScoreLine
+              awayPenalties={awayPenalties}
+              awayScore={awayScore}
+              homePenalties={homePenalties}
+              homeScore={homeScore}
+            />
           ) : (
             <span className={styles.vsLabel}>{t("vs")}</span>
           )}

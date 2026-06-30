@@ -63,14 +63,50 @@ export function isMatchInProgress(match, now = new Date()) {
   return match?.result == null;
 }
 
+function parseNumericScore(value) {
+  if (value == null || value === "") {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function readPenaltySide(source, ...keys) {
+  if (!source || typeof source !== "object") {
+    return null;
+  }
+
+  for (const key of keys) {
+    const parsed = parseNumericScore(source[key]);
+
+    if (parsed != null) {
+      return parsed;
+    }
+  }
+
+  return null;
+}
+
+function getPenaltyScoresFromObject(source) {
+  const homePenalties = readPenaltySide(source, "homeScore", "home");
+  const awayPenalties = readPenaltySide(source, "awayScore", "away");
+
+  if (homePenalties != null && awayPenalties != null) {
+    return { homePenalties, awayPenalties };
+  }
+
+  return null;
+}
+
 export function getMatchScores(match) {
   const homeScore = match?.homeScore ?? match?.score?.home;
   const awayScore = match?.awayScore ?? match?.score?.away;
 
   if (homeScore != null && awayScore != null) {
     return {
-      homeScore: Number(homeScore),
-      awayScore: Number(awayScore),
+      homeScore: parseNumericScore(homeScore),
+      awayScore: parseNumericScore(awayScore),
     };
   }
 
@@ -78,10 +114,10 @@ export function getMatchScores(match) {
 
   if (typeof result === "string" && result.includes("-")) {
     const [home, away] = result.split("-").map((value) => value.trim());
-    const parsedHome = Number(home);
-    const parsedAway = Number(away);
+    const parsedHome = parseNumericScore(home);
+    const parsedAway = parseNumericScore(away);
 
-    if (!Number.isNaN(parsedHome) && !Number.isNaN(parsedAway)) {
+    if (parsedHome != null && parsedAway != null) {
       return { homeScore: parsedHome, awayScore: parsedAway };
     }
   }
@@ -89,6 +125,37 @@ export function getMatchScores(match) {
   return {
     homeScore: null,
     awayScore: null,
+  };
+}
+
+export function getMatchPenaltyScores(match) {
+  const fromPenalties = getPenaltyScoresFromObject(match?.penalties);
+  const fromShootout = getPenaltyScoresFromObject(match?.penaltyShootout);
+  const resolved = fromPenalties ?? fromShootout;
+
+  return (
+    resolved ?? {
+      homePenalties: null,
+      awayPenalties: null,
+    }
+  );
+}
+
+export function hasPenaltyShootout(match) {
+  const { homePenalties, awayPenalties } = getMatchPenaltyScores(match);
+  return homePenalties != null && awayPenalties != null;
+}
+
+export function getMatchScoreDisplay(match) {
+  const { homeScore, awayScore } = getMatchScores(match);
+  const { homePenalties, awayPenalties } = getMatchPenaltyScores(match);
+
+  return {
+    homeScore,
+    awayScore,
+    homePenalties,
+    awayPenalties,
+    hasPenalties: homePenalties != null && awayPenalties != null,
   };
 }
 

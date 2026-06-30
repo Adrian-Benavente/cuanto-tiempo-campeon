@@ -3,8 +3,9 @@ import { useLocale } from "../../context/LocaleContext";
 import { groupMatchesByStage } from "../../utils/fixtureData";
 import { formatMatchDateTime } from "../../utils/formatMatchDateTime";
 import { isGroupStageKey } from "../../utils/groupStandings";
-import { getMatchScores } from "../../utils/liveMatchData";
+import { getMatchScoreDisplay } from "../../utils/liveMatchData";
 import { getMatchSideDisplayName } from "../../utils/matchTeams";
+import MatchScoreLine from "../MatchScoreLine/MatchScoreLine";
 import GroupStandingsTable from "./GroupStandingsTable";
 import scoreboardStyles from "../LiveMatchesBanner/LiveMatchesBanner.module.css";
 import styles from "./WorldCupFixture.module.css";
@@ -14,7 +15,8 @@ function FixtureMatchCard({ match }) {
   const tbdLabel = t("fixtureTbd");
   const home = getMatchSideDisplayName(match, "home", tbdLabel);
   const away = getMatchSideDisplayName(match, "away", tbdLabel);
-  const { homeScore, awayScore } = getMatchScores(match);
+  const { homeScore, awayScore, homePenalties, awayPenalties } =
+    getMatchScoreDisplay(match);
   const hasScore = homeScore != null && awayScore != null;
   const formattedDateTime = formatMatchDateTime(match, locale);
 
@@ -41,11 +43,12 @@ function FixtureMatchCard({ match }) {
         </span>
         <div className={scoreboardStyles.scoreCenter}>
           {hasScore ? (
-            <span className={scoreboardStyles.scoreLine}>
-              <span className={scoreboardStyles.scoreValue}>{homeScore}</span>
-              <span className={scoreboardStyles.scoreSeparator}>-</span>
-              <span className={scoreboardStyles.scoreValue}>{awayScore}</span>
-            </span>
+            <MatchScoreLine
+              awayPenalties={awayPenalties}
+              awayScore={awayScore}
+              homePenalties={homePenalties}
+              homeScore={homeScore}
+            />
           ) : (
             <span className={scoreboardStyles.vsLabel}>{t("vs")}</span>
           )}
