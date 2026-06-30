@@ -56,6 +56,8 @@ export const translations = {
     todayMatchesSubtitle: "Mundial {year}",
     kickoffAt: "{time}",
     matchInProgress: "Esperando resultado",
+    matchInProgressLine1: "Esperando",
+    matchInProgressLine2: "resultado",
     scoreWithPenalties:
       "{homeScore} a {awayScore}, {homePenalties}–{awayPenalties} en penales",
     noRecentResults: "Aún no hay resultados del torneo",
@@ -168,6 +170,8 @@ export const translations = {
     todayMatchesSubtitle: "World Cup {year}",
     kickoffAt: "{time}",
     matchInProgress: "Awaiting result",
+    matchInProgressLine1: "Awaiting",
+    matchInProgressLine2: "result",
     scoreWithPenalties:
       "{homeScore} to {awayScore}, {homePenalties}–{awayPenalties} on penalties",
     noRecentResults: "No tournament results yet",

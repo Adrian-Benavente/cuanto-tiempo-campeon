@@ -131,12 +131,33 @@
 }
 
 .matchInProgressLabel {
+  align-items: center;
   color: var(--color-text-muted);
+  display: inline-flex;
   font-size: 0.8125rem;
   font-weight: 600;
+  gap: 0.25em;
   letter-spacing: 0.02em;
+  line-height: 1.2;
   text-align: center;
   white-space: nowrap;
+}
+
+.matchInProgressLineBreak::before {
+  content: " ";
+  white-space: pre;
+}
+
+@media (max-width: 639px) {
+  .matchInProgressLabel {
+    flex-direction: column;
+    gap: 0;
+    white-space: normal;
+  }
+
+  .matchInProgressLineBreak::before {
+    content: none;
+  }
 }
 
 .vsLabel {

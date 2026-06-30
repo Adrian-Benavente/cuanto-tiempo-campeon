@@ -57,7 +57,10 @@ export default function RecentMatchCard({ match }) {
         <div className={styles.scoreCenter}>
           {inProgress ? (
             <span className={styles.matchInProgressLabel}>
-              {t("matchInProgress")}
+              <span>{t("matchInProgressLine1")}</span>
+              <span className={styles.matchInProgressLineBreak}>
+                {t("matchInProgressLine2")}
+              </span>
             </span>
           ) : hasScore ? (
             <MatchScoreLine
