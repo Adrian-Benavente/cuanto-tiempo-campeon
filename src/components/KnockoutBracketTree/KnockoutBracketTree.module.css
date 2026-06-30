@@ -6,9 +6,10 @@
 }
 
 .bracketRoot {
-  --bracket-connector-color: var(--color-border);
-  --bracket-connector-width: 1.5px;
-  color: var(--color-border);
+  --bracket-line-color: var(--color-text-subtle);
+  --bracket-connector-color: var(--bracket-line-color);
+  --bracket-connector-width: 2px;
+  color: var(--bracket-line-color);
   min-width: min-content;
   padding-bottom: var(--space-xs);
 }
@@ -26,7 +27,7 @@
 
 .matchCell {
   background: var(--color-surface-elevated, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--bracket-line-color);
   border-radius: var(--radius-sm, 6px);
   display: flex;
   flex-direction: column;
@@ -42,7 +43,7 @@
 }
 
 .teamRow + .teamRow {
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--bracket-line-color);
 }
 
 .teamWon {
@@ -87,7 +88,7 @@
 
 .tbdSlot {
   background: transparent;
-  border: 1px dashed var(--color-border);
+  border: 1px dashed var(--bracket-line-color);
   border-radius: 2px;
   display: block;
   height: 12px;
