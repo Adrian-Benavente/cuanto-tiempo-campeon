@@ -55,7 +55,7 @@ export const translations = {
     todayMatches: "Próximos partidos",
     todayMatchesSubtitle: "Mundial {year}",
     kickoffAt: "{time}",
-    matchInProgress: "En desarrollo",
+    matchInProgress: "Esperando resultado",
     scoreWithPenalties:
       "{homeScore} a {awayScore}, {homePenalties}–{awayPenalties} en penales",
     noRecentResults: "Aún no hay resultados del torneo",
@@ -167,7 +167,7 @@ export const translations = {
     todayMatches: "Upcoming matches",
     todayMatchesSubtitle: "World Cup {year}",
     kickoffAt: "{time}",
-    matchInProgress: "In progress",
+    matchInProgress: "Awaiting result",
     scoreWithPenalties:
       "{homeScore} to {awayScore}, {homePenalties}–{awayPenalties} on penalties",
     noRecentResults: "No tournament results yet",
