@@ -26,12 +26,18 @@ export default function WorldCupCountdown({ worldCup2026 }) {
     return null;
   }
 
+  if (daysRemaining === 0 && !hostLabel) {
+    return null;
+  }
+
   return (
     <section className={styles.banner} aria-live="polite">
-      <p className={styles.text}>
-        {t("worldCupCountdown", { days: daysRemaining })}
-      </p>
-      {hostLabel && <p className={styles.host}>{hostLabel}</p>}
+      {daysRemaining > 0 ? (
+        <p className={styles.text}>
+          {t("worldCupCountdown", { days: daysRemaining })}
+        </p>
+      ) : null}
+      {hostLabel ? <p className={styles.host}>{hostLabel}</p> : null}
     </section>
   );
 }
