@@ -9,8 +9,8 @@ import {
 
 describe("matchDetailData", () => {
   test("formatGoalMinute handles regular and stoppage time", () => {
-    expect(formatGoalMinute({ minute: 45 })).toBe("45");
-    expect(formatGoalMinute({ minute: 90, addedMinute: 5 })).toBe("90+5");
+    expect(formatGoalMinute({ minute: 45 })).toBe("45'");
+    expect(formatGoalMinute({ minute: 90, addedMinute: 5 })).toBe("90+5'");
     expect(formatGoalMinute({ minute: null })).toBe("—");
   });
 
@@ -22,7 +22,7 @@ describe("matchDetailData", () => {
       ],
     });
 
-    expect(goals.map((goal) => goal.minuteLabel)).toEqual(["45", "82"]);
+    expect(goals.map((goal) => goal.minuteLabel)).toEqual(["45'", "82'"]);
     expect(goals[0].scorer).toBe("Balogun");
   });
 

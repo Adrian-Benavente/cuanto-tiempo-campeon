@@ -31,10 +31,10 @@ export function formatGoalMinute(goal) {
   }
 
   if (addedMinute != null && addedMinute !== "" && Number(addedMinute) > 0) {
-    return `${minute}+${addedMinute}`;
+    return `${minute}+${addedMinute}'`;
   }
 
-  return String(minute);
+  return `${minute}'`;
 }
 
 function getGoalSortKey(goal) {
