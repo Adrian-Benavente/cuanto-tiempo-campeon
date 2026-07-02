@@ -26,9 +26,7 @@ export default function WorldCupCountdown({ worldCup2026 }) {
     return null;
   }
 
-  if (daysRemaining === 0 && !hostLabel) {
-    return null;
-  }
+  const tournamentYear = worldCup2026?.year ?? 2026;
 
   return (
     <section className={styles.banner} aria-live="polite">
@@ -36,7 +34,9 @@ export default function WorldCupCountdown({ worldCup2026 }) {
         <p className={styles.text}>
           {t("worldCupCountdown", { days: daysRemaining })}
         </p>
-      ) : null}
+      ) : (
+        <p className={styles.text}>{t("worldCupActiveTitle", { year: tournamentYear })}</p>
+      )}
       {hostLabel ? <p className={styles.host}>{hostLabel}</p> : null}
     </section>
   );

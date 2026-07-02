@@ -31,25 +31,32 @@ describe("WorldCupCountdown", () => {
     expect(screen.getByText("United States, Canada, Mexico")).toBeInTheDocument();
   });
 
-  it("hides the countdown at zero days but keeps the host label", () => {
+  it("shows the tournament title at zero days but keeps the host label", () => {
     useLiveNow.mockReturnValue(new Date("2026-06-11T18:00:00.000Z"));
 
     renderCountdown({
+      year: 2026,
       startDate: "2026-06-11T00:00:00.000Z",
       host: ["United States", "Canada", "Mexico"],
     });
 
     expect(screen.queryByText(/0 days until World Cup 2026|Faltan 0 días/)).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/FIFA World Cup 2026|Copa Mundial de la FIFA 2026/)
+    ).toBeInTheDocument();
     expect(screen.getByText("United States, Canada, Mexico")).toBeInTheDocument();
   });
 
-  it("renders nothing at zero days when there is no host", () => {
+  it("shows the tournament title at zero days when there is no host", () => {
     useLiveNow.mockReturnValue(new Date("2026-06-11T18:00:00.000Z"));
 
-    const { container } = renderCountdown({
+    renderCountdown({
+      year: 2026,
       startDate: "2026-06-11T00:00:00.000Z",
     });
 
-    expect(container).toBeEmptyDOMElement();
+    expect(
+      screen.getByText(/FIFA World Cup 2026|Copa Mundial de la FIFA 2026/)
+    ).toBeInTheDocument();
   });
 });

@@ -50,6 +50,7 @@ export const translations = {
     compareMetric_topScorer: "Goleador",
     compareMetric_bestPlayer: "Mejor jugador",
     worldCupCountdown: "Faltan {days} días para el Mundial 2026",
+    worldCupActiveTitle: "Copa Mundial de la FIFA {year}",
     recentResults: "Últimos resultados",
     recentResultsSubtitle: "Mundial {year}",
     recentResultsHint:
@@ -200,6 +201,7 @@ export const translations = {
     compareMetric_topScorer: "Top scorer",
     compareMetric_bestPlayer: "Best player",
     worldCupCountdown: "{days} days until World Cup 2026",
+    worldCupActiveTitle: "FIFA World Cup {year}",
     recentResults: "Recent results",
     recentResultsSubtitle: "World Cup {year}",
     recentResultsHint: "Tap a match to see goals, stats, and lineups",
