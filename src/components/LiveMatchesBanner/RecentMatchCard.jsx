@@ -26,7 +26,7 @@ function formatMatchDate(date, locale) {
   }).format(parsed);
 }
 
-export default function RecentMatchCard({ match }) {
+export default function RecentMatchCard({ match, onOpen }) {
   const { locale, t } = useLocale();
   const homeTeam = getTeamName(match.homeTeam ?? match.home);
   const awayTeam = getTeamName(match.awayTeam ?? match.away);
@@ -38,10 +38,12 @@ export default function RecentMatchCard({ match }) {
   const matchDate = formatMatchDate(match.date, locale);
 
   return (
-    <article
-      className={`${styles.recentCard} ${
+    <button
+      className={`${styles.recentCard} ${styles.recentCardButton} ${
         inProgress ? styles.recentCardInProgress : ""
       }`}
+      onClick={() => onOpen?.(match)}
+      type="button"
     >
       <div className={styles.recentCardHeader}>
         {stage ? <span className={styles.stage}>{stage}</span> : <span />}
@@ -77,6 +79,6 @@ export default function RecentMatchCard({ match }) {
           {awayTeam}
         </span>
       </div>
-    </article>
+    </button>
   );
 }

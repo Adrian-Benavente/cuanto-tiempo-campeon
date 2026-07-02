@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocale } from "../../context/LocaleContext";
 import { getMatchKey } from "../../utils/liveMatchData";
+import MatchDetailModal from "../MatchDetailModal/MatchDetailModal";
 import RecentMatchCard from "./RecentMatchCard";
 import styles from "./LiveMatchesBanner.module.css";
 
 function LiveMatchesBanner({ year = 2022, matches = [] }) {
   const { t } = useLocale();
+  const [selectedMatch, setSelectedMatch] = useState(null);
   const title = t("recentResults");
   const subtitle = matches.length ? t("recentResultsSubtitle", { year }) : null;
 
@@ -25,10 +27,11 @@ function LiveMatchesBanner({ year = 2022, matches = [] }) {
       <ul className={styles.recentList}>
         {matches.map((match, index) => (
           <li key={getMatchKey(match, index)}>
-            <RecentMatchCard match={match} />
+            <RecentMatchCard match={match} onOpen={setSelectedMatch} />
           </li>
         ))}
       </ul>
+      <MatchDetailModal match={selectedMatch} onClose={() => setSelectedMatch(null)} />
     </section>
   );
 }
