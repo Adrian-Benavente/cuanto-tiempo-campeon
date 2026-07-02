@@ -24,6 +24,7 @@ function LiveMatchesBanner({ year = 2022, matches = [] }) {
     <section className={styles.banner} aria-label={title}>
       <h2 className={styles.title}>{title}</h2>
       {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
+      <p className={styles.hint}>{t("recentResultsHint")}</p>
       <ul className={styles.recentList}>
         {matches.map((match, index) => (
           <li key={getMatchKey(match, index)}>

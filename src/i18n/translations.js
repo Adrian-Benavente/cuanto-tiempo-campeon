@@ -52,6 +52,8 @@ export const translations = {
     worldCupCountdown: "Faltan {days} días para el Mundial 2026",
     recentResults: "Últimos resultados",
     recentResultsSubtitle: "Mundial {year}",
+    recentResultsHint:
+      "Tocá un partido para ver goles, estadísticas y alineaciones",
     todayMatches: "Próximos partidos",
     todayMatchesSubtitle: "Mundial {year}",
     kickoffAt: "{time}",
@@ -200,6 +202,7 @@ export const translations = {
     worldCupCountdown: "{days} days until World Cup 2026",
     recentResults: "Recent results",
     recentResultsSubtitle: "World Cup {year}",
+    recentResultsHint: "Tap a match to see goals, stats, and lineups",
     todayMatches: "Upcoming matches",
     todayMatchesSubtitle: "World Cup {year}",
     kickoffAt: "{time}",

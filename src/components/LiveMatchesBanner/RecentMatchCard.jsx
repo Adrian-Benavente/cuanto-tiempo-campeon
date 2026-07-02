@@ -47,11 +47,16 @@ export default function RecentMatchCard({ match, onOpen }) {
     >
       <div className={styles.recentCardHeader}>
         {stage ? <span className={styles.stage}>{stage}</span> : <span />}
-        {matchDate ? (
-          <time className={styles.recentCardDate} dateTime={match.date}>
-            {matchDate}
-          </time>
-        ) : null}
+        <div className={styles.recentCardMeta}>
+          {matchDate ? (
+            <time className={styles.recentCardDate} dateTime={match.date}>
+              {matchDate}
+            </time>
+          ) : null}
+          <span aria-hidden="true" className={styles.cardChevron}>
+            ›
+          </span>
+        </div>
       </div>
 
       <div className={styles.scoreboard}>
