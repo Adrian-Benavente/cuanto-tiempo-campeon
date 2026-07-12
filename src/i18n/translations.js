@@ -55,6 +55,7 @@ export const translations = {
     recentResultsSubtitle: "Mundial {year}",
     recentResultsHint:
       "Tocá un partido para ver goles, estadísticas y alineaciones",
+    recentResultsDisclaimer: "Algunos resultados pueden tardar en actualizarse",
     todayMatches: "Próximos partidos",
     todayMatchesSubtitle: "Mundial {year}",
     kickoffAt: "{time}",
@@ -205,6 +206,7 @@ export const translations = {
     recentResults: "Recent results",
     recentResultsSubtitle: "World Cup {year}",
     recentResultsHint: "Tap a match to see goals, stats, and lineups",
+    recentResultsDisclaimer: "Some results may take a while to update",
     todayMatches: "Upcoming matches",
     todayMatchesSubtitle: "World Cup {year}",
     kickoffAt: "{time}",

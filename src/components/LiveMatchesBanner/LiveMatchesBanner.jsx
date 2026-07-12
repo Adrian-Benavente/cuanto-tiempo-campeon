@@ -32,6 +32,7 @@ function LiveMatchesBanner({ year = 2022, matches = [] }) {
           </li>
         ))}
       </ul>
+      <p className={styles.disclaimer}>{t("recentResultsDisclaimer")}</p>
       <MatchDetailModal match={selectedMatch} onClose={() => setSelectedMatch(null)} />
     </section>
   );
