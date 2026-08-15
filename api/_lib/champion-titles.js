@@ -22,13 +22,25 @@ function extractAggregatesPayload(payload) {
     return payload;
   }
 
-  return (
+  const candidate =
     payload?.data ??
     payload?.champions ??
     payload?.aggregates ??
     payload?.byCountry ??
-    []
-  );
+    [];
+
+  if (Array.isArray(candidate)) {
+    return candidate;
+  }
+
+  if (candidate && typeof candidate === "object") {
+    return Object.entries(candidate).map(([country, titles]) => ({
+      country,
+      titles,
+    }));
+  }
+
+  return [];
 }
 
 function normalizeAggregate(entry) {
@@ -67,17 +79,34 @@ function normalizeAggregate(entry) {
 }
 
 function mergeAggregatesWithFallback(normalized = []) {
+  const apiBySlug = new Map();
+
+  normalized.forEach((entry) => {
+    if (!entry?.slug || entry.titles == null) {
+      return;
+    }
+
+    const existing = apiBySlug.get(entry.slug);
+
+    if (!existing) {
+      apiBySlug.set(entry.slug, { ...entry });
+      return;
+    }
+
+    apiBySlug.set(entry.slug, {
+      ...existing,
+      ...entry,
+      titles: (existing.titles ?? 0) + (entry.titles ?? 0),
+    });
+  });
+
   const bySlug = new Map(
     FALLBACK_AGGREGATES.map((entry) => [entry.slug, { ...entry }])
   );
 
-  normalized.forEach((entry) => {
-    if (!entry?.slug) {
-      return;
-    }
-
-    const existing = bySlug.get(entry.slug) ?? {};
-    bySlug.set(entry.slug, {
+  apiBySlug.forEach((entry, slug) => {
+    const existing = bySlug.get(slug) ?? {};
+    bySlug.set(slug, {
       ...existing,
       ...entry,
       titles: entry.titles ?? existing.titles,

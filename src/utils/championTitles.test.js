@@ -30,4 +30,34 @@ describe("champion-titles API helpers", () => {
     expect(merged.find((entry) => entry.slug === "brasil")?.titles).toBe(5);
     expect(merged.find((entry) => entry.slug === "francia")?.titles).toBe(2);
   });
+
+  it("extracts aggregates from a Zafronix byCountry object", () => {
+    expect(
+      extractAggregatesPayload({
+        byCountry: {
+          Spain: 2,
+          Argentina: 3,
+        },
+      })
+    ).toEqual([
+      { country: "Spain", titles: 2 },
+      { country: "Argentina", titles: 3 },
+    ]);
+  });
+
+  it("merges Spain's second title from the API over the fallback", () => {
+    const extracted = extractAggregatesPayload({
+      byCountry: {
+        Spain: 2,
+        "West Germany": 3,
+        Germany: 1,
+      },
+    });
+    const merged = mergeAggregatesWithFallback(
+      extracted.map(normalizeAggregate).filter(Boolean)
+    );
+
+    expect(merged.find((entry) => entry.slug === "españa")?.titles).toBe(2);
+    expect(merged.find((entry) => entry.slug === "alemania")?.titles).toBe(4);
+  });
 });

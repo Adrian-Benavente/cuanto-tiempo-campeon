@@ -60,6 +60,47 @@ function getMatchScores(match) {
   return { homeScore: undefined, awayScore: undefined };
 }
 
+function normalizeTeamLabel(name) {
+  return String(name ?? "")
+    .trim()
+    .toLowerCase();
+}
+
+function isChampionSide(teamName, championName, resolveName) {
+  const team = normalizeTeamLabel(teamName);
+  const champion = normalizeTeamLabel(championName);
+
+  if (!team || !champion) {
+    return false;
+  }
+
+  if (team === champion) {
+    return true;
+  }
+
+  const resolvedTeam = normalizeTeamLabel(resolveName(teamName) || teamName);
+  const resolvedChampion = normalizeTeamLabel(
+    resolveName(championName) || championName
+  );
+
+  return (
+    resolvedTeam === champion ||
+    resolvedTeam === resolvedChampion ||
+    team === resolvedChampion
+  );
+}
+
+function pickOpponentByScore(home, away, homeScore, awayScore) {
+  const homeValue = Number(homeScore);
+  const awayValue = Number(awayScore);
+
+  if (!Number.isNaN(homeValue) && !Number.isNaN(awayValue) && homeValue !== awayValue) {
+    return homeValue > awayValue ? away : home;
+  }
+
+  return away;
+}
+
 function formatFinalSummary(finalMatch, championName, resolveName = (name) => name) {
   if (!finalMatch) {
     return null;
@@ -73,9 +114,13 @@ function formatFinalSummary(finalMatch, championName, resolveName = (name) => na
     return null;
   }
 
-  const championLower = championName.toLowerCase();
-  const opponentRaw =
-    home.toLowerCase() === championLower || home === championName ? away : home;
+  const homeIsChampion = isChampionSide(home, championName, resolveName);
+  const awayIsChampion = isChampionSide(away, championName, resolveName);
+  const opponentRaw = homeIsChampion
+    ? away
+    : awayIsChampion
+      ? home
+      : pickOpponentByScore(home, away, homeScore, awayScore);
   const opponent = resolveName(opponentRaw) || opponentRaw;
 
   return `${championName} ganó la final ${homeScore}-${awayScore} ante ${opponent}.`;

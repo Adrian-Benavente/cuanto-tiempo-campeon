@@ -93,4 +93,36 @@ describe("formatFinalSummary", () => {
   it("returns null when required fields are missing", () => {
     expect(formatFinalSummary({ stage: "final" }, "Argentina")).toBeNull();
   });
+
+  it("matches a translated champion name against Zafronix English team names", () => {
+    const summary = formatFinalSummary(
+      {
+        stage: "final",
+        homeTeam: "Spain",
+        awayTeam: "Argentina",
+        homeScore: 1,
+        awayScore: 0,
+      },
+      "España",
+      (name) => resolveCountryMeta(name)?.displayName ?? name
+    );
+
+    expect(summary).toBe("España ganó la final 1-0 ante Argentina.");
+  });
+
+  it("picks the home team as opponent when the champion is the away side", () => {
+    const summary = formatFinalSummary(
+      {
+        stage: "final",
+        homeTeam: "Croatia",
+        awayTeam: "France",
+        homeScore: 2,
+        awayScore: 4,
+      },
+      "Francia",
+      (name) => resolveCountryMeta(name)?.displayName ?? name
+    );
+
+    expect(summary).toBe("Francia ganó la final 2-4 ante Croatia.");
+  });
 });
